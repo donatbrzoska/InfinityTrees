@@ -75,6 +75,7 @@ public class TreeCreator : MonoBehaviour {
 
         //squeezedTree();
         normalTree();
+        //hollowNormalTree();
         //demoTree();
         //bigTree();
 
@@ -170,6 +171,38 @@ public class TreeCreator : MonoBehaviour {
         tree.Grow(40, cylinderResolution);
     }
 
+    void hollowNormalTree() {
+        Vector3 center = new Vector3(0, 5f, 0);
+        float minDistance = 3.5f;
+        float maxDistance = 5f;
+        int amount = 2000;
+        HashSet<Vector3> attractionPoints = GenerateAttractionPoints_Outer(center, minDistance, maxDistance, amount);
+
+        GrowthProperties growthProperties = new GrowthProperties();
+        growthProperties.SetInfluenceDistance(2*maxDistance);
+        growthProperties.SetGrowthDistance(0.25f);
+        growthProperties.SetClearDistance(0.4f);
+        growthProperties.SetTropisms(new Vector3(0, 1f, 0));
+
+        growthProperties.SetMaxTwigRadiusForLeaves(0.02f);
+        growthProperties.SetMinLeafSize(0.1f);
+        growthProperties.SetMaxLeafSize(0.5f);
+        growthProperties.SetLeavesPerNode(2);
+
+        growthProperties.SetMaxBranchingAngle(80);
+        //growthProperties.SetNthRoot(1.f);
+        SpaceColonization grower = new SpaceColonization(attractionPoints, growthProperties);
+        //SpaceColonizationSimple grower = new SpaceColonizationSimple(attractionPoints, growthProperties);
+
+
+        Vector3 position = Vector3.zero;
+        tree = new Tree(position, grower, growthProperties);
+
+        cylinderResolution = 4;
+
+        tree.Grow(40, cylinderResolution);
+    }
+
     //void demoTree() {
     //    Vector3 center = new Vector3(0, 5f, 0);
     //    float maxDistance = 5f;
@@ -219,6 +252,7 @@ public class TreeCreator : MonoBehaviour {
 
         growthProperties.SetMaxBranchingAngle(80);
         SpaceColonization grower = new SpaceColonization(attractionPoints, growthProperties);
+        //SimpleSpaceColonization grower = new SimpleSpaceColonization(attractionPoints, growthProperties);
 
 
         Vector3 position = Vector3.zero;
@@ -254,6 +288,24 @@ public class TreeCreator : MonoBehaviour {
 
             float distance = (point - center).magnitude;
             if (distance <= radius) {
+                result.Add(point);
+            }
+        }
+
+        return result;
+    }
+
+
+    HashSet<Vector3> GenerateAttractionPoints_Outer(Vector3 center, float minRadius, float maxRadius, int amount) {
+        HashSet<Vector3> result = new HashSet<Vector3>();
+        while (result.Count < amount) {
+            float x = UnityEngine.Random.Range(-maxRadius, maxRadius);
+            float y = UnityEngine.Random.Range(-maxRadius, maxRadius);
+            float z = UnityEngine.Random.Range(-maxRadius, maxRadius);
+            Vector3 point = new Vector3(x, y, z) + center;
+
+            float distance = (point - center).magnitude;
+            if (distance <= maxRadius && distance >= minRadius) {
                 result.Add(point);
             }
         }

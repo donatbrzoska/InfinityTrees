@@ -98,7 +98,7 @@ public class Tree {
             List<Vector2> uvsTmp = new List<Vector2>();
             List<int> trianglesTmp = new List<int>();
 
-            CalculateEverythingHelper(root, nodeVerticesPositions, 0, verticesTmp, uvsTmp, trianglesTmp, cylinderResolution, curveResolution);
+            CalculateEverything(root, nodeVerticesPositions, 0, verticesTmp, uvsTmp, trianglesTmp, cylinderResolution, curveResolution);
 
 
             //What happens, when a new node is added while iterating through the TMP List?
@@ -129,12 +129,8 @@ public class Tree {
         triangles = this.triangles;
     }
 
-    //private void CalculateEverything() {
-
-    //}
-
     //looks at the current node, builds cylinders to it's subnodes and recursively calls the function for all subnodes
-    private void CalculateEverythingHelper(Node node, Dictionary<Node, int> nodeVerticesPositions, float vOffset, List<Vector3> verticesResult, List<Vector2> uvsResult, List<int> trianglesResult, int cylinderResolution, int curveResolution) {
+    private void CalculateEverything(Node node, Dictionary<Node, int> nodeVerticesPositions, float vOffset, List<Vector3> verticesResult, List<Vector2> uvsResult, List<int> trianglesResult, int cylinderResolution, int curveResolution) {
         if (node.IsRoot()) {
             CalculateAndStoreVertices(node, nodeVerticesPositions, verticesResult, cylinderResolution, false);
             CalculateAndStoreUVs(vOffset, uvsResult, cylinderResolution);
@@ -171,7 +167,7 @@ public class Tree {
             //}
 
             //recursive call
-            CalculateEverythingHelper(subnode, nodeVerticesPositions, vOffset, verticesResult, uvsResult, trianglesResult, cylinderResolution, curveResolution);
+            CalculateEverything(subnode, nodeVerticesPositions, vOffset, verticesResult, uvsResult, trianglesResult, cylinderResolution, curveResolution);
         }
     }
 

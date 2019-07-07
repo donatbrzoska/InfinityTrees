@@ -39,21 +39,52 @@ public class SpaceColonization : Grower {
         Dictionary<Node, List<Vector3>> nodesAttractionPoints = new Dictionary<Node, List<Vector3>>();
         List<Node> nodeList = root.GetNodeList();
 
+        //List<Thread> threads = new List<Thread>();
+
         //iterate through all attractionPoints
         foreach (Vector3 attractionPoint in attractionPoints) {
-            //and find the closest Node respectively
-            Node closest = FindClosestNode(nodeList, attractionPoint);
+            //if (threadsLeft > 0) {
+            //    threadsLeft--;
+            //    Thread t = new Thread(() => {
+            //        //and find the closest Node respectively
+            //        Node closest = FindClosestNode(nodeList, attractionPoint);
 
-            //if there is a close Node
-            if (closest != null) {
-                //add it to the nodesAttractionPoints
-                if (nodesAttractionPoints.ContainsKey(closest)) {
-                    nodesAttractionPoints[closest].Add(attractionPoint);
-                } else {
-                    nodesAttractionPoints[closest] = new List<Vector3> { attractionPoint };
+            //        //if there is a close Node
+            //        if (closest != null) {
+            //            lock (nodesAttractionPoints) { //make sure, multiple threads don't access the dictionary while modifying it
+            //                //add it to the nodesAttractionPoints
+            //                if (nodesAttractionPoints.ContainsKey(closest)) {
+            //                    nodesAttractionPoints[closest].Add(attractionPoint);
+            //                } else {
+            //                    nodesAttractionPoints[closest] = new List<Vector3> { attractionPoint };
+            //                }
+            //            }
+            //        }
+            //        threadsLeft++; //TODO: synchronize this?
+            //    });
+            //    threads.Add(t);
+            //    t.Start();
+            //} else {
+                //and find the closest Node respectively
+                Node closest = FindClosestNode(attractionPoint, nodeList);
+
+                //if there is a close Node
+                if (closest != null) {
+                    //lock (nodesAttractionPoints) { //make sure, multiple threads don't access the dictionary while modifying it
+                        //add it to the nodesAttractionPoints
+                        if (nodesAttractionPoints.ContainsKey(closest)) {
+                            nodesAttractionPoints[closest].Add(attractionPoint);
+                        } else {
+                            nodesAttractionPoints[closest] = new List<Vector3> { attractionPoint };
+                        }
+                    //}
                 }
-            }
+            //}
         }
+
+        //foreach (Thread t in threads) {
+        //    t.Join();
+        //}
 
         List<Vector3> newPositions = new List<Vector3>();
         //iterate through all Nodes with attractionPoints associated
@@ -81,19 +112,44 @@ public class SpaceColonization : Grower {
     }
 
     //returns null if there is no closest node
-    Node FindClosestNode(List<Node> nodeList, Vector3 attractionPoint) {
+    Node FindClosestNode(Vector3 attractionPoint, List<Node> nodeList) {
         Node closest = null;
 
         float minDistance = growthProperties.GetSquaredInfluenceDistance();
 
         foreach (Node current in nodeList) {
-            float quadraticDistanceToCurrent = GetQuadraticDistance(current.GetPosition(), attractionPoint);
+            float quadraticDistanceToCurrent = 0;
 
-            if (quadraticDistanceToCurrent <= minDistance) {
-                minDistance = quadraticDistanceToCurrent;
-                closest = current;
+            float dx = current.GetPosition().x - attractionPoint.x;
+            quadraticDistanceToCurrent += dx * dx;
+            if (quadraticDistanceToCurrent > minDistance) {
+                continue;
             }
+
+            float dy = current.GetPosition().y - attractionPoint.y;
+            quadraticDistanceToCurrent += dy * dy;
+            if (quadraticDistanceToCurrent > minDistance) {
+                continue;
+            }
+
+            float dz = current.GetPosition().z - attractionPoint.z;
+            quadraticDistanceToCurrent += dz * dz;
+            if (quadraticDistanceToCurrent > minDistance) {
+                continue;
+            }
+
+            minDistance = quadraticDistanceToCurrent;
+            closest = current;
         }
+
+        //foreach (Node current in nodeList) {
+        //    float quadraticDistanceToCurrent = GetQuadraticDistance(current.GetPosition(), attractionPoint);
+
+        //    if (quadraticDistanceToCurrent <= minDistance) {
+        //        minDistance = quadraticDistanceToCurrent;
+        //        closest = current;
+        //    }
+        //}
 
         return closest;
     }

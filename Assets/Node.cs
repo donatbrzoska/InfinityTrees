@@ -25,6 +25,7 @@ public class Node : IEquatable<Node>{
     private Vector3 normal;
     private float radius;
 
+
     private Node supernode;
     private List<Node> subnodes = new List<Node>();
 
