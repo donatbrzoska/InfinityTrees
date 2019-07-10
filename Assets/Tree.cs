@@ -31,28 +31,28 @@ public class Tree {
 
     private Grower grower;
 
-    private GrowthProperties growthProperties;
+    private GeometryProperties geometryProperties;
 
     private Node root;
 
     private int age;
 
 
-    private int ageAtPreviousCalculation;
+    private int ageAtPreviousCalculation = -1;
     private Vector3[] vertices;
     private Vector3[] normals;
     private Vector2[] uvs;
     private int[] triangles;
 
 
-    public Tree(Vector3 position, Grower grower, GrowthProperties growthProperties) {
+    public Tree(Vector3 position, Grower grower, GeometryProperties geometryProperties) {
         this.grower = grower;
-        this.growthProperties = growthProperties;
+        this.geometryProperties = geometryProperties;
 
-        root = new Node(position, growthProperties);
+        root = new Node(position, geometryProperties);
     }
 
-    public void Grow(int iterations, int res) {
+    public void Grow(int iterations) {
 
         Thread t = new Thread(() => {
             Stopwatch growingStopwatch = new Stopwatch();
@@ -64,6 +64,10 @@ public class Tree {
 
                 grower.Apply(root);
                 age++;
+
+                if (grower.GetGrowthProperties().GetHangingBranchesEnabled() && i > iterations * grower.GetGrowthProperties().GetHangingBranchesFromAgeRatio()) {
+                    grower.GetGrowthProperties().SetTropisms(new Vector3(0, -1f, 0));
+                }
 
                 iterationStopwatch.Stop();
                 debug(new FormatString("iteration {0} took {1}", i, iterationStopwatch.Elapsed));
@@ -77,10 +81,19 @@ public class Tree {
             //GetEverything(ref vertices, ref normals, ref uvs, ref triangles, res, -1);
             //getStopwatch.Stop();
             //debug("vertex, normal, uv and triangle calculations took " + getStopwatch.Elapsed);
+            Thread.Sleep(100);
 
             debug(new FormatString("{0} vertices, {1} triangles", vertices.Length, triangles.Length/3));
         });
         t.Start();
+    }
+
+    public void Regrow() {
+        grower.GetGrowthProperties().Reset();
+
+        age = 0;
+        root = new Node(Vector3.zero, geometryProperties);
+        Grow(30);
     }
 
 
@@ -88,9 +101,9 @@ public class Tree {
 
 
 
-    public void GetEverything(ref Vector3[] vertices, ref Vector3[] normals, ref Vector2[] uvs, ref int[] triangles, int cylinderResolution, int curveResolution) {
+    public void GetEverything(ref Vector3[] vertices, ref Vector3[] normals, ref Vector2[] uvs, ref int[] triangles) {
         int currentAge = age; //only recalculate everything, when there where changes
-        if ((ageAtPreviousCalculation < currentAge) || (currentAge == 0)) {
+        if ((ageAtPreviousCalculation != currentAge)) {// || (currentAge == 0)) {
 
             Dictionary<Node, int> nodeVerticesPositions = new Dictionary<Node, int>();
 
@@ -98,7 +111,7 @@ public class Tree {
             List<Vector2> uvsTmp = new List<Vector2>();
             List<int> trianglesTmp = new List<int>();
 
-            CalculateEverything(root, nodeVerticesPositions, 0, verticesTmp, uvsTmp, trianglesTmp, cylinderResolution, curveResolution);
+            CalculateEverything(root, nodeVerticesPositions, 0, verticesTmp, uvsTmp, trianglesTmp);
 
 
             //What happens, when a new node is added while iterating through the TMP List?
@@ -130,11 +143,11 @@ public class Tree {
     }
 
     //looks at the current node, builds cylinders to it's subnodes and recursively calls the function for all subnodes
-    private void CalculateEverything(Node node, Dictionary<Node, int> nodeVerticesPositions, float vOffset, List<Vector3> verticesResult, List<Vector2> uvsResult, List<int> trianglesResult, int cylinderResolution, int curveResolution) {
+    private void CalculateEverything(Node node, Dictionary<Node, int> nodeVerticesPositions, float vOffset, List<Vector3> verticesResult, List<Vector2> uvsResult, List<int> trianglesResult) {
         if (node.IsRoot()) {
-            CalculateAndStoreVertices(node, nodeVerticesPositions, verticesResult, cylinderResolution, false);
-            CalculateAndStoreUVs(vOffset, uvsResult, cylinderResolution);
-            vOffset += growthProperties.GetGrowthDistance();
+            CalculateAndStoreCylinderVertices(node, nodeVerticesPositions, verticesResult, false);
+            CalculateAndStoreCylinderUVs(vOffset, uvsResult);
+            vOffset += grower.GetGrowthProperties().GetGrowthDistance(); //TODO: this is a little inaccurate
         }
 
         int n_subnodes = node.GetSubnodes().Count;
@@ -142,38 +155,27 @@ public class Tree {
             Node subnode = node.GetSubnodes()[i];
 
             //calculate and store vertices
-            CalculateAndStoreVertices(subnode, nodeVerticesPositions, verticesResult, cylinderResolution, false);
+            CalculateAndStoreCylinderVertices(subnode, nodeVerticesPositions, verticesResult, false);
 
             //calculate and store uvs
-            CalculateAndStoreUVs(vOffset, uvsResult, cylinderResolution);
-            vOffset += growthProperties.GetGrowthDistance();
+            CalculateAndStoreCylinderUVs(vOffset, uvsResult);
+            vOffset += grower.GetGrowthProperties().GetGrowthDistance(); //TODO: this is a little inaccurate
 
             //calculate triangles between the node's vertices and the subnode's vertices
-            CalculateAndStoreCylinderTriangles(nodeVerticesPositions[node], nodeVerticesPositions[subnode], trianglesResult, cylinderResolution);
+            CalculateAndStoreCylinderTriangles(nodeVerticesPositions[node], nodeVerticesPositions[subnode], trianglesResult);
 
-            //TODO: parametrisieren
-            //calculate and store leaf triangles
-            //if (subnode.GetRadius() < growthProperties.GetMaxTwigRadiusForLeaves()) {
-            //    for (int j = 0; j < growthProperties.GetLeavesPerNode(); j++) {
-            //        CalculateAndStoreLeafTriangles(
-            //            subnode.GetPosition(),
-            //            growthProperties.GetLeafRotationAxis(),
-            //            growthProperties.GetLeafRotationAngle(),
-            //            growthProperties.GetLeafSize(),
-            //            verticesResult,
-            //            uvsResult,
-            //            trianglesResult);
-            //    }
-            //}
+			//calculate and store leaf triangles
+			subnode.CalculateAndStoreLeafData(verticesResult, uvsResult, trianglesResult);
+
 
             //recursive call
-            CalculateEverything(subnode, nodeVerticesPositions, vOffset, verticesResult, uvsResult, trianglesResult, cylinderResolution, curveResolution);
+            CalculateEverything(subnode, nodeVerticesPositions, vOffset, verticesResult, uvsResult, trianglesResult);
         }
     }
 
-    private void CalculateAndStoreVertices(Node node, Dictionary<Node, int> nodeVerticesPostions, List<Vector3> verticesResult, int cylinderResolution, bool doubled) {
+    private void CalculateAndStoreCylinderVertices(Node node, Dictionary<Node, int> nodeVerticesPostions, List<Vector3> verticesResult, bool doubled) {
         //calculate vertices of the current node
-        Vector3[] vertices = node.GetVertices(cylinderResolution, doubled);
+        Vector3[] vertices = node.GetCircleVertices(doubled);
         //store the position of the node's vertices (the position in the 'global' vertices array)
         nodeVerticesPostions[node] = verticesResult.Count;
         TreeUtil.InsertArrayIntoList(vertices, verticesResult);
@@ -181,89 +183,26 @@ public class Tree {
 
     //TODO: u in Abhängigkeit von Radius?
     //TODO: v kontinuierlich und abhängig von der growthDistance -> uPointer oder sowas, Distancen zu vorherigen Nodes benötigt...
-    private void CalculateAndStoreUVs(float v, List<Vector2> uvsResult, int cylinderResolution) {
-        float circle_segment_size = 0.5f / cylinderResolution;
+    private void CalculateAndStoreCylinderUVs(float v, List<Vector2> uvsResult) {
+        //float circle_segment_size = 0.5f / geometryProperties.GetCircleResolution();
+        //float circle_segment_size = 0.4f / geometryProperties.GetCircleResolution();
 
-        float u = 0;
-        for (int i = 0; i < cylinderResolution + 1; i++) {
+        float u = 0.1f;
+        for (int i = 0; i < geometryProperties.GetCircleResolution() + 1; i++) {
             Vector2 uv = new Vector2(u, v);
             uvsResult.Add(uv);
 
-            u += circle_segment_size;
+            //u += circle_segment_size;
         }
     }
 
-    private void CalculateAndStoreCylinderTriangles(int from, int to, List<int> trianglesResult, int cylinderResolution) {
-        int[] cylinderTriangles = TreeUtil.CalculateCylinderTriangles(from, to, cylinderResolution);
+    private void CalculateAndStoreCylinderTriangles(int from, int to, List<int> trianglesResult) {
+        int[] cylinderTriangles = TreeUtil.CalculateCylinderTriangles(from, to, geometryProperties.GetCircleResolution());
 
         //store the triangles in the 'global' temporary triangles array
         TreeUtil.InsertArrayIntoList(cylinderTriangles, trianglesResult);
     }
 
-    private void CalculateAndStoreLeafTriangles(Vector3 position, Vector3 rotationAxis, float rotationAngle, float size, List<Vector3> verticesResult,/* List<Vector3> normalsResult,*/ List<Vector2> uvsResult, List<int> trianglesResult) {
-
-        int verticesOffset = verticesResult.Count;
-
-        Quaternion rotation = Quaternion.AngleAxis(rotationAngle, rotationAxis);
-
-        //top side of leaf
-        verticesResult.Add(rotation * new Vector3(-0.5f, 0, 0) * size + position);
-        verticesResult.Add(rotation * new Vector3(-0.5f, 0, 1) * size + position);
-        verticesResult.Add(rotation * new Vector3(0.5f, 0, 1) * size + position);
-        verticesResult.Add(rotation * new Vector3(0.5f, 0, 0) * size + position);
-
-        //bottom side of leaf
-        verticesResult.Add(rotation * new Vector3(-0.5f, 0.0001f, 0) * size + position);
-        verticesResult.Add(rotation * new Vector3(-0.5f, 0.0001f, 1) * size + position);
-        verticesResult.Add(rotation * new Vector3(0.5f, 0.0001f, 1) * size + position);
-        verticesResult.Add(rotation * new Vector3(0.5f, 0.0001f, 0) * size + position);
-
-        //for (int i = 0; i < 4; i++) {
-        //    normalsResult.Add(Vector3.up); //TODO
-        //}
-
-        //top side of leaf
-        uvsResult.Add(new Vector2(0.5f, 0));
-        uvsResult.Add(new Vector2(0.5f, 1));
-        uvsResult.Add(new Vector2(1, 1));
-        uvsResult.Add(new Vector2(1, 0));
-
-        //bottom side of leaf
-        uvsResult.Add(new Vector2(0.5f, 0));
-        uvsResult.Add(new Vector2(0.5f, 1));
-        uvsResult.Add(new Vector2(1, 1));
-        uvsResult.Add(new Vector2(1, 0));
-
-
-        //top side of leaf
-        //triangle 1
-        trianglesResult.Add(verticesOffset + 0);
-        trianglesResult.Add(verticesOffset + 1);
-        trianglesResult.Add(verticesOffset + 2);
-        //triangle 2
-        trianglesResult.Add(verticesOffset + 0);
-        trianglesResult.Add(verticesOffset + 2);
-        trianglesResult.Add(verticesOffset + 3);
-
-        verticesOffset += 4; //TODO: ADJUST THIS WHEN ADDING VERTICES FOR LEAVES
-
-        //bottom side of leaf
-        //triangle 1
-        trianglesResult.Add(verticesOffset + 0);
-        trianglesResult.Add(verticesOffset + 2);
-        trianglesResult.Add(verticesOffset + 1);
-        //triangle 2
-        trianglesResult.Add(verticesOffset + 0);
-        trianglesResult.Add(verticesOffset + 3);
-        trianglesResult.Add(verticesOffset + 2);
-
-        //trianglesResult.Add(verticesOffset + 4);
-        //trianglesResult.Add(verticesOffset + 6);
-        //trianglesResult.Add(verticesOffset + 5);
-        //trianglesResult.Add(verticesOffset + 4);
-        //trianglesResult.Add(verticesOffset + 7);
-        //trianglesResult.Add(verticesOffset + 6);
-    }
 
     ////looks at the current node, builds cylinders to it's subnodes and recursively calls the function for all subnodes
     //private void CalculateVerticesAndTriangles(Node node, List< verticesResult, List< trianglesResult, int cylinderResolution, int curveResolution) {
@@ -528,83 +467,61 @@ public static class TreeUtil {
     }
 
     public static Vector3[] CalculateNormals(Vector3[] vertices, int[] triangles) {
-        Dictionary<Vector3, Vector3> verticesToSummedNormals = new Dictionary<Vector3, Vector3>();
+        //debug("Calculating normals for " + vertices.Length + " vertices and " + triangles.Length + " triangles");
+        if (triangles.Length == 0) {
+            debug("No triangles ...");
+            Vector3[] normals = new Vector3[vertices.Length];
+            return normals;
+        } else {
+            Dictionary<Vector3, Vector3> verticesToSummedNormals = new Dictionary<Vector3, Vector3>();
 
-        //https://stackoverflow.com/questions/16340931/calculating-vertex-normals-of-a-mesh?noredirect=1&lq=1
-        //iterate through all triangles
-        int triangle_vertexPointer = 0;
-        while (triangle_vertexPointer<triangles.Length) {
-            // and calculate their normals
-            Vector3 a = vertices[triangles[triangle_vertexPointer++]];
-            Vector3 b = vertices[triangles[triangle_vertexPointer++]];
-            Vector3 c = vertices[triangles[triangle_vertexPointer++]];
+            //https://stackoverflow.com/questions/16340931/calculating-vertex-normals-of-a-mesh?noredirect=1&lq=1
+            //iterate through all triangles
+            int triangle_vertexPointer = 0;
+            while (triangle_vertexPointer < triangles.Length) {
+                // and calculate their normals
+                Vector3 a = vertices[triangles[triangle_vertexPointer++]];
+                Vector3 b = vertices[triangles[triangle_vertexPointer++]];
+                Vector3 c = vertices[triangles[triangle_vertexPointer++]];
 
-            Vector3 ab = b - a;
-            Vector3 ac = c - a;
-            Vector3 currentNormal = Vector3.Cross(ab, ac);
+                Vector3 ab = b - a;
+                Vector3 ac = c - a;
+                Vector3 currentNormal = Vector3.Cross(ab, ac);
 
-            // then, add the normal in the map to the respective vertex
-            if (verticesToSummedNormals.ContainsKey(a)) {
-                verticesToSummedNormals[a] += currentNormal;
-            } else {
-                verticesToSummedNormals[a] = currentNormal;
+                // then, add the normal in the map to the respective vertex
+                if (verticesToSummedNormals.ContainsKey(a)) {
+                    verticesToSummedNormals[a] += currentNormal;
+                } else {
+                    verticesToSummedNormals[a] = currentNormal;
+                }
+
+                if (verticesToSummedNormals.ContainsKey(b)) {
+                    verticesToSummedNormals[b] += currentNormal;
+                } else {
+                    verticesToSummedNormals[b] = currentNormal;
+                }
+
+                if (verticesToSummedNormals.ContainsKey(c)) {
+                    verticesToSummedNormals[c] += currentNormal;
+                } else {
+                    verticesToSummedNormals[c] = currentNormal;
+                }
             }
 
-            if (verticesToSummedNormals.ContainsKey(b)) {
-                verticesToSummedNormals[b] += currentNormal;
-            } else {
-                verticesToSummedNormals[b] = currentNormal;
+            //normalize all the summed normals
+            foreach (Vector3 normal in verticesToSummedNormals.Values) {
+                normal.Normalize();
             }
 
-            if (verticesToSummedNormals.ContainsKey(c)) {
-                verticesToSummedNormals[c] += currentNormal;
-            } else {
-                verticesToSummedNormals[c] = currentNormal;
+            //put the calculated normals in an array, retrieving the respective normal for each vertex
+            Vector3[] normals = new Vector3[vertices.Length];
+            for (int i = 0; i < vertices.Length; i++) {
+                Vector3 associatedVertex = vertices[i];
+                normals[i] = verticesToSummedNormals[associatedVertex];
             }
+
+            return normals;
         }
-
-        //for (int i = 0; i < triangles.Length-2; i += 3) {
-        //    // and calculate their normals
-        //    Vector3 a = vertices[triangles[i]];
-        //    Vector3 b = vertices[triangles[i + 1]];
-        //    Vector3 c = vertices[triangles[i + 2]];
-
-        //    Vector3 ab = b - a;
-        //    Vector3 ac = c - a;
-        //    Vector3 currentNormal = Vector3.Cross(ab, ac);
-
-        //    // then, add the normal in the map to the respective vertex
-        //    if (verticesToSummedNormals.ContainsKey(a)) {
-        //        verticesToSummedNormals[a] += currentNormal;
-        //    } else {
-        //        verticesToSummedNormals[a] = currentNormal;
-        //    }
-
-        //    if (verticesToSummedNormals.ContainsKey(b)) {
-        //        verticesToSummedNormals[b] += currentNormal;
-        //    } else {
-        //        verticesToSummedNormals[b] = currentNormal;
-        //    }
-
-        //    if (verticesToSummedNormals.ContainsKey(c)) {
-        //        verticesToSummedNormals[c] += currentNormal;
-        //    } else {
-        //        verticesToSummedNormals[c] = currentNormal;
-        //    }
-        //}
-
-        //normalize all the summed normals
-        foreach (Vector3 normal in verticesToSummedNormals.Values) {
-            normal.Normalize();
-        }
-
-        //put the calculated normals in an array, retrieving the respective normal for each vertex
-        Vector3[] normals = new Vector3[vertices.Length];
-        for (int i = 0; i < vertices.Length; i++) {
-            Vector3 associatedVertex = vertices[i];
-            normals[i] = verticesToSummedNormals[associatedVertex];
-        }
-
-        return normals;
     }
+
 }

@@ -19,100 +19,48 @@ public class Node : IEquatable<Node>{
         }
     }
 
-    private GrowthProperties growthProperties;
+    private GeometryProperties geometryProperties;
 
     private Vector3 position;
     private Vector3 normal;
     private float radius;
-
+    
 
     private Node supernode;
     private List<Node> subnodes = new List<Node>();
+    private List<Leaf> leaves = new List<Leaf>();
 
-    public Node(Vector3 position, GrowthProperties growthProperties) : this(position, 0, null, growthProperties) { }
+    public Node(Vector3 position, GeometryProperties geometryProperties) : this(position, null, geometryProperties) { }
 
-    private Node(Vector3 position, float radius, Node supernode, GrowthProperties growthProperties) {
+    private Node(Vector3 position, Node supernode, GeometryProperties geometryProperties) {
         this.position = position;
-        this.radius = radius;
         this.supernode = supernode;
+        this.radius = geometryProperties.GetTipRadius();
 
-        this.growthProperties = growthProperties;
+        this.geometryProperties = geometryProperties;
 
         CalculateNormal();
+
+
+        //add leaves
+        for (int i = 0; i < geometryProperties.GetLeavesPerNode(); i++) {
+            leaves.Add(new Leaf(position, geometryProperties));
+        }
     }
 
-    private bool IsDuplicateNode(Vector3 position) {
-        foreach (Node subnode in subnodes) {
-            if (subnode.GetPosition().Equals(position)) {
-                //debug("given node is already a subnode");
-                return true;
-            }
+    public void Add(Vector3 position) {
+        //the following needs to be one atomic step, because as soon as there is a new subnode, the current normal is not valid anymore
+        // and when GetVertices() would get called in between, there would be an invalid result
+        lock (this) { //the corresponding lock is located at GetVertices()
+            Node completeNode = new Node(position, this, geometryProperties);
+
+            //add the node
+            subnodes.Add(completeNode);
+
+            //recalculate the normal
+            CalculateNormal();
         }
-
-        return false;
-    }
-
-    private bool IsGrowingBackwards(Vector3 position) {
-        Vector3 thisNodeToNewNode = position - this.position;
-
-        Vector3 superNodeToThisNode;
-        if (supernode != null) {
-            superNodeToThisNode = this.position - supernode.GetPosition();
-        } else {
-            superNodeToThisNode = Vector3.up;
-        }
-
-        float angle = Vector3.Angle(thisNodeToNewNode, superNodeToThisNode);
-
-        if (angle > growthProperties.GetMaxBranchingAngle()) {
-            //debug("backwards growing twig detected");
-            return true;
-        }
-
-        return false;
-    }
-
-    //WRITE: this is way better than a minimum Angle to all other nodes (apart from the fact how one would calculate this)
-    private bool IsTooClose(Vector3 position) {
-        //lock (this) { //TODO: is this lock necessary? (no subnode should be added while looping through this)
-            foreach (Node subnode in subnodes) {
-                float distance = Vector3.Distance(position, subnode.GetPosition());
-                if (distance < growthProperties.GetMinDistanceToExistingNodes()) {
-                    //debug("node too close to an existing node");
-                    return true;
-                }
-            }
-
-        return false;
-        //}
-    }
-
-    public bool Add(Vector3 position) {
-        //make sure, that the new node does not exist yet, doesn't grow "backwards", and not too close to an existing branch
-        if (!IsDuplicateNode(position)
-            && !IsGrowingBackwards(position)
-            && !IsTooClose(position)) {
-
-            //the following needs to be one atomic step, because as soon as there is a new subnode, the current normal is not valid anymore
-            // and when GetVertices() would get called in between, there would be an invalid result
-            lock (this) { //the corresponding lock is located at GetVertices()
-                //Node completeNode = new Node(position, this.radius * radiusRatio, this);
-                Node completeNode = new Node(position, growthProperties.GetTipRadius(), this, growthProperties);
-
-                //3. add the node
-                subnodes.Add(completeNode);
-                //debug("added node at " + position.ToString());
-
-                //4. recalculate the normal
-                CalculateNormal();
-
-
-                RecalculateRadii(); //TODO: put outside lock?
-            }
-            return true;
-        } else {
-            return false;
-        }
+        RecalculateRadii();
     }
 
     public bool IsRoot() {
@@ -135,6 +83,15 @@ public class Node : IEquatable<Node>{
         return normal;
     }
 
+    public Vector3 GetDirection() {
+        if (this.IsRoot()) {
+            return Vector3.up;
+        } else {
+            return position - supernode.position;
+            //return supernode.position - position;
+        }
+    }
+
     private void CalculateNormal() {
         if (supernode == null) { //if this is the root node
             if (!this.HasSubnodes()) { //no subnodes
@@ -142,12 +99,21 @@ public class Node : IEquatable<Node>{
                 normal = Vector3.up;
             } else if (subnodes.Count == 1) { //one subnode
                 //point to subnode
-                normal = ((Node)subnodes[0]).position - position; //vector from this to subnode
+                //normal = subnodes[0].position - position; //vector from this to subnode
+
+                normal = Vector3.up;
             } else { //many subnodes
-                //TODO: point to the thickest subnode the most?
-                normal = Vector3.zero;
+
+                //normal = Vector3.zero;
+                //foreach (Node subnode in subnodes) {
+                //    normal = normal + subnode.GetPosition() - position;
+                //}
+
+                //normal = Vector3.up;
+
+                normal = Vector3.up * this.radius;
                 foreach (Node subnode in subnodes) {
-                    normal = normal + subnode.GetPosition() - position;
+                    normal = normal + (subnode.GetPosition() - position) * subnode.GetRadius();
                 }
             }
         } else {
@@ -157,27 +123,40 @@ public class Node : IEquatable<Node>{
             } else if (subnodes.Count == 1) { //one subnode
                 //find tangent between(vector pointing from super to this, vector pointing from this to sub)
                 Vector3 superToThis = position - supernode.GetPosition();
-                Vector3 thisToSub = ((Node)subnodes[0]).GetPosition() - position;
-                normal = thisToSub.normalized + superToThis.normalized;
+                Vector3 thisToSub = subnodes[0].GetPosition() - position;
+                //normal = thisToSub.normalized + superToThis.normalized;
+                normal = thisToSub + superToThis;
             } else { //many subnodes
-                //TODO: point to the thickest subnode the most?
+                // #####
+                // TODO: SOMETHING IS WRONG HERE MAKING THE NORMALS FLIP OVER SOMETIMES
+                // #####
+
                 //normal = supernode.GetNormal();
-                normal = Vector3.zero;
+
+                //normal = Vector3.zero;
+
+                //normal = subnodes[0].GetPosition() - position;
+                //foreach (Node subnode in subnodes) {
+                //    normal = normal + subnode.GetPosition() - position;
+                //}
+
+                //normal = position - supernode.GetPosition();
+
+                normal = (position - supernode.GetPosition()) * this.radius;
                 foreach (Node subnode in subnodes) {
-                    normal = normal + subnode.GetPosition() - position;
+                    normal = normal + (subnode.GetPosition() - position) * subnode.GetRadius();
                 }
             }
         }
     }
 
     public void RecalculateRadii() {
-
         float summedPottedSubnodeRadii = 0;
         foreach (Node subnode in subnodes) {
-            summedPottedSubnodeRadii += (float) Math.Pow(subnode.GetRadius(), growthProperties.GetNthRoot());
+            summedPottedSubnodeRadii += (float) Math.Pow(subnode.GetRadius(), geometryProperties.GetNthRoot());
         }
 
-        radius = (float) Math.Pow(summedPottedSubnodeRadii, 1f/growthProperties.GetNthRoot());
+        radius = (float) Math.Pow(summedPottedSubnodeRadii, 1f/geometryProperties.GetNthRoot());
 
         if (!this.IsRoot()) {
             supernode.RecalculateRadii();
@@ -204,9 +183,19 @@ public class Node : IEquatable<Node>{
     }
 
 
-    public Vector3[] GetVertices(int resolution, bool doubled) {
+    public Vector3[] GetCircleVertices(bool doubled) {
         lock (this) {
-            return TreeUtil.CalculateCircleVertices(position, normal, radius, resolution, doubled);
+            return TreeUtil.CalculateCircleVertices(position, normal, radius, geometryProperties.GetCircleResolution(), doubled);
+        }
+    }
+
+    public void CalculateAndStoreLeafData(List<Vector3> verticesResult, List<Vector2> uvsResult, List<int> trianglesResult) {
+        if (geometryProperties.GetLeavesEnabled()) {
+            if (radius < geometryProperties.GetMaxTwigRadiusForLeaves()) {
+                foreach (Leaf leaf in leaves) {
+                    leaf.CalculateAndStoreGeometry(verticesResult, uvsResult, trianglesResult);
+                }
+            }
         }
     }
 

@@ -167,59 +167,59 @@ public class LeafCreator : MonoBehaviour
     //}
 }
 
-public class Leaf {
-    Vector3 position;
-    Vector3 normal;
-    Vector3 direction;
+//public class Leaf {
+//    Vector3 position;
+//    Vector3 normal;
+//    Vector3 direction;
 
-    float size;
+//    float size;
 
-    public Leaf(Vector3 position, Vector3 normal, Vector3 direction, float size) {
-        this.position = position;
-        this.normal = normal;
-        this.direction = direction;
-        this.size = size;
-    }
+//    public Leaf(Vector3 position, Vector3 normal, Vector3 direction, float size) {
+//        this.position = position;
+//        this.normal = normal;
+//        this.direction = direction;
+//        this.size = size;
+//    }
 
-    public void GetEverything(ref Vector3[] vertices, ref Vector3[] normals, ref Vector2[] uvs, ref int[] triangles) {
-        //Vector3 normalAxis = Vector3.Cross(Vector3.up, normal);
-        //float normalAngle = Vector3.Angle(Vector3.up, normal);
-        //Quaternion normalRotation = Quaternion.AngleAxis(normalAngle, normalAxis);
+//    public void GetEverything(ref Vector3[] vertices, ref Vector3[] normals, ref Vector2[] uvs, ref int[] triangles) {
+//        //Vector3 normalAxis = Vector3.Cross(Vector3.up, normal);
+//        //float normalAngle = Vector3.Angle(Vector3.up, normal);
+//        //Quaternion normalRotation = Quaternion.AngleAxis(normalAngle, normalAxis);
 
-        Vector3 directionAxis = Vector3.Cross(new Vector3(0, 0, 1), direction);
-        float directionAngle = Vector3.Angle(new Vector3(0, 0, 1), direction);
-        Quaternion directionRotation = Quaternion.AngleAxis(directionAngle, directionAxis);
+//        Vector3 directionAxis = Vector3.Cross(new Vector3(0, 0, 1), direction);
+//        float directionAngle = Vector3.Angle(new Vector3(0, 0, 1), direction);
+//        Quaternion directionRotation = Quaternion.AngleAxis(directionAngle, directionAxis);
 
-        vertices = new Vector3[4];
-        vertices[0] = directionRotation * new Vector3(-0.5f, 0, 0)*size + position;
-        vertices[1] = directionRotation * new Vector3(-0.5f, 0, 1)*size + position;
-        vertices[2] = directionRotation * new Vector3(0.5f, 0, 1)*size + position;
-        vertices[3] = directionRotation * new Vector3(0.5f, 0, 0)*size + position;
+//        vertices = new Vector3[4];
+//        vertices[0] = directionRotation * new Vector3(-0.5f, 0, 0)*size + position;
+//        vertices[1] = directionRotation * new Vector3(-0.5f, 0, 1)*size + position;
+//        vertices[2] = directionRotation * new Vector3(0.5f, 0, 1)*size + position;
+//        vertices[3] = directionRotation * new Vector3(0.5f, 0, 0)*size + position;
 
-        normals = new Vector3[4];
-        for (int i=0; i<normals.Length; i++) {
-            normals[i] = normal;
-        }
+//        normals = new Vector3[4];
+//        for (int i=0; i<normals.Length; i++) {
+//            normals[i] = normal;
+//        }
 
-        uvs = new Vector2[4];
-        uvs[0] = new Vector2(0, 0);
-        uvs[1] = new Vector2(0, 1);
-        uvs[2] = new Vector2(1, 1);
-        uvs[3] = new Vector2(1, 0);
+//        uvs = new Vector2[4];
+//        uvs[0] = new Vector2(0, 0);
+//        uvs[1] = new Vector2(0, 1);
+//        uvs[2] = new Vector2(1, 1);
+//        uvs[3] = new Vector2(1, 0);
 
-        int n_triangles = 4;
-        triangles = new int[n_triangles*3];
-        triangles[0] = 0;
-        triangles[1] = 1;
-        triangles[2] = 2;
-        triangles[3] = 0;
-        triangles[4] = 2;
-        triangles[5] = 3;
-        triangles[6] = 0;
-        triangles[7] = 2;
-        triangles[8] = 1;
-        triangles[9] = 0;
-        triangles[10] = 3;
-        triangles[11] = 2;
-    }
-}
+//        int n_triangles = 4;
+//        triangles = new int[n_triangles*3];
+//        triangles[0] = 0;
+//        triangles[1] = 1;
+//        triangles[2] = 2;
+//        triangles[3] = 0;
+//        triangles[4] = 2;
+//        triangles[5] = 3;
+//        triangles[6] = 0;
+//        triangles[7] = 2;
+//        triangles[8] = 1;
+//        triangles[9] = 0;
+//        triangles[10] = 3;
+//        triangles[11] = 2;
+//    }
+//}

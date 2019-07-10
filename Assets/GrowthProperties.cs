@@ -1,24 +1,22 @@
 ﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class GrowthProperties {
     private float influenceDistance; //FREE
-    private float growthDistance; //SET
+    private float perceptionAngle; //SET
+
     private float clearDistance; //DEPENDS
+
+    private Vector3 tropismsBackup;
     private Vector3 tropisms;
+    private bool hangingBranchesEnabled;
+    private float hangingBranchesFromAgeRatio;
 
+    private float growthDistance; //SET
 
-    private float maxTwigRadiusForLeaves; //DEPENDS on tipRadius?
-    private float minLeafSize; //FREE
-    private float maxLeafSize; //FREE
-    private int leavesPerNode;
-
-
-    private float maxBranchingAngle; //SET
-    //public float minDistanceToExistingNodes; //FREE with min value that DEPENDS on influenceDistance
-    private float tipRadius = 0.007f; //SET
-    private float nth_root = 1.6f; //smaller values make bigger radii
-
+    private List<Vector3> attractionPointsBackup;
+    private List<Vector3> attractionPoints;
 
 
     //THIS OR clearDistance
@@ -34,18 +32,21 @@ public class GrowthProperties {
         return influenceDistance;
     }
 
-    //FIXED?
-    public void SetGrowthDistance(float growthDistance) {
-        this.growthDistance = growthDistance;
+
+
+    public void SetPerceptionAngle(float perceptionAngle) {
+        this.perceptionAngle = perceptionAngle;
     }
 
-    public float GetGrowthDistance() {
-        return growthDistance;
+    public float GetPerceptionAngle() {
+        return perceptionAngle;
     }
+
+
 
     //THIS OR influenceDistance
     public void SetClearDistance(float clearDistance) {
-        this.clearDistance = clearDistance*clearDistance;
+        this.clearDistance = clearDistance * clearDistance;
     }
 
     //public float GetClearDistance() {
@@ -56,80 +57,72 @@ public class GrowthProperties {
         return clearDistance;
     }
 
+
+
     public void SetTropisms(Vector3 tropisms) {
         this.tropisms = tropisms.normalized;
+        this.tropismsBackup = new Vector3(tropisms.x, tropisms.y, tropisms.z);
     }
 
     public Vector3 GetTropisms() {
         return tropisms;
     }
 
-    //##############################################################################
+
+
+    public void SetHangingBranchesEnabled(bool hangingBranchesEnabled) {
+        this.hangingBranchesEnabled = hangingBranchesEnabled;
+    }
+
+    public bool GetHangingBranchesEnabled() {
+        return hangingBranchesEnabled;
+    }
+
+
+
+    public void SetHangingBranchesFromAgeRatio(float hangingBranchesFromAgeRatio) {
+        this.hangingBranchesFromAgeRatio = hangingBranchesFromAgeRatio;
+    }
+
+    public float GetHangingBranchesFromAgeRatio() {
+        return hangingBranchesFromAgeRatio;
+    }
+
+
 
     //FIXED?
-    public void SetMaxTwigRadiusForLeaves(float maxTwigRadiusForLeaves) {
-        this.maxTwigRadiusForLeaves = maxTwigRadiusForLeaves;
+    public void SetGrowthDistance(float growthDistance) {
+        this.growthDistance = growthDistance;
     }
 
-    public float GetMaxTwigRadiusForLeaves() {
-        return maxTwigRadiusForLeaves;
+    public float GetGrowthDistance() {
+        return growthDistance;
     }
 
-    public void SetMinLeafSize(float minLeafSize) {
-        this.minLeafSize = minLeafSize;
+
+
+    public void SetAttractionPoints(List<Vector3> attractionPoints) {
+        this.attractionPoints = attractionPoints;
+
+        this.attractionPointsBackup = new List<Vector3>();
+        foreach (Vector3 p in attractionPoints) {
+            this.attractionPointsBackup.Add(p);
+        }
     }
 
-    public void SetMaxLeafSize(float maxLeafSize) {
-        this.maxLeafSize = maxLeafSize;
+    public List<Vector3> GetAttractionPoints() {
+        return attractionPoints;
     }
 
-    public void SetLeavesPerNode(int leavesPerNode) {
-        this.leavesPerNode = leavesPerNode;
-    }
 
-    public int GetLeavesPerNode() {
-        return leavesPerNode;
-    }
 
-    public float GetLeafSize() {
-        return UnityEngine.Random.Range(minLeafSize, maxLeafSize);
-    }
+    public void Reset() {
+        this.tropisms.x = tropismsBackup.x;
+        this.tropisms.y = tropismsBackup.y;
+        this.tropisms.z = tropismsBackup.z;
 
-    public Vector3 GetLeafRotationAxis() {
-        float x = UnityEngine.Random.Range(-1, 1);
-        float y = UnityEngine.Random.Range(-1, 1);
-        float z = UnityEngine.Random.Range(-1, 1);
-        return new Vector3(x, y, z);
-    }
-
-    public float GetLeafRotationAngle() {
-        return UnityEngine.Random.Range(0, 360);
-    }
-
-    //##############################################################################
-
-    public void SetMaxBranchingAngle(float maxBranchingAngle) {
-        this.maxBranchingAngle = maxBranchingAngle;
-    }
-
-    public float GetMaxBranchingAngle() {
-        return maxBranchingAngle;
-    }
-
-    //TODO find good value, make adjustable with min value?
-    public float GetMinDistanceToExistingNodes() {
-        return 0.5f * growthDistance;
-    }
-
-    public float GetTipRadius() {
-        return tipRadius;
-    }
-
-    public void SetNthRoot(float nth_root) {
-        this.nth_root = nth_root;
-    }
-
-    public float GetNthRoot() {
-        return nth_root;
+        foreach (Vector3 p in attractionPointsBackup) {
+            this.attractionPoints.Add(p);
+        }
     }
 }
