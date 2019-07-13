@@ -63,21 +63,35 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\FormatString.cs" />
-    <Compile Include="Assets\GeometryProperties.cs" />
-    <Compile Include="Assets\Grower.cs" />
-    <Compile Include="Assets\GrowthProperties.cs" />
-    <Compile Include="Assets\Leaf.cs" />
-    <Compile Include="Assets\LeafCreator.cs" />
-    <Compile Include="Assets\Node.cs" />
-    <Compile Include="Assets\ObjExporter.cs" />
-    <Compile Include="Assets\Randomize.cs" />
-    <Compile Include="Assets\Save.cs" />
-    <Compile Include="Assets\SelfOrganization.cs" />
-    <Compile Include="Assets\SimpleSpaceColonization.cs" />
-    <Compile Include="Assets\SpaceColonization.cs" />
-    <Compile Include="Assets\Tree.cs" />
+    <Compile Include="Assets\Geometry\GeometryProperties.cs" />
+    <Compile Include="Assets\Geometry\Leaf.cs" />
+    <Compile Include="Assets\Geometry\Node.cs" />
+    <Compile Include="Assets\Geometry\ObjExporter.cs" />
+    <Compile Include="Assets\Geometry\Tree.cs" />
+    <Compile Include="Assets\Geometry\TreeUtil.cs" />
+    <Compile Include="Assets\Grower\Grower.cs" />
+    <Compile Include="Assets\Grower\GrowerListener.cs" />
+    <Compile Include="Assets\Grower\GrowthProperties\AttractionPoints\AttractionPoints.cs" />
+    <Compile Include="Assets\Grower\GrowthProperties\AttractionPoints\AttractionPointsListener.cs" />
+    <Compile Include="Assets\Grower\GrowthProperties\AttractionPoints\PseudoEllipsoid.cs" />
+    <Compile Include="Assets\Grower\GrowthProperties\GrowthProperties.cs" />
+    <Compile Include="Assets\Grower\GrowthProperties\GrowthPropertiesListener.cs" />
+    <Compile Include="Assets\Grower\SelfOrganization.cs" />
+    <Compile Include="Assets\Grower\SpaceColonization.cs" />
+    <Compile Include="Assets\RecycleBin\Ellipsoid.cs" />
+    <Compile Include="Assets\RecycleBin\LeafCreator.cs" />
+    <Compile Include="Assets\RecycleBin\SimpleSpaceColonization.cs" />
+    <Compile Include="Assets\RecycleBin\SphereCut.cs" />
+    <Compile Include="Assets\RecycleBin\Spheroid.cs" />
+    <Compile Include="Assets\RecycleBin\VertexPointer.cs" />
+    <Compile Include="Assets\ThreadManager.cs" />
     <Compile Include="Assets\TreeCreator.cs" />
-    <Compile Include="Assets\VertexPointer.cs" />
+    <Compile Include="Assets\UI\Age.cs" />
+    <Compile Include="Assets\UI\CrownRadius.cs" />
+    <Compile Include="Assets\UI\NewClass.cs" />
+    <Compile Include="Assets\UI\NewSeed.cs" />
+    <Compile Include="Assets\UI\QuitOnEscape.cs" />
+    <Compile Include="Assets\UI\Save.cs" />
     <Reference Include="Unity.Timeline.Editor">
       <HintPath>/Users/donatdeva/Documents/Studium/6. Semester/Bachelorarbeit/Unity/AnimationTrees/Library/ScriptAssemblies/Unity.Timeline.Editor.dll</HintPath>
     </Reference>
