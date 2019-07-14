@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading;
 
 public static class ThreadManager {
@@ -16,13 +15,20 @@ public static class ThreadManager {
         }
     }
 
-    public static void Reset() {
+ //   public static void Reset() {
+ //       lock (threads) {
+ //           foreach (Thread t in threads) {
+ //               t.Abort();
+ //           }
+ //           threads.Clear();
+ //       }
+	//}
+
+    public static void Join() {
         lock (threads) {
             foreach (Thread t in threads) {
-                t.Abort();
+                t.Join();
             }
-            threads.Clear();
         }
-	}
-
+    }
 }

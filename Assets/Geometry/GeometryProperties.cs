@@ -78,7 +78,7 @@ public class GeometryProperties {
     }
 
     public float GetLeafSize() {
-        return UnityEngine.Random.Range(minLeafSize, maxLeafSize);
+        return Util.RandomInRange(minLeafSize, maxLeafSize);
     }
 
 

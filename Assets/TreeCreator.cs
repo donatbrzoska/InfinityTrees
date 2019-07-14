@@ -2,6 +2,7 @@
 using System.Runtime.CompilerServices;
 using UnityEngine;
 using UnityEngine.UI;
+using System;
 
 [RequireComponent(typeof(MeshFilter))]
 public class TreeCreator : MonoBehaviour {
@@ -16,10 +17,20 @@ public class TreeCreator : MonoBehaviour {
     Vector3[] normals;
     Vector2[] uvs;
     int[] triangles;
+    //public Vector3[] vertices;
+    //public Vector3[] normals;
+    //public Vector2[] uvs;
+    //public int[] triangles;
+    bool meshReady;
 
     Renderer renderer_;
 
     PseudoEllipsoid attractionPoints;
+
+    public AttractionPoints GetAttractionPoints() {
+        return attractionPoints;
+    }
+
     GrowthProperties growthProperties;
     Grower grower;
     GeometryProperties geometryProperties;
@@ -27,6 +38,22 @@ public class TreeCreator : MonoBehaviour {
 
     // Start is called before the first frame update
     void Start() {
+
+
+        //SortedList l = new SortedList();
+        //for (int i=0; i<40000; i++) {
+        //    int e = UnityEngine.Random.Range(0, 4000);
+        //    l.InsertSorted(e);
+        //}
+
+        //int j = 32;
+        //Debug.Log("Nearest to " + j + " is " + l.GetNearest(j));
+
+        //Debug.Log("Count: " + l.Count);
+        //foreach (int k in l) {
+        //    Debug.Log(k);
+        //}
+
         Initialize();
 
         //SetTexture("potentialOak_png_alpha");
@@ -53,17 +80,19 @@ public class TreeCreator : MonoBehaviour {
         int initialAge = 30;
         float initialRadius_x = 3;
         float initialRadius_y = 5;
-        float initialRadius_z = 3;
+        float initialRadius_z = 3.5f;
+        //float initialRadius_x = 4;
+        //float initialRadius_y = 10;
+        //float initialRadius_z = 4;
 
-        GameObject.Find("Age").GetComponent<Slider>().SetValueWithoutNotify(30);
-        GameObject.Find("CR X Slider").GetComponent<Slider>().SetValueWithoutNotify(initialRadius_x);
-        GameObject.Find("CR Y Slider").GetComponent<Slider>().SetValueWithoutNotify(initialRadius_y);
-        GameObject.Find("CR Z Slider").GetComponent<Slider>().SetValueWithoutNotify(initialRadius_z);
+        GameObject.Find("Age Slider").GetComponent<Slider>().SetValueWithoutNotify(30);
+        GameObject.Find("Width X Slider").GetComponent<Slider>().SetValueWithoutNotify(initialRadius_x);
+        GameObject.Find("Width Y Slider").GetComponent<Slider>().SetValueWithoutNotify(initialRadius_y);
+        GameObject.Find("Width Z Slider").GetComponent<Slider>().SetValueWithoutNotify(initialRadius_z);
 
         //load_normalTree_hangingBranches();
-        Debug.Log("Loading normal tree");
         load_normalTree(initialAge, initialRadius_x, initialRadius_y, initialRadius_z);
-        Debug.Log("Loaded normal tree");
+
         tree.Grow();
     }
 
@@ -102,31 +131,38 @@ public class TreeCreator : MonoBehaviour {
 
 
     public void OnAge(int value) {
-        ThreadManager.Reset();
+        //debug("received");
+        grower.Stop();
+
         growthProperties.UpdateIterations(value);
     }
 
     public void OnCrownRadius_x(float value) {
-        ThreadManager.Reset();
+        //debug("received");
+        grower.Stop();
 
-        //?
+        ((PseudoEllipsoid)attractionPoints).UpdateRadius_x(value);
     }
 
     public void OnCrownRadius_y(float value) {
-        ThreadManager.Reset();
+        //debug("received");
+        grower.Stop();
 
-        //?
+        ((PseudoEllipsoid)attractionPoints).UpdateRadius_y(value);
     }
 
     public void OnCrownRadius_z(float value) {
-        ThreadManager.Reset();
+        //debug("received");
+        grower.Stop();
 
-        //?
+        ((PseudoEllipsoid)attractionPoints).UpdateRadius_z(value);
     }
 
     public void OnNewSeed() {
-        ThreadManager.Reset();
-        growthProperties.GetAttractionPoints().NewSeed();
+        //debug("received");
+        grower.Stop();
+
+        attractionPoints.NewSeed();
     }
 
     //TODO: specify location &| unique naming
@@ -137,7 +173,9 @@ public class TreeCreator : MonoBehaviour {
 
     void OnApplicationQuit() {
         //UnityEngine.Debug.Log("Application ending after " + Time.time + " seconds");
-        ThreadManager.Reset();
+        grower.Stop();
+        ThreadManager.Join();
+        //ThreadManager.Reset();
     }
 
     //void smallTree_hangingBranches() {
@@ -207,7 +245,7 @@ public class TreeCreator : MonoBehaviour {
 
         //influence distance und cleardistance müssen auf jeden Fall von density / Radien abhängen
 
-        attractionPoints = new PseudoEllipsoid(new Vector3(0, 0, 0), radius_x, radius_y, radius_z, 15, 0.15f, 0.1f);
+        attractionPoints = new PseudoEllipsoid(new Vector3(0, 0, 0), radius_x, radius_y, radius_z, 15, 0.15f, 0.05f);
 
 
         growthProperties = new GrowthProperties();
@@ -216,7 +254,8 @@ public class TreeCreator : MonoBehaviour {
         growthProperties.SetPerceptionAngle(160f);
         growthProperties.SetClearDistance(0.9f);
         //growthProperties.SetClearDistance(1f);
-        growthProperties.SetTropisms(new Vector3(-0.25f, 0.5f, 0));
+        //growthProperties.SetTropisms(new Vector3(-0.25f, 0.5f, 0));
+        growthProperties.SetTropisms(new Vector3(0, 0.5f, 0));
         growthProperties.SetGrowthDistance(0.25f);
         growthProperties.SetAttractionPoints(attractionPoints);
         growthProperties.SetIterations(age);
@@ -244,7 +283,7 @@ public class TreeCreator : MonoBehaviour {
         geometryProperties.SetLeavesEnabled(true);
 
 
-        tree = new Tree(position, grower, geometryProperties);
+        tree = new Tree(position, grower, geometryProperties, this);
         //SET LISTENER
         grower.SetGrowerListener(tree);
     }
@@ -413,17 +452,40 @@ public class TreeCreator : MonoBehaviour {
 
     // Update is called once per frame
     void Update() {
-        tree.GetEverything(ref vertices, ref normals, ref uvs, ref triangles);
-        UpdateMesh();
+        //tree.GetEverything(ref vertices, ref normals, ref uvs, ref triangles);
+
+        if (meshReady) {
+            UpdateMesh();
+            meshReady = false;
+        }
+
+    }
+
+    //private void OnDrawGizmos() {
+    //    Gizmos.color = Color.yellow;
+    //    Gizmos.DrawSphere(Vector3.up, 3);
+    //}
+
+    public void OnUpdateMesh(Vector3[] vertices, Vector3[] normals, Vector2[] uvs, int[] triangles) {
+        lock (mesh) {
+            this.vertices = vertices;
+            this.normals = normals;
+            this.uvs = uvs;
+            this.triangles = triangles;
+
+            meshReady = true;
+        }
     }
 
     void UpdateMesh() {
-        mesh.Clear();
+        lock (mesh) {
+            mesh.Clear();
 
-        mesh.vertices = vertices;
-        mesh.uv = uvs;
-        mesh.triangles = triangles;
-        mesh.normals = normals;
+            mesh.vertices = vertices;
+            mesh.uv = uvs;
+            mesh.triangles = triangles;
+            mesh.normals = normals;
+        }
     }
 
     /* NOTIZEN
@@ -439,6 +501,8 @@ public class TreeCreator : MonoBehaviour {
      * - - Randomize
      * - Vertices und Triangles anzeigen
      *
+     * - automatisches Camera-Movement
+     * 
      * >> EventSystem für Änderungen einzelner Werte
      * 
      * 
@@ -459,8 +523,10 @@ public class TreeCreator : MonoBehaviour {
      * - - über Änderung des PerceptionVolumes -> Achse in Abhängigkeit der Noderichtung
      * - - über neue AttractionPoints, Persistenz durch Seed?
      *
+     * - 
+     * 
      *
-     * !! über Thread.Abort nachdenken, in Besitz genommene Locks werden nicht freigegeben!
+     * - middleware für Buttons?
      *
      * - nächsten Punkt finden über Octree oder Sortierung und dann Suchen
      * 
@@ -482,6 +548,7 @@ public class TreeCreator : MonoBehaviour {
      * - genau so: Änderungen der cutoffRatio zur Laufzeit?
      *
      * - Sinnhaftigkeit des density Parameters überdenken
+     *
      * 
      * Parameter die definitiv während des Wachstums gebraucht werden
      * - position vom jeweils vorherigen Node
@@ -543,7 +610,7 @@ public class TreeCreator : MonoBehaviour {
      *
      * uvs out of bounds fixen
      *
-     *
+     *!! über Thread.Abort nachdenken, in Besitz genommene Locks werden nicht freigegeben!
      */
 
     /* BEACHTEN
@@ -560,4 +627,138 @@ public class TreeCreator : MonoBehaviour {
      * ansonsten: OPTIMIERBAR
      */
 
+}
+
+public class SortedList : List<int> {
+    public void InsertSorted(int e) {
+        if (base.Count == 0) {
+            base.Add(e);
+        } else {
+            //InsertSorted(e, 0, base.Count - 1);
+            for (int i = 0; i < base.Count; i++) {
+                if (e <= base[i]) {
+                    base.Insert(i, e);
+                    break;
+                }
+
+                if (i == base.Count - 1 && e > base[i]) {
+                    base.Add(e);
+                    break;
+                }
+            }
+        }
+
+        //base.Add(e);
+        //base.Sort();
+    }
+
+    public int GetNearest(int e) {
+        if (base.Count == 0) {
+            throw new System.Exception("List is empty...");
+        } else if (base.Count==1) {
+            return base[0];
+        } else {
+            return GetNearestH(e);
+        }
+    }
+
+    private int GetNearestH(int e) {
+        int steps = 0;
+
+        int l = 0;
+        int r = base.Count - 1;
+
+        int d = r - l;
+        int i = 0;
+
+        while (d>0) {
+            steps++;
+
+            d = r - l;
+            i = l + d / 2;
+
+            int number = base[i];
+            if (Equals(e,number)) {
+                Debug.Log(steps + " steps");
+                return base[i];
+            }
+            if (LessThan(e,number)) {
+                r = i - 1;
+            }
+            //if (GreaterThan(e, number)) {
+                l = i + 1;
+            //}
+        }
+
+        Debug.Log(steps + " steps");
+
+        return CheckNeighbours(e, i);
+    }
+
+    private bool Equals(int a, int b) {
+        return a == b;
+    }
+
+    private bool LessThan(int a, int b) {
+        return a < b;
+    }
+
+    //private bool GreaterThan(int a, int b) {
+    //    return a > b;
+    //}
+
+    private int CheckNeighbours(int e, int i) {
+        int d_left = Math.Abs(base[i - 1] - e);
+        int d_index = Math.Abs(base[i] - e);
+        int d_right = Math.Abs(base[i + 1] - e);
+
+        int min = int.MaxValue;
+        if (d_left < min) {
+            min = d_left;
+        }
+        if (d_index < min) {
+            min = d_index;
+        }
+        if (d_right < min) {
+            min = d_right;
+        }
+
+        if (d_left == min) {
+            return base[i - 1];
+        }
+        if (d_index == min) {
+            return base[i];
+        }
+        //if (d_right == min) {
+            return base[i+1];
+        //}
+    }
+
+    private void InsertSorted(int e, int l, int r) {
+        int d = r - l;
+        int i = l + d / 2;
+
+        if (d == 0) {
+            base.Insert(i, e);
+        } else {
+            int number = base[i];
+            if (e == number) {
+                base.Insert(i, e);
+            } else if (e < number) {
+                if (i == 0) {
+                    base.Insert(i, e);
+                } else {
+                    r = i - 1;
+                    InsertSorted(e, l, r);
+                }
+            } else if (e > number) {
+                if (i == base.Count - 1) {
+                    base.Insert(i, e);
+                } else {
+                    l = i + 1;
+                    InsertSorted(e, l, r);
+                }
+            }
+        }
+    }
 }

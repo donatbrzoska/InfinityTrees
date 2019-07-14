@@ -23,7 +23,7 @@ public class Ellipsoid : AttractionPoints
         Generate();
 	}
 
-	private void Generate()
+    override protected void Generate()
 	{
         //https://planetcalc.com/149/
         //(https://math.stackexchange.com/questions/1145267/volume-of-the-smaller-region-of-ellipsoid-cut-by-plane)
@@ -66,12 +66,4 @@ public class Ellipsoid : AttractionPoints
         Debug.Log(base[1]);
         Debug.Log(base[2]);
     }
-
-	//generates a new set of points
-	override public void NewSeed()
-	{
-		base.Clear();
-		backup.Clear();
-		Generate();
-	}
 }

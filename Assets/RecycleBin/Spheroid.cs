@@ -22,7 +22,7 @@ public class Spheroid : AttractionPoints
 		Generate();
 	}
 
-	private void Generate()	{
+    override protected void Generate()	{
         //https://planetcalc.com/149/
         float volume = (float)((4f / 3f) * Math.PI * radius_x_z * radius_x_z * radius_y);
 
@@ -46,13 +46,5 @@ public class Spheroid : AttractionPoints
 				backup.Add(point);
 			}
 		}
-	}
-
-	//generates a new set of points
-	override public void NewSeed()
-	{
-		base.Clear();
-		backup.Clear();
-		Generate();
 	}
 }

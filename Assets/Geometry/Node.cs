@@ -169,19 +169,19 @@ public class Node : IEquatable<Node>{
     }
 
 
-    public List<Node> GetNodeList() {
-        List<Node> nodeList = new List<Node> { this };
-        ExtractNodes(this, nodeList);
-        return nodeList;
-    }
+    //public List<Node> GetNodeList() {
+    //    List<Node> nodeList = new List<Node> { this };
+    //    ExtractNodes(this, nodeList);
+    //    return nodeList;
+    //}
 
-    //PUSHES A LOT TO THE STACK
-    private void ExtractNodes(Node current, List<Node> extracted) {
-        foreach (Node n in current.GetSubnodes()) {
-            extracted.Add(n);
-            ExtractNodes(n, extracted);
-        }
-    }
+    ////PUSHES A LOT TO THE STACK
+    //private void ExtractNodes(Node current, List<Node> extracted) {
+    //    foreach (Node n in current.GetSubnodes()) {
+    //        extracted.Add(n);
+    //        ExtractNodes(n, extracted);
+    //    }
+    //}
 
 
     //public Vector3[] GetCircleVertices(bool doubled) {

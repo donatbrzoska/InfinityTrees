@@ -23,12 +23,6 @@ public static class TreeUtil
 	}
 
 
-
-	public static float ToRadians(float degrees)
-	{
-		return degrees * Mathf.PI / 180;
-	}
-
 	public static void printTriangles(int[] triangles)
 	{
 		int pointer = 0;
@@ -207,9 +201,9 @@ public static class TreeUtil
 		for (int i = 0; i < resolution; i++)
 		{
 			//calculate coordinates
-			float x1 = Mathf.Cos(ToRadians(currentAngle));
+			float x1 = Mathf.Cos(Util.DegreesToRadians(currentAngle));
 			float y1 = 0;
-			float z1 = Mathf.Sin(ToRadians(currentAngle));
+			float z1 = Mathf.Sin(Util.DegreesToRadians(currentAngle));
 
 			//create vertex
 			Vector3 vertex = new Vector3(x1, y1, z1);

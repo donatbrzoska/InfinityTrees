@@ -2,10 +2,27 @@
 using UnityEngine.UI;
 
 public class Age : MonoBehaviour {
-    public void OnValueChanged() {
-        Debug.Log("UI: Slider: Age");
 
-        int value = (int) GetComponent<Slider>().value;
-        GameObject.Find("TreeMesh").GetComponent<TreeCreator>().OnAge(value);
+    int sentValue;
+    Middleware middleware;
+
+    public Age() {
+        middleware = new Middleware();
+    }
+
+    public void OnValueChanged() {
+        middleware.DisableCameraMovement();
+    }
+
+    public void Update() {
+        if (Input.GetMouseButtonUp(0)) {
+            int value = (int) GetComponent<Slider>().value;
+            if (sentValue != value) {
+                GameObject.Find("TreeMesh").GetComponent<TreeCreator>().OnAge(value);
+                sentValue = value;
+            }
+
+            middleware.EnableCameraMovement();
+        }
     }
 }

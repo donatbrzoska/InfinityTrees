@@ -33,63 +33,43 @@ public class Tree : GrowerListener {
 
     private Node root;
 
-    private int age;
+    //private int age;
 
 
-    private int ageAtPreviousCalculation = -1;
+    //private int ageAtPreviousCalculation = -1;
+    //private Vector3[][] vertices = new Vector3[2][];
+    //private Vector3[][] normals = new Vector3[2][];
+    //private Vector2[][] uvs = new Vector2[2][];
+    //private int[][] triangles = new int[2][];
+    //private FinishedPointer finishedPointer = new FinishedPointer();
+
     private Vector3[] vertices;
     private Vector3[] normals;
     private Vector2[] uvs;
     private int[] triangles;
 
+    TreeCreator treeCreator;
 
-    public Tree(Vector3 position, Grower grower, GeometryProperties geometryProperties) {
+    public Tree(Vector3 position, Grower grower, GeometryProperties geometryProperties, TreeCreator treeCreator) {
         this.grower = grower;
         this.geometryProperties = geometryProperties;
+        this.treeCreator = treeCreator;
 
         root = new Node(position, geometryProperties);
     }
 
     public void Grow() {
-
         Thread t = new Thread(() => {
-            Stopwatch growingStopwatch = new Stopwatch();
-            growingStopwatch.Start();
-
-            for (int i = 0; i < grower.GetGrowthProperties().GetIterations(); i++) {
-                Stopwatch iterationStopwatch = new Stopwatch();
-                iterationStopwatch.Start();
-
-                grower.Apply(root);
-                age++;
-
-                if (grower.GetGrowthProperties().GetHangingBranchesEnabled() && i > grower.GetGrowthProperties().GetIterations() * grower.GetGrowthProperties().GetHangingBranchesFromAgeRatio()) {
-                    grower.GetGrowthProperties().SetTropisms(new Vector3(0, -1f, 0), true);
-                    debug("updated tropisms");
-                }
-
-                iterationStopwatch.Stop();
-                debug(new FormatString("iteration {0} took {1}", i, iterationStopwatch.Elapsed));
-            }
-
-            growingStopwatch.Stop();
-            debug(new FormatString("grew {0} times in {1}", grower.GetGrowthProperties().GetIterations(), growingStopwatch.Elapsed));
-
-            //Stopwatch getStopwatch = new Stopwatch();
-            //getStopwatch.Start();
-            //GetEverything(ref vertices, ref normals, ref uvs, ref triangles, res, -1);
-            //getStopwatch.Stop();
-            //debug("vertex, normal, uv and triangle calculations took " + getStopwatch.Elapsed);
+            grower.Apply(root);
             Thread.Sleep(100);
-
-            debug(new FormatString("{0} vertices, {1} triangles", vertices.Length, triangles.Length/3));
+            debug(new FormatString("{0} vertices, {1} triangles", vertices.Length, triangles.Length / 3));
         });
         ThreadManager.Add(t);
         t.Start();
     }
 
     private void Regrow() {
-        age = 0;
+        //age = 0;
         root = new Node(Vector3.zero, geometryProperties);
         Grow();
     }
@@ -97,53 +77,61 @@ public class Tree : GrowerListener {
 
 
 
-    public void GetEverything(ref Vector3[] vertices, ref Vector3[] normals, ref Vector2[] uvs, ref int[] triangles) {
-        //Stopwatch sw = new Stopwatch();
-        //if (age==39) {
-        //    sw.Start();
-        //}
+    //public void GetEverything(ref Vector3[] vertices, ref Vector3[] normals, ref Vector2[] uvs, ref int[] triangles) {
+    //    int index = finishedPointer.GetRead();
 
-        int currentAge = age; //only recalculate everything, when there where changes
-        if (ageAtPreviousCalculation != currentAge) {// || (currentAge == 0)) {
+    //    if (index == -1) { //return not null arrays, when there weren't any calculations yet
+    //        vertices = new Vector3[0];
+    //        normals = new Vector3[0];
+    //        uvs = new Vector2[0];
+    //        triangles = new int[0];
+    //    } else {
+    //        vertices = this.vertices[index];
+    //        normals = this.normals[index];
+    //        uvs = this.uvs[index];
+    //        triangles = this.triangles[index];
+    //    }
+    //}
 
-            Dictionary<Node, int> nodeVerticesPositions = new Dictionary<Node, int>();
+    private void CalculateEverything() {
+        Dictionary<Node, int> nodeVerticesPositions = new Dictionary<Node, int>();
 
-            List<Vector3> verticesTmp = new List<Vector3>();// verticesTmp.Capacity = 5000;
-            List<Vector2> uvsTmp = new List<Vector2>();// uvsTmp.Capacity = 5000;
-            List<int> trianglesTmp = new List<int>();// trianglesTmp.Capacity = 5000;
+        List<Vector3> verticesTmp = new List<Vector3>();// verticesTmp.Capacity = 5000;
+        List<Vector2> uvsTmp = new List<Vector2>();// uvsTmp.Capacity = 5000;
+        List<int> trianglesTmp = new List<int>();// trianglesTmp.Capacity = 5000;
 
-            CalculateEverything(root, nodeVerticesPositions, 0, verticesTmp, uvsTmp, trianglesTmp);
+        CalculateEverythingHelper(root, nodeVerticesPositions, 0, verticesTmp, uvsTmp, trianglesTmp);
 
 
-            //What happens, when a new node is added while iterating through the TMP List?
-            // -> it won't be drawn
-            this.vertices = new Vector3[verticesTmp.Count];
-            verticesTmp.CopyTo(this.vertices);
+        //int write = finishedPointer.GetWrite();
+        ////What happens, when a new node is added while iterating through the TMP List?
+        //// -> it won't be drawn
+        //this.vertices[write] = new Vector3[verticesTmp.Count];
+        //verticesTmp.CopyTo(this.vertices[write]);
 
-            this.uvs = new Vector2[uvsTmp.Count];
-            uvsTmp.CopyTo(this.uvs);
+        //this.uvs[write] = new Vector2[uvsTmp.Count];
+        //uvsTmp.CopyTo(this.uvs[write]);
 
-            this.triangles = new int[trianglesTmp.Count];
-            trianglesTmp.CopyTo(this.triangles);
+        //this.triangles[write] = new int[trianglesTmp.Count];
+        //trianglesTmp.CopyTo(this.triangles[write]);
 
-            this.normals = TreeUtil.CalculateNormals(this.vertices, this.triangles);
+        //int read = finishedPointer.GetRead();
+        //this.normals[write] = TreeUtil.CalculateNormals(this.vertices[read], this.triangles[read]);
 
-            ageAtPreviousCalculation = currentAge;
-        }
+        this.vertices = new Vector3[verticesTmp.Count];
+        verticesTmp.CopyTo(this.vertices);
 
-        vertices = this.vertices;
-        normals = this.normals;
-        uvs = this.uvs;
-        triangles = this.triangles;
+        this.uvs = new Vector2[uvsTmp.Count];
+        uvsTmp.CopyTo(this.uvs);
 
-        //if (age==39) {
-        //    sw.Stop();
-        //    debug(""+sw.Elapsed);
-        //}
+        this.triangles = new int[trianglesTmp.Count];
+        trianglesTmp.CopyTo(this.triangles);
+
+        this.normals = TreeUtil.CalculateNormals(this.vertices, this.triangles);
     }
 
     //looks at the current node, builds cylinders to it's subnodes and recursively calls the function for all subnodes
-    private void CalculateEverything(Node node, Dictionary<Node, int> nodeVerticesPositions, float vOffset, List<Vector3> verticesResult, List<Vector2> uvsResult, List<int> trianglesResult) {
+    private void CalculateEverythingHelper(Node node, Dictionary<Node, int> nodeVerticesPositions, float vOffset, List<Vector3> verticesResult, List<Vector2> uvsResult, List<int> trianglesResult) {
         if (node.IsRoot()) {
             CalculateAndStoreCylinderVertices(node, nodeVerticesPositions, verticesResult, false);
             CalculateAndStoreCylinderUVs(vOffset, uvsResult);
@@ -169,7 +157,7 @@ public class Tree : GrowerListener {
 
 
             //recursive call
-            CalculateEverything(subnode, nodeVerticesPositions, vOffset, verticesResult, uvsResult, trianglesResult);
+            CalculateEverythingHelper(subnode, nodeVerticesPositions, vOffset, verticesResult, uvsResult, trianglesResult);
         }
     }
 
@@ -275,5 +263,11 @@ public class Tree : GrowerListener {
     public void OnAgeChanged() {
         //grower.GetGrowthProperties().ResetTropisms();
         Regrow();
+    }
+
+    public void OnIterationFinished() {
+        CalculateEverything();
+        //finishedPointer.Done();
+        treeCreator.OnUpdateMesh(this.vertices, this.normals, this.uvs, this.triangles);
     }
 }

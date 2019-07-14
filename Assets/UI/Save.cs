@@ -5,7 +5,7 @@ using UnityEngine;
 public class Save : MonoBehaviour
 {
     public void OnClick() {
-        Debug.Log("UI: Button: Save");
+        //Debug.Log("UI: Button: Save");
 
         GameObject.Find("TreeMesh").GetComponent<TreeCreator>().OnSave();
     }

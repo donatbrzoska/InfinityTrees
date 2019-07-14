@@ -5,10 +5,13 @@ using UnityEngine;
 public abstract class AttractionPoints : List<Vector3> {
     protected Vector3 position;
 
-    //backup points, so the tree can be regrown with any amount of iterations
-    protected List<Vector3> backup = new List<Vector3>();
+    protected Vector3 center;
 
-    protected System.Random random = new System.Random();
+	//backup points, so the tree can be regrown with any amount of iterations
+	protected List<Vector3> backup = new List<Vector3>();
+
+    protected int seed;
+    protected System.Random random;
 
     protected AttractionPointsListener attractionPointsListener;
 
@@ -16,8 +19,21 @@ public abstract class AttractionPoints : List<Vector3> {
         this.attractionPointsListener = attractionPointsListener;
     }
 
+    public AttractionPoints() {
+        seed = (int) (new System.Random()).NextDouble() * 65335;
+        random = new System.Random(seed);
+    }
+
+    protected abstract void Generate();
+
     //generates a new set of points
-    public abstract void NewSeed();
+    public void NewSeed() {
+        seed = (int) Util.RandomInRange(0, 65335);// (int)(new System.Random()).NextDouble() * 65335;
+        random = new System.Random(seed);
+
+        Generate();
+        attractionPointsListener.OnAttractionPointsChanged();
+    }
 
     //"copies" all points in backup to the base
     public void Reset() {
@@ -26,7 +42,15 @@ public abstract class AttractionPoints : List<Vector3> {
             base.Add(p);
         }
 
-        attractionPointsListener.OnAttractionPointsChanged();
+        //attractionPointsListener.OnAttractionPointsChanged();
+    }
+
+    public Vector3 GetCenter() {
+        return center;
+    }
+
+    public List<Vector3> GetBackup() {
+        return backup;
     }
 
     protected float RandomInRange(float from, float to) {

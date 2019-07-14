@@ -31,7 +31,7 @@ public class SphereCut : AttractionPoints
 		Generate();
 	}
 
-	private void Generate()
+	override protected void Generate()
 	{
 		float cutoffThreshhold = 2 * radius * cutoffRatio;
 
@@ -64,13 +64,5 @@ public class SphereCut : AttractionPoints
 				backup.Add(point);
 			}
 		}
-	}
-
-	//generates a new set of points
-	override public void NewSeed()
-	{
-		base.Clear();
-		backup.Clear();
-		Generate();
 	}
 }

@@ -13,6 +13,9 @@ public class PseudoEllipsoid : AttractionPoints {
 
     //density says: how many points per 1x1x1 voxel
     public PseudoEllipsoid(Vector3 position, float radius_x, float radius_y, float radius_z, float density, float cutoffRatio_bottom, float cutoffRatio_top) {
+        seed = (int)(new System.Random()).NextDouble() * 65335;
+        random = new System.Random(seed);
+
         this.position = position;
         this.radius_x = radius_x;
         this.radius_y = radius_y;
@@ -24,7 +27,10 @@ public class PseudoEllipsoid : AttractionPoints {
         Generate();
     }
 
-    private void Generate() {
+    override protected void Generate() {
+        base.Clear();
+        base.backup.Clear();
+
         //1. Calculate volume of sphere with radius 1
         float radius = 1f;
 
@@ -49,6 +55,11 @@ public class PseudoEllipsoid : AttractionPoints {
         //3. Calculate the amount of points for the given density
         int n_points = (int)(volume * density);
 
+        //float smallestx = float.MaxValue;
+        //float biggestx = float.MinValue;
+        //float smallestz = float.MaxValue;
+        //float biggestz = float.MinValue;
+
         //4. Generate n_points attraction points
         while (base.Count < n_points) {
             //4.1 generate points within the sphere with radius 1
@@ -57,7 +68,19 @@ public class PseudoEllipsoid : AttractionPoints {
                 continue;
             }
             float x = RandomInRange(-1, 1);
+            //if (x < smallestx) {
+            //    smallestx = x;
+            //}
+            //if (x > biggestx) {
+            //    biggestx = x;
+            //}
             float z = RandomInRange(-1, 1);
+            //if (z < smallestz) {
+            //    smallestz = z;
+            //}
+            //if (z > biggestz) {
+            //    biggestz = z;
+            //}
 
             Vector3 point = new Vector3(x, y, z);
 
@@ -69,11 +92,17 @@ public class PseudoEllipsoid : AttractionPoints {
                 //4.3 Translate the points based on the real cutoff threshhold at the bottom (it is a different one than the one for the sphere with radius 1!)
                 float real_cutoffThreshhold_bottom = 2f * radius_y * cutoffRatio_bottom;
                 Vector3 targetCenter = new Vector3(position.x, position.y + radius_y - real_cutoffThreshhold_bottom, position.z);// Vector3.up*radius + position;
+                base.center = targetCenter;
 
                 base.Add(point + targetCenter);
                 backup.Add(point + targetCenter);
             }
         }
+
+        //Debug.Log("smallest x: " + smallestx);
+        //Debug.Log("biggest x: " + biggestx);
+        //Debug.Log("smallest z: " + smallestz);
+        //Debug.Log("biggest z: " + biggestz);
     }
 
     //private void Generate() {
@@ -122,10 +151,25 @@ public class PseudoEllipsoid : AttractionPoints {
     //    }
     //}
 
-    //generates a new set of points
-    override public void NewSeed() {
-        base.Clear();
-        backup.Clear();
+    public void UpdateRadius_x(float radius_x) {
+        this.radius_x = radius_x;
+        base.random = new System.Random(base.seed);
+        Generate();
+
+        attractionPointsListener.OnAttractionPointsChanged();
+    }
+
+    public void UpdateRadius_y(float radius_y) {
+        this.radius_y = radius_y;
+        base.random = new System.Random(base.seed);
+        Generate();
+
+        attractionPointsListener.OnAttractionPointsChanged();
+    }
+
+    public void UpdateRadius_z(float radius_z) {
+        this.radius_z = radius_z;
+        base.random = new System.Random(base.seed);
         Generate();
 
         attractionPointsListener.OnAttractionPointsChanged();

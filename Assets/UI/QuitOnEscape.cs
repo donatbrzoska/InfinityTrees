@@ -14,7 +14,7 @@ public class QuitOnEscape : MonoBehaviour
     void Update()
     {
         if (Input.GetKey("escape")) {
-            ThreadManager.Reset();
+            //ThreadManager.Reset();
             Application.Quit();
         }
     }
