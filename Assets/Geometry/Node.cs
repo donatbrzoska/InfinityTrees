@@ -31,6 +31,11 @@ public class Node : IEquatable<Node>{
     private List<Leaf> leaves = new List<Leaf>();
 
 
+    //THIS SHOULD ONLY BE USED BY THE NEAREST NODE ALGORITHM
+    public Node(Vector3 position) {
+        this.position = position;
+    }
+
     public Node(Vector3 position, GeometryProperties geometryProperties) : this(position, null, geometryProperties) { }
 
     private Node(Vector3 position, Node supernode, GeometryProperties geometryProperties) {

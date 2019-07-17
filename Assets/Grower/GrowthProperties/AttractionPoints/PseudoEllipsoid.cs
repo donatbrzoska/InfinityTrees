@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-public class PseudoEllipsoid : AttractionPoints {
+public sealed class PseudoEllipsoid : AttractionPoints {
     float radius_x;
     float radius_y;
     float radius_z;
@@ -11,9 +11,15 @@ public class PseudoEllipsoid : AttractionPoints {
     float density;
     float densityRatio; //TODO, what did I want to do here?
 
+    float height;
+    public float GetHeight() {
+        return height;
+    }
+
     //density says: how many points per 1x1x1 voxel
     public PseudoEllipsoid(Vector3 position, float radius_x, float radius_y, float radius_z, float density, float cutoffRatio_bottom, float cutoffRatio_top) {
-        seed = (int)(new System.Random()).NextDouble() * 65335;
+        //seed = (int)(new System.Random()).NextDouble() * 65335;
+        seed = 0;// (int)Util.RandomInRange(0, 65335);
         random = new System.Random(seed);
 
         this.position = position;
@@ -67,6 +73,10 @@ public class PseudoEllipsoid : AttractionPoints {
             if ((y < 0 - radius + cutoffThreshhold_bottom) | y > 0 + radius - cutoffThreshhold_top) {
                 continue;
             }
+            if (y > height) {
+                height = y;
+            }
+
             float x = RandomInRange(-1, 1);
             //if (x < smallestx) {
             //    smallestx = x;

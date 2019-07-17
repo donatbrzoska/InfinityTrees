@@ -28,7 +28,10 @@ public class SpaceColonization : Grower {
     //int threadsLeft = 8;
     //Vector3 defaultPosition = new Vector3(0, -10000, 0);
 
+    bool default_algorithm = false;
     List<Node> nodeList;
+    NearestNodeAlgorithm nearestNodeAlgorithm;
+
     GrowthProperties growthProperties;
     GrowerListener growerListener;
 
@@ -55,11 +58,19 @@ public class SpaceColonization : Grower {
         running = true;
 
         if (regrow) {
-            nodeList = new List<Node> { root };
+            if (default_algorithm) {
+                nodeList = new List<Node> { root };
+            } else {
+                nearestNodeAlgorithm = new NearestNodeAlgorithm();
+                nearestNodeAlgorithm.Add(root);
+            }
         }
 
         Stopwatch growingStopwatch = new Stopwatch();
         growingStopwatch.Start();
+
+        Stopwatch findClosePointStopwatch = new Stopwatch();
+        Stopwatch removeClosePointsStopwatch = new Stopwatch();
 
         for (int i = 0; i < growthProperties.GetIterations(); i++) {
 
@@ -71,10 +82,16 @@ public class SpaceColonization : Grower {
             //List<Node> nodeList = root.GetNodeList();
             //debug("n nodes: " + nodeList.Count);
 
+            findClosePointStopwatch.Start();
             //iterate through all attractionPoints
             foreach (Vector3 attractionPoint in growthProperties.GetAttractionPoints()) {
                 //and find the closest Node respectively
-                Node closest = FindClosestNode(attractionPoint);
+                Node closest;
+                if (default_algorithm) {
+                    closest = FindClosestNode(attractionPoint);
+                } else {
+                    closest = nearestNodeAlgorithm.GetNearestWithinSquaredDistance(attractionPoint, growthProperties.GetSquaredInfluenceDistance(), growthProperties.GetPerceptionAngle());
+                }
 
                 //if there is a close Node
                 if (closest != null) {
@@ -86,6 +103,7 @@ public class SpaceColonization : Grower {
                     }
                 }
             }
+            findClosePointStopwatch.Stop();
 
 
             List<Vector3> newPositions = new List<Vector3>();
@@ -106,13 +124,19 @@ public class SpaceColonization : Grower {
                     //add new node to currentNode
                     currentNode.Add(happyNodePosition);
                     //add to the nodeList
-                    nodeList.Add(currentNode.GetSubnodes()[currentNode.GetSubnodes().Count-1]);
+                    if (default_algorithm) {
+                        nodeList.Add(currentNode.GetSubnodes()[currentNode.GetSubnodes().Count - 1]);
+                    } else {
+                        nearestNodeAlgorithm.Add(currentNode.GetSubnodes()[currentNode.GetSubnodes().Count - 1]);
+                    }
                     //and to the newPositions list
                     newPositions.Add(happyNodePosition);
                 }
             }
 
+            removeClosePointsStopwatch.Start();
             RemoveClosePoints(newPositions);
+            removeClosePointsStopwatch.Stop();
 
             growerListener.OnIterationFinished();
 
@@ -125,6 +149,8 @@ public class SpaceColonization : Grower {
 
         growingStopwatch.Stop();
         debug(new FormatString("grew {0} times in {1}", growthProperties.GetIterations(), growingStopwatch.Elapsed));
+        debug(new FormatString("finding close points took {0}", findClosePointStopwatch.Elapsed));
+        debug(new FormatString("removing close points took {0}", removeClosePointsStopwatch.Elapsed));
 
     }
 
@@ -147,7 +173,7 @@ public class SpaceColonization : Grower {
 
             float quadraticDistanceToCurrent = GetQuadraticDistanceWithMaxValue(current.GetPosition(), attractionPoint, currentSmallestDistance);
 
-            if (quadraticDistanceToCurrent > -1) {
+            if (!Util.AlmostEqual(quadraticDistanceToCurrent, -1, 0.0001f)) {
                 if (AttractionPointInPerceptionAngle(current, attractionPoint)) { //angle calculation is a lot slower than one distance calculation
                     currentSmallestDistance = quadraticDistanceToCurrent;
                     closest = current;

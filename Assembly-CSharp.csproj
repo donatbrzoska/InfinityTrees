@@ -77,6 +77,7 @@
     <Compile Include="Assets\Grower\GrowthProperties\AttractionPoints\PseudoEllipsoid.cs" />
     <Compile Include="Assets\Grower\GrowthProperties\GrowthProperties.cs" />
     <Compile Include="Assets\Grower\GrowthProperties\GrowthPropertiesListener.cs" />
+    <Compile Include="Assets\Grower\NearestNodeAlgorithm.cs" />
     <Compile Include="Assets\Grower\SelfOrganization.cs" />
     <Compile Include="Assets\Grower\SortedNodeList.cs" />
     <Compile Include="Assets\Grower\SpaceColonization.cs" />

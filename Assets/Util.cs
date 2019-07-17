@@ -11,4 +11,8 @@ public static class Util {
     public static float DegreesToRadians(float degrees) {
         return (float) (degrees * Math.PI / 180);
     }
+
+    public static bool AlmostEqual(float a, float b, float precision) {
+        return Math.Abs(a - b) <= precision;
+    }
 }

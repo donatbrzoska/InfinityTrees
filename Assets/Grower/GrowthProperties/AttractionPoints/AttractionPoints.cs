@@ -19,10 +19,13 @@ public abstract class AttractionPoints : List<Vector3> {
         this.attractionPointsListener = attractionPointsListener;
     }
 
-    public AttractionPoints() {
-        seed = (int) (new System.Random()).NextDouble() * 65335;
-        random = new System.Random(seed);
-    }
+    //public AttractionPoints() {
+    //    Debug.Log("AttractionPoints Constructor called");
+        //    //seed = (int)(new System.Random()).NextDouble() * 65335;
+        //    seed = (int)Util.RandomInRange(0, 65335);
+        //    Debug.Log("Seed is " + seed);
+        //    random = new System.Random(seed);
+    //}
 
     protected abstract void Generate();
 

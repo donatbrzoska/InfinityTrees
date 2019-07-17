@@ -3,6 +3,8 @@ using System.Runtime.CompilerServices;
 using UnityEngine;
 using UnityEngine.UI;
 using System;
+using System.Diagnostics;
+using System.Threading;
 
 [RequireComponent(typeof(MeshFilter))]
 public class TreeCreator : MonoBehaviour {
@@ -39,19 +41,35 @@ public class TreeCreator : MonoBehaviour {
     // Start is called before the first frame update
     void Start() {
 
-
-        //SortedList l = new SortedList();
+        //List<int> l = new List<int>();
         //for (int i=0; i<40000; i++) {
-        //    int e = UnityEngine.Random.Range(0, 4000);
-        //    l.InsertSorted(e);
+        //    int number = UnityEngine.Random.Range(0, 4000);
+        //    int index = UnityEngine.Random.Range(0, l.Count-1);
+
+        //    l.Insert(index, number);
         //}
 
-        //int j = 32;
-        //Debug.Log("Nearest to " + j + " is " + l.GetNearest(j));
+        //SortedIntList l = new SortedIntList();// { 2, 2, 4, 9, 12, 12, 34, 34};
 
-        //Debug.Log("Count: " + l.Count);
+        //Stopwatch t = new Stopwatch();
+        //t.Start();
+        //for (int i = 0; i < 40000; i++) {
+        //    int e = UnityEngine.Random.Range(0, 100000);
+        //    l.InsertSorted(e);
+        //}
+        //t.Stop();
+        //debug("insertions took: " + t.Elapsed);
+
+        //int j = 11111111;
+        ////int j = 0;
+        //t.Restart();
+        //UnityEngine.Debug.Log("Nearest to " + j + " is " + l[l.GetNearestIndex(j)]);
+        //t.Stop();
+        //debug("search took: " + t.Elapsed);
+
+        //UnityEngine.Debug.Log("Count: " + l.Count);
         //foreach (int k in l) {
-        //    Debug.Log(k);
+        //    UnityEngine.Debug.Log(k);
         //}
 
         Initialize();
@@ -77,15 +95,21 @@ public class TreeCreator : MonoBehaviour {
         //bigTree();
 
 
-        int initialAge = 30;
-        float initialRadius_x = 3;
-        float initialRadius_y = 5;
-        float initialRadius_z = 3.5f;
+        //int initialAge = 30;
+        //float initialRadius_x = 3;
+        //float initialRadius_y = 5;
+        //float initialRadius_z = 3.5f;
+
+        int initialAge = 40;
+        float initialRadius_x = 10;
+        float initialRadius_y = 10;
+        float initialRadius_z = 10;
+
         //float initialRadius_x = 4;
         //float initialRadius_y = 10;
         //float initialRadius_z = 4;
 
-        GameObject.Find("Age Slider").GetComponent<Slider>().SetValueWithoutNotify(30);
+        GameObject.Find("Age Slider").GetComponent<Slider>().SetValueWithoutNotify(initialAge);
         GameObject.Find("Width X Slider").GetComponent<Slider>().SetValueWithoutNotify(initialRadius_x);
         GameObject.Find("Width Y Slider").GetComponent<Slider>().SetValueWithoutNotify(initialRadius_y);
         GameObject.Find("Width Z Slider").GetComponent<Slider>().SetValueWithoutNotify(initialRadius_z);
@@ -501,7 +525,7 @@ public class TreeCreator : MonoBehaviour {
      * - - Randomize
      * - Vertices und Triangles anzeigen
      *
-     * - automatisches Camera-Movement
+     * - automatisches / besseres Camera-Movement
      * 
      * >> EventSystem für Änderungen einzelner Werte
      * 
@@ -629,70 +653,118 @@ public class TreeCreator : MonoBehaviour {
 
 }
 
-public class SortedList : List<int> {
+public class SortedIntList : List<int> {
+
     public void InsertSorted(int e) {
         if (base.Count == 0) {
             base.Add(e);
-        } else {
-            //InsertSorted(e, 0, base.Count - 1);
-            for (int i = 0; i < base.Count; i++) {
-                if (e <= base[i]) {
-                    base.Insert(i, e);
-                    break;
-                }
-
-                if (i == base.Count - 1 && e > base[i]) {
-                    base.Add(e);
-                    break;
-                }
-            }
         }
 
-        //base.Add(e);
-        //base.Sort();
+        int i = GetNearestIndex(e);
+
+        if (e <= base[i]) { // if e is less or equal to the found index, the new element can be placed at that index
+            base.Insert(i, e);
+        } else { // otherwise e is greater, so the new element is placed right next to it
+            base.Insert(i + 1, e);
+        }
     }
 
-    public int GetNearest(int e) {
+    public int GetNearestIndex(int e) {
         if (base.Count == 0) {
             throw new System.Exception("List is empty...");
-        } else if (base.Count==1) {
-            return base[0];
+        } else if (base.Count == 1) {
+            return 0;
         } else {
-            return GetNearestH(e);
-        }
-    }
+            int l = 0;
+            int r = base.Count - 1;
 
-    private int GetNearestH(int e) {
-        int steps = 0;
+            int d = r - l;
+            int i = l + d / 2;
+            bool found = false;
 
-        int l = 0;
-        int r = base.Count - 1;
+            while (!found && l < r) {
+                // l<r is important because it may happen, that for example r gets smaller than l, ({ 2, 2, 4, 9, 12, 12, 34, 34} insert 13)
+                // in this case we just need to look at the neighbours and are done
 
-        int d = r - l;
-        int i = 0;
+                d = r - l;
+                if (d == 0) {
+                    break;
+                }
+                i = l + d / 2;
+                int current = base[i];
 
-        while (d>0) {
-            steps++;
+                if (Equals(e, current)) {
+                    found = true;
+                    break;
+                }
 
-            d = r - l;
-            i = l + d / 2;
-
-            int number = base[i];
-            if (Equals(e,number)) {
-                Debug.Log(steps + " steps");
-                return base[i];
+                if (LessThan(e, current)) {
+                    if (i == 0) { // when the element is smaller than the current and we already look at the smallest, the result is obvious
+                        found = true;
+                        break;
+                    } // otherwise look at the left
+                    r = i - 1;
+                } else {
+                    if (i == base.Count - 1) { //when the element is greater than the current and we already look at the greatest, the result is obvious
+                        found = true;
+                        break;
+                    } // otherwise look at the right
+                    l = i + 1;
+                }
             }
-            if (LessThan(e,number)) {
-                r = i - 1;
+
+            if (found) {
+                return i;
+            } else {
+                if (i == 0) {
+                    int mid = base[i];
+                    int d_mid = Math.Abs(mid - e);
+
+                    int right = base[i + 1];
+                    int d_right = Math.Abs(right - e);
+
+                    if (d_mid <= d_right) {
+                        return i;
+                    } else {
+                        return i + 1;
+                    }
+                } else if (i == base.Count - 1) {
+                    int left = base[i - 1];
+                    int d_left = Math.Abs(left - e);
+
+                    int mid = base[i];
+                    int d_mid = Math.Abs(mid - e);
+
+                    if (d_left <= d_mid) {
+                        return i - 1;
+                    } else {
+                        return i;
+                    }
+                } else {
+                    // when d==0, it is:
+                    // - base[i-1]<e -> because of that l was increased
+                    // - base[i]! =e -> because of that the Equals condition didn't match
+                    // - base[i+1]>e -> because of that r was decreased
+                    // so we need to find out which one is the closest
+                    int left = base[i - 1];
+                    int d_left = Math.Abs(left - e);
+
+                    int mid = base[i];
+                    int d_mid = Math.Abs(mid - e);
+
+                    int right = base[i + 1];
+                    int d_right = Math.Abs(right - e);
+
+                    if (d_left <= d_right && d_left <= d_mid) { //when they are equally distanced, return the left one
+                        return i - 1;
+                    } else if (d_mid < d_right && d_mid < d_left) {
+                        return i;
+                    } else /*if (d_right < d_mid && d_right < d_left)*/ {
+                        return i + 1;
+                    }
+                }
             }
-            //if (GreaterThan(e, number)) {
-                l = i + 1;
-            //}
         }
-
-        Debug.Log(steps + " steps");
-
-        return CheckNeighbours(e, i);
     }
 
     private bool Equals(int a, int b) {
@@ -702,63 +774,5 @@ public class SortedList : List<int> {
     private bool LessThan(int a, int b) {
         return a < b;
     }
-
-    //private bool GreaterThan(int a, int b) {
-    //    return a > b;
-    //}
-
-    private int CheckNeighbours(int e, int i) {
-        int d_left = Math.Abs(base[i - 1] - e);
-        int d_index = Math.Abs(base[i] - e);
-        int d_right = Math.Abs(base[i + 1] - e);
-
-        int min = int.MaxValue;
-        if (d_left < min) {
-            min = d_left;
-        }
-        if (d_index < min) {
-            min = d_index;
-        }
-        if (d_right < min) {
-            min = d_right;
-        }
-
-        if (d_left == min) {
-            return base[i - 1];
-        }
-        if (d_index == min) {
-            return base[i];
-        }
-        //if (d_right == min) {
-            return base[i+1];
-        //}
-    }
-
-    private void InsertSorted(int e, int l, int r) {
-        int d = r - l;
-        int i = l + d / 2;
-
-        if (d == 0) {
-            base.Insert(i, e);
-        } else {
-            int number = base[i];
-            if (e == number) {
-                base.Insert(i, e);
-            } else if (e < number) {
-                if (i == 0) {
-                    base.Insert(i, e);
-                } else {
-                    r = i - 1;
-                    InsertSorted(e, l, r);
-                }
-            } else if (e > number) {
-                if (i == base.Count - 1) {
-                    base.Insert(i, e);
-                } else {
-                    l = i + 1;
-                    InsertSorted(e, l, r);
-                }
-            }
-        }
-    }
 }
+
