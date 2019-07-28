@@ -7,6 +7,7 @@ public class GrowthProperties : AttractionPointsListener {
     private float perceptionAngle; //SET
 
     private float clearDistance; //DEPENDS
+    private float clearDistance_2; //DEPENDS
 
     private Vector3 tropismsBackup;
     private Vector3 tropisms;
@@ -56,12 +57,21 @@ public class GrowthProperties : AttractionPointsListener {
         this.clearDistance = clearDistance * clearDistance;
     }
 
+    //THIS OR influenceDistance
+    public void SetClearDistance_2(float clearDistance_2) {
+        this.clearDistance_2 = clearDistance_2 * clearDistance_2;
+    }
+
     //public float GetClearDistance() {
     //    return clearDistance;
     //}
 
     public float GetSquaredClearDistance() {
         return clearDistance;
+    }
+
+    public float GetSquaredClearDistance_2() {
+        return clearDistance_2;
     }
 
 

@@ -3,7 +3,7 @@ using UnityEngine.UI;
 
 public class Age : MonoBehaviour {
 
-    int sentValue;
+    int sentValue=30;
     Middleware middleware;
 
     public Age() {

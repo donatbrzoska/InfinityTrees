@@ -28,7 +28,7 @@ public class SpaceColonization : Grower {
     //int threadsLeft = 8;
     //Vector3 defaultPosition = new Vector3(0, -10000, 0);
 
-    bool default_algorithm = false;
+    bool advanced_algorithm = true;
     List<Node> nodeList;
     NearestNodeAlgorithm nearestNodeAlgorithm;
 
@@ -58,7 +58,7 @@ public class SpaceColonization : Grower {
         running = true;
 
         if (regrow) {
-            if (default_algorithm) {
+            if (!advanced_algorithm) {
                 nodeList = new List<Node> { root };
             } else {
                 nearestNodeAlgorithm = new NearestNodeAlgorithm();
@@ -85,9 +85,14 @@ public class SpaceColonization : Grower {
             findClosePointStopwatch.Start();
             //iterate through all attractionPoints
             foreach (Vector3 attractionPoint in growthProperties.GetAttractionPoints()) {
+
+                if (!running) {
+                    break;
+                }
+
                 //and find the closest Node respectively
                 Node closest;
-                if (default_algorithm) {
+                if (!advanced_algorithm) {
                     closest = FindClosestNode(attractionPoint);
                 } else {
                     closest = nearestNodeAlgorithm.GetNearestWithinSquaredDistance(attractionPoint, growthProperties.GetSquaredInfluenceDistance(), growthProperties.GetPerceptionAngle());
@@ -105,6 +110,9 @@ public class SpaceColonization : Grower {
             }
             findClosePointStopwatch.Stop();
 
+            if (!running) {
+                return;
+            }
 
             List<Vector3> newPositions = new List<Vector3>();
             //iterate through all Nodes with attractionPoints associated
@@ -124,7 +132,7 @@ public class SpaceColonization : Grower {
                     //add new node to currentNode
                     currentNode.Add(happyNodePosition);
                     //add to the nodeList
-                    if (default_algorithm) {
+                    if (!advanced_algorithm) {
                         nodeList.Add(currentNode.GetSubnodes()[currentNode.GetSubnodes().Count - 1]);
                     } else {
                         nearestNodeAlgorithm.Add(currentNode.GetSubnodes()[currentNode.GetSubnodes().Count - 1]);
@@ -135,7 +143,11 @@ public class SpaceColonization : Grower {
             }
 
             removeClosePointsStopwatch.Start();
-            RemoveClosePoints(newPositions);
+            if (i > growthProperties.GetIterations() * 0.7) {
+                RemoveClosePoints(newPositions, true);
+            } else {
+                RemoveClosePoints(newPositions);
+            }
             removeClosePointsStopwatch.Stop();
 
             growerListener.OnIterationFinished();
@@ -190,9 +202,14 @@ public class SpaceColonization : Grower {
         return isInPerceptionAngle;
     }
 
-    private void RemoveClosePoints(List<Vector3> newPositions) {
+    private void RemoveClosePoints(List<Vector3> newPositions, bool d2 = false) {
         foreach (Vector3 newPosition in newPositions) {
-            List<Vector3> closePoints = DetermineAttractionPointsWithinQuadraticDistance(newPosition, growthProperties.GetSquaredClearDistance());
+            List<Vector3> closePoints;
+            if (!d2) {
+                closePoints = DetermineAttractionPointsWithinQuadraticDistance(newPosition, growthProperties.GetSquaredClearDistance());
+            } else {
+                closePoints = DetermineAttractionPointsWithinQuadraticDistance(newPosition, growthProperties.GetSquaredClearDistance_2());
+            }
             foreach (Vector3 closePoint in closePoints) {
                 growthProperties.GetAttractionPoints().Remove(closePoint);
             }

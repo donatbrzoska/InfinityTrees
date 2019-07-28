@@ -36,6 +36,13 @@ public class Node : IEquatable<Node>{
         this.position = position;
     }
 
+    //public Node(Vector3 position, Vector3 normal, float radius, GeometryProperties geometryProperties) {
+    //    this.position = new Vector3(position.x, position.y, position.z);
+    //    this.normal = new Vector3(normal.x, normal.y, normal.z);
+    //    this.radius = radius;
+    //    this.geometryProperties = geometryProperties;
+    //}
+
     public Node(Vector3 position, GeometryProperties geometryProperties) : this(position, null, geometryProperties) { }
 
     private Node(Vector3 position, Node supernode, GeometryProperties geometryProperties) {
@@ -52,6 +59,17 @@ public class Node : IEquatable<Node>{
         for (int i = 0; i < geometryProperties.GetLeavesPerNode(); i++) {
             leaves.Add(new Leaf(position, geometryProperties));
         }
+    }
+
+    private Node(Vector3 position, Vector3 normal, float radius, GeometryProperties geometryProperties) {
+        this.position = position;
+        this.normal = normal;
+        this.radius = radius;
+        this.geometryProperties = geometryProperties;
+    }
+
+    public Node GetGeometryCopyWithNormalAndRadius(Vector3 normal, float radius) {
+        return new Node(this.position, normal, radius, geometryProperties);
     }
 
     public void Add(Vector3 position) {
@@ -196,9 +214,9 @@ public class Node : IEquatable<Node>{
     //}
 
 
-    public void GetCircleVertices(List<Vector3> verticesResult, bool doubled) {
+    public void GetCircleVertices(List<Vector3> verticesResult) {
         lock (this) {
-            TreeUtil.CalculateAndStoreCircleVertices(verticesResult, position, normal, radius, geometryProperties.GetCircleResolution(), doubled);
+            TreeUtil.CalculateAndStoreCircleVertices(verticesResult, position, normal, radius, geometryProperties.GetCircleResolution());
         }
     }
 

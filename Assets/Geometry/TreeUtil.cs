@@ -168,7 +168,7 @@ public static class TreeUtil
 	//    return result;
 	//}
 
-	public static void CalculateAndStoreCircleVertices(List<Vector3> verticesResult, Vector3 position, Vector3 targetNormal, float radius, int resolution, bool doubled)
+	public static void CalculateAndStoreCircleVertices(List<Vector3> verticesResult, Vector3 position, Vector3 targetNormal, float radius, int resolution)
 	{
 		float angle = 360f / resolution;
 		float currentAngle = 0;
@@ -299,8 +299,7 @@ public static class TreeUtil
 	//    return triangles;
 	//}
 
-	public static void CalculateCylinderTriangles(List<int> trianglesResult, int fromVerticesOffset, int toVerticesOffset, int resolution)
-	{
+	public static void CalculateCylinderTriangles(List<int> trianglesResult, int fromVerticesOffset, int toVerticesOffset, int resolution) {
 		//initialize a VertexPointer for both circles
 		//the VertexPointers indicate, where the next vertex is going to be read from
 		int fromVertexPointer = fromVerticesOffset;
@@ -321,24 +320,19 @@ public static class TreeUtil
 		}
 	}
 
-	public static Vector3[] CalculateNormals(Vector3[] vertices, int[] triangles)
-	{
-		//debug("Calculating normals for " + vertices.Length + " vertices and " + triangles.Length + " triangles");
-		if (triangles.Length == 0)
-		{
+	public static Vector3[] CalculateNormals(Vector3[] vertices, int[] triangles) {
+        debug("Calculating normals for " + vertices.Length + " vertices and " + triangles.Length + " triangles");
+        if (triangles.Length == 0) {
 			debug("No triangles ...");
 			Vector3[] normals = new Vector3[vertices.Length];
 			return normals;
-		}
-		else
-		{
+		} else {
 			Dictionary<Vector3, Vector3> verticesToSummedNormals = new Dictionary<Vector3, Vector3>();
 
 			//https://stackoverflow.com/questions/16340931/calculating-vertex-normals-of-a-mesh?noredirect=1&lq=1
 			//iterate through all triangles
 			int triangle_vertexPointer = 0;
-			while (triangle_vertexPointer < triangles.Length)
-			{
+			while (triangle_vertexPointer < triangles.Length) {
 				// and calculate their normals
 				Vector3 a = vertices[triangles[triangle_vertexPointer++]];
 				Vector3 b = vertices[triangles[triangle_vertexPointer++]];
@@ -349,50 +343,42 @@ public static class TreeUtil
 				Vector3 currentNormal = Vector3.Cross(ab, ac);
 
 				// then, add the normal in the map to the respective vertex
-				if (verticesToSummedNormals.ContainsKey(a))
-				{
+				if (verticesToSummedNormals.ContainsKey(a)) {
 					verticesToSummedNormals[a] += currentNormal;
-				}
-				else
-				{
+				} else {
 					verticesToSummedNormals[a] = currentNormal;
 				}
 
-				if (verticesToSummedNormals.ContainsKey(b))
-				{
+				if (verticesToSummedNormals.ContainsKey(b)) {
 					verticesToSummedNormals[b] += currentNormal;
-				}
-				else
-				{
+				} else {
 					verticesToSummedNormals[b] = currentNormal;
 				}
 
-				if (verticesToSummedNormals.ContainsKey(c))
-				{
+				if (verticesToSummedNormals.ContainsKey(c)) {
 					verticesToSummedNormals[c] += currentNormal;
-				}
-				else
-				{
+				} else {
 					verticesToSummedNormals[c] = currentNormal;
 				}
 			}
 
 			//normalize all the summed normals
-			foreach (Vector3 normal in verticesToSummedNormals.Values)
-			{
+			foreach (Vector3 normal in verticesToSummedNormals.Values) {
 				normal.Normalize();
 			}
 
 			//put the calculated normals in an array, retrieving the respective normal for each vertex
 			Vector3[] normals = new Vector3[vertices.Length];
-			for (int i = 0; i < vertices.Length; i++)
-			{
+			for (int i = 0; i < vertices.Length; i++) {
 				Vector3 associatedVertex = vertices[i];
-				normals[i] = verticesToSummedNormals[associatedVertex];
+                try {
+                    normals[i] = verticesToSummedNormals[associatedVertex];
+                } catch (KeyNotFoundException e) {
+                    debug("Root's vertices are stored once too much. If this occurrs more circleResolution+1 times per normal calculation, there is a bug in the code!");
+                }
 			}
 
 			return normals;
 		}
 	}
-
 }

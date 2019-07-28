@@ -81,6 +81,7 @@
     <Compile Include="Assets\Grower\SelfOrganization.cs" />
     <Compile Include="Assets\Grower\SortedNodeList.cs" />
     <Compile Include="Assets\Grower\SpaceColonization.cs" />
+    <Compile Include="Assets\Notes.cs" />
     <Compile Include="Assets\RecycleBin\Ellipsoid.cs" />
     <Compile Include="Assets\RecycleBin\LeafCreator.cs" />
     <Compile Include="Assets\RecycleBin\SimpleSpaceColonization.cs" />

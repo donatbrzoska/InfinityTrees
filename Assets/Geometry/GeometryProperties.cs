@@ -15,6 +15,7 @@ public class GeometryProperties {
     private int circleResolution;
     //private int curveResolution = -1;
 
+    private float minRadiusRatioForNormalConnection;
 
 
     public void SetTipRadius(float tipRadius) {
@@ -43,6 +44,16 @@ public class GeometryProperties {
 
     public int GetCircleResolution() {
         return circleResolution;
+    }
+
+
+
+    public void SetMinRadiusRatioForNormalConnection(float minRadiusRatioForNormalConnection) {
+        this.minRadiusRatioForNormalConnection = minRadiusRatioForNormalConnection;
+    }
+
+    public float GetMinRadiusRatioForNormalConnection() {
+        return minRadiusRatioForNormalConnection;
     }
 
     //############################

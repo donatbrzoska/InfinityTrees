@@ -47,6 +47,7 @@ public class CameraMovement : MonoBehaviour {
                 }
             }
 
+
             Vector3 lookAt = new Vector3(treeCenter.x, treeCenter.y + y_position, treeCenter.z);
 
 
@@ -70,6 +71,7 @@ public class CameraMovement : MonoBehaviour {
                     // update the rotation parameters
                     horizontalRotation = (horizontalRotation + d_x) % 360;
 
+                    //comment this for camera demo
                     float verticalRotationBackup = verticalRotation; //make backup for restoring when flipping over
                     verticalRotation = (verticalRotation + d_y) % 360;
                     if (verticalRotation < 0 || verticalRotation > 180) { //don't flip over
