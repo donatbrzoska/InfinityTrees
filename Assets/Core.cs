@@ -233,8 +233,7 @@ public class Core : MonoBehaviour {
         growthProperties = new GrowthProperties();
         growthProperties.SetInfluenceDistance(1f);
         growthProperties.SetPerceptionAngle(160f);
-        growthProperties.SetClearDistance(0.9f);
-        growthProperties.SetClearDistance_2(0.9f);
+        growthProperties.SetClearDistance(0.9f, 0.9f);
         growthProperties.SetTropisms(new Vector3(0, 1f, 0));
         growthProperties.SetGrowthDistance(0.25f);
         growthProperties.SetAttractionPoints(attractionPoints);
@@ -307,8 +306,7 @@ public class Core : MonoBehaviour {
         //growthProperties.SetInfluenceDistance(1.1f);
         //growthProperties.SetInfluenceDistance(1.2f);
         growthProperties.SetPerceptionAngle(160f);
-        growthProperties.SetClearDistance(0.9f);
-        growthProperties.SetClearDistance_2(0.9f);
+        growthProperties.SetClearDistance(0.9f, 0.9f);
         //growthProperties.SetClearDistance(1f);
         //growthProperties.SetTropisms(new Vector3(-0.25f, 0.5f, 0));
         //growthProperties.SetTropisms(new Vector3(0, 0.5f, 0));
@@ -354,8 +352,7 @@ public class Core : MonoBehaviour {
 
         growthProperties.SetInfluenceDistance(1);
         growthProperties.SetPerceptionAngle(160f);
-        growthProperties.SetClearDistance(0.925f);
-        growthProperties.SetClearDistance_2(0.7f);
+        growthProperties.SetClearDistance(0.925f, 0.7f);
 
 
         //growthProperties.SetInfluenceDistance(1.3f);
@@ -407,7 +404,7 @@ public class Core : MonoBehaviour {
         growthProperties.SetInfluenceDistance(5f);
         //growthProperties.SetInfluenceDistance(1.1f);
         growthProperties.SetPerceptionAngle(160f);
-        growthProperties.SetClearDistance(0.8f);
+        growthProperties.SetClearDistance(0.8f, 0.8f);
         //growthProperties.SetClearDistance(1f);
         //growthProperties.SetTropisms(new Vector3(-0.25f, 0.5f, 0));
         //growthProperties.SetTropisms(new Vector3(0, 0.5f, 0));
@@ -453,7 +450,7 @@ public class Core : MonoBehaviour {
         growthProperties.SetInfluenceDistance(2f);
         //growthProperties.SetInfluenceDistance(1.1f);
         growthProperties.SetPerceptionAngle(160f);
-        growthProperties.SetClearDistance(1.8f);
+        growthProperties.SetClearDistance(1.8f, 1.8f);
         //growthProperties.SetClearDistance(1f);
         //growthProperties.SetTropisms(new Vector3(-0.25f, 0.5f, 0));
         growthProperties.SetTropisms(new Vector3(0, 0.5f, 0));

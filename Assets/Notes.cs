@@ -1,4 +1,17 @@
-﻿/* NOTIZEN 
+﻿/* NEXT STEPS
+ *
+ * Blätter als Partikel
+ * Blattfarbe und Anzahl einstellen
+ * 
+ * Distanzberechnungen optimieren
+ *
+ * Shadowgrid
+ *
+ * 
+ *
+ */
+
+/* TODO
  * Random Parameter Configurations
  *
  * 

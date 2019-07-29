@@ -64,13 +64,13 @@
   <ItemGroup>
     <Compile Include="Assets\Core.cs" />
     <Compile Include="Assets\FormatString.cs" />
-    <Compile Include="Assets\Geometry\FinishedPointer.cs" />
-    <Compile Include="Assets\Geometry\GeometryProperties.cs" />
-    <Compile Include="Assets\Geometry\Leaf.cs" />
-    <Compile Include="Assets\Geometry\Node.cs" />
-    <Compile Include="Assets\Geometry\ObjExporter.cs" />
-    <Compile Include="Assets\Geometry\Tree.cs" />
-    <Compile Include="Assets\Geometry\TreeUtil.cs" />
+    <Compile Include="Assets\TopologyGeometry\FinishedPointer.cs" />
+    <Compile Include="Assets\TopologyGeometry\GeometryProperties.cs" />
+    <Compile Include="Assets\TopologyGeometry\Leaf.cs" />
+    <Compile Include="Assets\TopologyGeometry\Node.cs" />
+    <Compile Include="Assets\TopologyGeometry\ObjExporter.cs" />
+    <Compile Include="Assets\TopologyGeometry\Tree.cs" />
+    <Compile Include="Assets\TopologyGeometry\TreeUtil.cs" />
     <Compile Include="Assets\Grower\Grower.cs" />
     <Compile Include="Assets\Grower\GrowerListener.cs" />
     <Compile Include="Assets\Grower\GrowthProperties\AttractionPoints\AttractionPoints.cs" />

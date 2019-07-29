@@ -137,11 +137,7 @@ public class SpaceColonization : Grower {
             }
 
             removeClosePointsStopwatch.Start();
-            if (i > growthProperties.GetIterations() * 0.7) {
-                RemoveClosePoints(newPositions, true);
-            } else {
-                RemoveClosePoints(newPositions);
-            }
+            RemoveClosePoints(newPositions, i);
             removeClosePointsStopwatch.Stop();
 
             growerListener.OnIterationFinished();
@@ -196,14 +192,10 @@ public class SpaceColonization : Grower {
         return isInPerceptionAngle;
     }
 
-    private void RemoveClosePoints(List<Vector3> newPositions, bool d2 = false) {
+    private void RemoveClosePoints(List<Vector3> newPositions, int iteration) {
         foreach (Vector3 newPosition in newPositions) {
             List<Vector3> closePoints;
-            if (!d2) {
-                closePoints = DetermineAttractionPointsWithinQuadraticDistance(newPosition, growthProperties.GetSquaredClearDistance());
-            } else {
-                closePoints = DetermineAttractionPointsWithinQuadraticDistance(newPosition, growthProperties.GetSquaredClearDistance_2());
-            }
+            closePoints = DetermineAttractionPointsWithinQuadraticDistance(newPosition, growthProperties.GetSquaredClearDistance(iteration));
             foreach (Vector3 closePoint in closePoints) {
                 growthProperties.GetAttractionPoints().Remove(closePoint);
             }

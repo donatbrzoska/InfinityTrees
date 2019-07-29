@@ -6,8 +6,8 @@ public class GrowthProperties : AttractionPointsListener {
     private float influenceDistance; //FREE
     private float perceptionAngle; //SET
 
-    private float clearDistance; //DEPENDS
-    private float clearDistance_2; //DEPENDS
+    private float clearDistance_begin; //DEPENDS
+    private float clearDistance_end; //DEPENDS
 
     private Vector3 tropismsBackup;
     private Vector3 tropisms;
@@ -53,25 +53,60 @@ public class GrowthProperties : AttractionPointsListener {
 
 
     //THIS OR influenceDistance
-    public void SetClearDistance(float clearDistance) {
-        this.clearDistance = clearDistance * clearDistance;
+    //public void SetClearDistance(float clearDistance) {
+    //    this.clearDistance_begin = clearDistance * clearDistance;
+    //    this.clearDistance_end = clearDistance_begin;
+    //}
+
+    public void SetClearDistance(float begin, float end) {
+        this.clearDistance_begin = begin * begin;
+        this.clearDistance_end = end * end;
     }
+    //enum ClearDistanceFunction {
+    //    linear,
+    //    exponential
+    //}
+
 
     //THIS OR influenceDistance
-    public void SetClearDistance_2(float clearDistance_2) {
-        this.clearDistance_2 = clearDistance_2 * clearDistance_2;
-    }
+    //public void SetClearDistance_2(float clearDistance_2) {
+    //    this.clearDistance_2 = clearDistance_2 * clearDistance_2;
+    //}
 
     //public float GetClearDistance() {
     //    return clearDistance;
     //}
 
-    public float GetSquaredClearDistance() {
-        return clearDistance;
+
+    private float MapIteration(int iteration, float begin, float end) {
+        float d = end - begin;
+        float step = d / iterations;
+
+        return begin + step * iteration;
     }
 
-    public float GetSquaredClearDistance_2() {
-        return clearDistance_2;
+    private float ExponentialInterpolation(int iteration) {
+        float d = clearDistance_begin - clearDistance_end;
+
+        return (float)(clearDistance_begin - Math.Exp(MapIteration(iteration, -4, 0)) * d);
+    }
+
+    private float Sigmoid(float x) {
+        return (float) (Math.Exp(x) / (1 + Math.Exp(x)));
+    }
+
+    private float SigmoidInterpolation(int iteration) {
+        float d = clearDistance_begin - clearDistance_end;
+
+        return (float)(clearDistance_begin - Sigmoid(MapIteration(iteration, -15, 8)) * d);
+    }
+
+    public float GetSquaredClearDistance(int iteration) {
+
+        return SigmoidInterpolation(iteration);
+
+        //float step = d / iterations;
+        //return clearDistance_begin + step * iteration;
     }
 
 
