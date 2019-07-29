@@ -48,9 +48,9 @@ public class Tree : GrowerListener {
     private Vector2[] uvs;
     private int[] triangles;
 
-    TreeCreator treeCreator;
+    Core treeCreator;
 
-    public Tree(Vector3 position, Grower grower, GeometryProperties geometryProperties, TreeCreator treeCreator) {
+    public Tree(Vector3 position, Grower grower, GeometryProperties geometryProperties, Core treeCreator) {
         this.grower = grower;
         this.geometryProperties = geometryProperties;
         this.treeCreator = treeCreator;
@@ -260,6 +260,7 @@ public class Tree : GrowerListener {
     public void OnAttractionPointsChanged() {
         //grower.GetGrowthProperties().ResetTropisms();
         //grower.GetGrowthProperties().ResetAttractionPoints();
+        treeCreator.OnAttractionPointsChanged();
         Regrow();
     }
 

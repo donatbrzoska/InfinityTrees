@@ -62,6 +62,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\Core.cs" />
     <Compile Include="Assets\FormatString.cs" />
     <Compile Include="Assets\Geometry\FinishedPointer.cs" />
     <Compile Include="Assets\Geometry\GeometryProperties.cs" />
@@ -89,7 +90,6 @@
     <Compile Include="Assets\RecycleBin\Spheroid.cs" />
     <Compile Include="Assets\RecycleBin\VertexPointer.cs" />
     <Compile Include="Assets\ThreadManager.cs" />
-    <Compile Include="Assets\TreeCreator.cs" />
     <Compile Include="Assets\UI\_.cs" />
     <Compile Include="Assets\UI\__.cs" />
     <Compile Include="Assets\UI\___.cs" />
@@ -98,9 +98,10 @@
     <Compile Include="Assets\UI\CrownShape.cs" />
     <Compile Include="Assets\UI\Middleware.cs" />
     <Compile Include="Assets\UI\NewSeed.cs" />
-    <Compile Include="Assets\UI\PointCloud.cs" />
+    <Compile Include="Assets\UI\PointCloudRenderer.cs" />
     <Compile Include="Assets\UI\QuitOnEscape.cs" />
     <Compile Include="Assets\UI\Save.cs" />
+    <Compile Include="Assets\UI\TreeRenderer.cs" />
     <Compile Include="Assets\Util.cs" />
     <Reference Include="Unity.Timeline.Editor">
       <HintPath>/Users/donatdeva/Documents/Studium/6. Semester/Bachelorarbeit/Unity/AnimationTrees/Library/ScriptAssemblies/Unity.Timeline.Editor.dll</HintPath>

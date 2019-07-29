@@ -30,12 +30,12 @@ public class CameraMovement : MonoBehaviour {
     void Update() {
         if (Enabled) {
             // find out where to look at
-            Vector3 treeCenter = GameObject.Find("TreeMesh").GetComponent<TreeCreator>().GetAttractionPoints().GetCenter();
+            Vector3 treeCenter = GameObject.Find("Core").GetComponent<Core>().GetAttractionPoints().GetCenter();
 
             if (Input.GetKey(KeyCode.Space)) {
                 y_position += speed;
 
-                if (y_position > ((PseudoEllipsoid)GameObject.Find("TreeMesh").GetComponent<TreeCreator>().GetAttractionPoints()).GetHeight()) {
+                if (y_position > ((PseudoEllipsoid)GameObject.Find("Core").GetComponent<Core>().GetAttractionPoints()).GetHeight()) {
                     y_position -= speed;
                 }
             }

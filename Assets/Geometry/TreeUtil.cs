@@ -5,7 +5,7 @@ using UnityEngine;
 public static class TreeUtil
 {
 
-	private static bool debugEnabled = true;
+	private static bool debugEnabled = false;
 	private static void debug(string message, [CallerMemberName]string callerName = "")
 	{
 		if (debugEnabled)
@@ -67,121 +67,12 @@ public static class TreeUtil
 		}
 	}
 
-	//public static Vector3[] Translate(Vector3[] vectors, Vector3 by) {
-	//    for (int i = 0; i < vectors.Length; i++) {
-	//        vectors[i].x += by.x;
-	//        vectors[i].y += by.y;
-	//        vectors[i].z += by.z;
-	//    }
-	//    return vectors;
-	//}
-
-	// resolution must be >= 3
-	//public static Vector3[] CalculateCircleVertices(Vector3 position, Vector3 targetNormal, float radius, int resolution, bool doubled) {
-	//    float angle = 360f / resolution;
-	//    float currentAngle = 0;
-
-	//    //Vector3[] result = new Vector3[resolution];
-	//    //for (int i = 0; i < resolution; i++) {
-	//    //    //calculate coordinates
-	//    //    float x1 = Mathf.Cos(ToRadians(currentAngle));
-	//    //    float y1 = 0;
-	//    //    float z1 = Mathf.Sin(ToRadians(currentAngle));
-
-	//    //    //create vertex
-	//    //    Vector3 vertex = new Vector3(x1, y1, z1);
-
-	//    //    //apply radius parameter
-	//    //    vertex = vertex * radius;
-
-	//    //    //store in result
-	//    //    result[i] = vertex;
-
-	//    //    currentAngle = currentAngle + angle;
-	//    //}
-
-	//    Vector3[] result;
-	//    if (doubled) {
-	//        result = new Vector3[resolution * 2 + 2];
-	//    } else {
-	//        result = new Vector3[resolution + 1];
-	//    }
-	//    int vertexPointer = 0;
-
-	//    Vector3 firstVertex = new Vector3(00000000, 00000000,0000000); //just setting some default value
-
-
-	//    //calculate rotation Quaternion if necessary
-	//    Quaternion rotation = Quaternion.AngleAxis(0, Vector3.zero);
-	//    if (!targetNormal.Equals(Vector3.up)) {
-	//        // 1. calculate the angle between the current normal (0, 1, 0) and the targetNormal
-	//        float _angle = Vector3.Angle(Vector3.up, targetNormal);
-
-	//        // 2. rotate all coordinates by that angle (the axis to rotate by is calculated by cross(normal, targetNormal))
-	//        //WRITE: order of Cross() parameters is important, probably determines in which direction the rotation takes place (right hand rule)
-	//        //Vector3 axis = Vector3.Cross(targetNormal, normal);
-	//        Vector3 axis = Vector3.Cross(Vector3.up, targetNormal);
-	//        rotation = Quaternion.AngleAxis(_angle, axis);
-	//    }
-
-	//    for (int i = 0; i < resolution; i++) {
-	//        //calculate coordinates
-	//        float x1 = Mathf.Cos(ToRadians(currentAngle));
-	//        float y1 = 0;
-	//        float z1 = Mathf.Sin(ToRadians(currentAngle));
-
-	//        //create vertex
-	//        Vector3 vertex = new Vector3(x1, y1, z1);
-
-
-	//        //apply target normal
-	//        vertex = rotation * vertex;
-
-	//        //apply radius parameter
-	//        vertex = vertex * radius;
-
-	//        //apply position (after rotating!)
-	//        vertex = vertex + position;
-
-
-	//        //store in result
-	//        result[vertexPointer] = vertex;
-	//        if (doubled) {
-	//            result[resolution + vertexPointer + 1] = vertex; //second circle
-	//        }
-	//        vertexPointer++;
-
-	//        //store first vertex
-	//        if (i==0) {
-	//            firstVertex = vertex;
-	//        }
-
-	//        currentAngle = currentAngle + angle;
-	//    }
-
-	//    //store first vertexPointer two times more
-	//    result[resolution] = firstVertex;
-	//    if (doubled) {
-	//        result[resolution * 2 + 1] = firstVertex;
-	//    }
-
-	//    return result;
-	//}
-
 	public static void CalculateAndStoreCircleVertices(List<Vector3> verticesResult, Vector3 position, Vector3 targetNormal, float radius, int resolution)
 	{
 		float angle = 360f / resolution;
 		float currentAngle = 0;
 
-		//Vector3[] result;
-		//if (doubled) {
-		//    result = new Vector3[resolution * 2 + 2];
-		//} else {
-		//    result = new Vector3[resolution + 1];
-		//}
-		//int vertexPointer = 0;
-
-		Vector3 firstVertex = new Vector3(00000000, 00000000, 0000000); //just setting some default value
+		Vector3 firstVertex = new Vector3(0, 0, 0); //just setting some default value
 
 
 		//calculate rotation Quaternion if necessary
@@ -221,11 +112,6 @@ public static class TreeUtil
 
 			//store in result
 			verticesResult.Add(vertex);
-			//result[vertexPointer] = vertex;
-			//if (doubled) {
-			//    result[resolution + vertexPointer + 1] = vertex; //second circle
-			//}
-			//vertexPointer++;
 
 			//store first vertex
 			if (i == 0)
@@ -238,66 +124,8 @@ public static class TreeUtil
 
 		//store first vertex once more for texturing
 		verticesResult.Add(firstVertex);
-		//store first vertex two times more
-		//result[resolution] = firstVertex;
-		//if (doubled) {
-		//    result[resolution * 2 + 1] = firstVertex;
-		//}
 
 	}
-
-	//public static int[] CalculateCylinderTriangles(int fromVerticesOffset, int toVerticesOffset, int resolution) {
-	//    //every resolution results in 2 triangles which consist of 3 vertices
-	//    int[] triangles = new int[resolution * 2 * 3];
-	//    int trianglePointer = 0;
-
-	//    //initialize a VertexPointer for both circles
-	//    //the VertexPointers indicate, where the next vertex is going to be read from
-	//    VertexPointer fromVertexPointer = new VertexPointer(resolution, fromVerticesOffset);
-	//    VertexPointer toVertexPointer = new VertexPointer(resolution, toVerticesOffset);
-
-	//    //for every resolution, two triangles are made
-	//    for (int i = 0; i < resolution; i++) {
-	//        //first triangle
-	//        triangles[trianglePointer++] = fromVertexPointer.Current(); fromVertexPointer.Increment();
-	//        triangles[trianglePointer++] = toVertexPointer.Current();
-	//        triangles[trianglePointer++] = fromVertexPointer.Current();
-
-	//        //second triangle
-	//        triangles[trianglePointer++] = fromVertexPointer.Current();
-	//        triangles[trianglePointer++] = toVertexPointer.Current(); toVertexPointer.Increment();
-	//        triangles[trianglePointer++] = toVertexPointer.Current();
-	//    }
-
-	//    return triangles;
-	//}
-
-
-	//public static int[] CalculateCylinderTriangles(int fromVerticesOffset, int toVerticesOffset, int resolution) {
-	//    //every resolution results in 2 triangles which consist of 3 vertices
-	//    int[] triangles = new int[resolution * 2 * 3];
-	//    int trianglePointer = 0;
-
-	//    //initialize a VertexPointer for both circles
-	//    //the VertexPointers indicate, where the next vertex is going to be read from
-	//    int fromVertexPointer = fromVerticesOffset;
-	//    int toVertexPointer = toVerticesOffset;
-
-	//    //for every resolution, two triangles are made
-	//    for (int i = 0; i < resolution; i++) {
-	//        //first triangle
-	//        triangles[trianglePointer++] = fromVertexPointer; fromVertexPointer++;
-	//        triangles[trianglePointer++] = toVertexPointer;
-	//        triangles[trianglePointer++] = fromVertexPointer;
-
-	//        //second triangle
-	//        triangles[trianglePointer++] = fromVertexPointer;
-	//        triangles[trianglePointer++] = toVertexPointer; toVertexPointer++;
-	//        triangles[trianglePointer++] = toVertexPointer;
-	//    }
-
-	//    return triangles;
-	//}
 
 	public static void CalculateCylinderTriangles(List<int> trianglesResult, int fromVerticesOffset, int toVerticesOffset, int resolution) {
 		//initialize a VertexPointer for both circles

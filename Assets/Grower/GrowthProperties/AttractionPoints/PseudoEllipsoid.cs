@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public sealed class PseudoEllipsoid : AttractionPoints {
@@ -9,7 +10,7 @@ public sealed class PseudoEllipsoid : AttractionPoints {
     float cutoffRatio_top; //how many "percent" of the sphere in y direction are cut off at the top
 
     float density;
-    float densityRatio; //TODO, what did I want to do here?
+    //float densityRatio; //TODO, what did I want to do here?
 
     float height;
     public float GetHeight() {
@@ -35,7 +36,7 @@ public sealed class PseudoEllipsoid : AttractionPoints {
 
     override protected void Generate() {
         base.Clear();
-        base.backup.Clear();
+        base.backup = new List<Vector3>();//.Clear();
 
         //1. Calculate volume of sphere with radius 1
         float radius = 1f;

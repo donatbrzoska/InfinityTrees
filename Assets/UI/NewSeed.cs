@@ -12,6 +12,6 @@ public class NewSeed : MonoBehaviour {
     public void OnClick() {
         //Debug.Log("UI: Button: NewSeed");
 
-		GameObject.Find("TreeMesh").GetComponent<TreeCreator>().OnNewSeed();
+		GameObject.Find("Core").GetComponent<Core>().OnNewSeed();
     }
 }

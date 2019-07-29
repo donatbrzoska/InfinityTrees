@@ -6,11 +6,11 @@ using UnityEngine.UI;
 public class EventHandler : MonoBehaviour
 {
     Dictionary<GameObject, float> sliders = new Dictionary<GameObject, float>();
-    TreeCreator listener;
+    Core listener;
 
     // Start is called before the first frame update
     void Start() {
-        listener = GameObject.Find("TreeMesh").GetComponent<TreeCreator>();
+        listener = GameObject.Find("TreeMesh").GetComponent<Core>();
         sliders[GameObject.Find("Width X Slider")] = -1;
         sliders[GameObject.Find("Width Y Slider")] = -1;
         sliders[GameObject.Find("Width Z Slider")] = -1;

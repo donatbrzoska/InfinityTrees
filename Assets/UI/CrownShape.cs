@@ -12,33 +12,33 @@ public class CrownShape : MonoBehaviour {
 
     public void OnValueChanged_x() {
         float value = GetComponent<Slider>().value;
-        GameObject.Find("TreeMesh").GetComponent<TreeCreator>().OnCrownRadius_x(value);
+        GameObject.Find("Core").GetComponent<Core>().OnCrownRadius_x(value);
 
         middleware.DisableCameraMovement();
-        middleware.ShowPointCloud();
+        middleware.EnablePointCloudRenderer();
     }
 
     public void OnValueChanged_y() {
         float value = GetComponent<Slider>().value;
-        GameObject.Find("TreeMesh").GetComponent<TreeCreator>().OnCrownRadius_y(value);
+        GameObject.Find("Core").GetComponent<Core>().OnCrownRadius_y(value);
 
         middleware.DisableCameraMovement();
-        middleware.ShowPointCloud();
+        middleware.EnablePointCloudRenderer();
     }
 
     public void OnValueChanged_z() {
         float value = GetComponent<Slider>().value;
-        GameObject.Find("TreeMesh").GetComponent<TreeCreator>().OnCrownRadius_z(value);
+        GameObject.Find("Core").GetComponent<Core>().OnCrownRadius_z(value);
 
         middleware.DisableCameraMovement();
-        middleware.ShowPointCloud();
+        middleware.EnablePointCloudRenderer();
     }
 
 
     void Update() {
         if (Input.GetMouseButtonUp(0)) {
             middleware.EnableCameraMovement();
-            middleware.HidePointCloud();
+            middleware.DisablePointCloudRenderer();
         }
     }
 }

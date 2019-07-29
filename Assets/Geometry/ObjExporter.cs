@@ -49,6 +49,36 @@ public static class ObjExporter {
     }
 
 
+    public static string MeshToString(Vector3[] vertices, Vector3[] normals, Vector2[] uvs, int[] triangles) {
+        StringBuilder sb = new StringBuilder();
+
+        sb.Append("g ").Append("TreeMesh").Append("\n");
+        foreach (Vector3 v in vertices) {
+            sb.Append(string.Format("v {0} {1} {2}\n", v.x, v.y, v.z));
+        }
+        sb.Append("\n");
+        foreach (Vector3 v in normals) {
+            sb.Append(string.Format("vn {0} {1} {2}\n", v.x, v.y, v.z));
+        }
+        sb.Append("\n");
+        foreach (Vector3 v in uvs) {
+            sb.Append(string.Format("vt {0} {1}\n", v.x, v.y));
+        }
+        for (int i = 0; i < triangles.Length; i += 3) {
+            sb.Append(string.Format("f {0}/{0}/{0} {1}/{1}/{1} {2}/{2}/{2}\n",
+                triangles[i] + 1, triangles[i + 1] + 1, triangles[i + 2] + 1));
+        }
+        return sb.ToString();
+    }
+
+    public static void MeshToFile(Vector3[] vertices, Vector3[] normals, Vector2[] uvs, int[] triangles, string filename) {
+        using (StreamWriter sw = new StreamWriter(filename)) {
+            sw.Write(MeshToString(vertices, normals, uvs, triangles));
+        }
+        Debug.Log("Saved mesh to " + filename);
+    }
+
+
 
 
 

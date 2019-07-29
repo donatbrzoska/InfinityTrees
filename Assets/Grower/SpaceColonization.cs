@@ -22,12 +22,6 @@ public class SpaceColonization : Grower {
     }
 
 
-
-
-    //these are additional threads, there are always threadsLeft+1 active threads for the calculation
-    //int threadsLeft = 8;
-    //Vector3 defaultPosition = new Vector3(0, -10000, 0);
-
     bool advanced_algorithm = true;
     List<Node> nodeList;
     NearestNodeAlgorithm nearestNodeAlgorithm;

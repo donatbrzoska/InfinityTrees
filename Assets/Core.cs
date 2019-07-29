@@ -6,26 +6,13 @@ using System;
 using System.Diagnostics;
 using System.Threading;
 
-[RequireComponent(typeof(MeshFilter))]
-public class TreeCreator : MonoBehaviour {
+public class Core : MonoBehaviour {
     private static void debug(string message, [CallerMemberName]string callerName = "") {
         if (true) {
             UnityEngine.Debug.Log("DEBUG: TreeCreator: " + callerName + "(): " + message);
         }
     }
 
-    Mesh mesh;
-    Vector3[] vertices;
-    Vector3[] normals;
-    Vector2[] uvs;
-    int[] triangles;
-    //public Vector3[] vertices;
-    //public Vector3[] normals;
-    //public Vector2[] uvs;
-    //public int[] triangles;
-    bool meshReady;
-
-    Renderer renderer_;
 
     PseudoEllipsoid attractionPoints;
 
@@ -40,54 +27,6 @@ public class TreeCreator : MonoBehaviour {
 
     // Start is called before the first frame update
     void Start() {
-
-        //List<int> l = new List<int>();
-        //for (int i=0; i<40000; i++) {
-        //    int number = UnityEngine.Random.Range(0, 4000);
-        //    int index = UnityEngine.Random.Range(0, l.Count-1);
-
-        //    l.Insert(index, number);
-        //}
-
-        //SortedIntList l = new SortedIntList();// { 2, 2, 4, 9, 12, 12, 34, 34};
-
-        //Stopwatch t = new Stopwatch();
-        //t.Start();
-        //for (int i = 0; i < 40000; i++) {
-        //    int e = UnityEngine.Random.Range(0, 100000);
-        //    l.InsertSorted(e);
-        //}
-        //t.Stop();
-        //debug("insertions took: " + t.Elapsed);
-
-        //int j = 11111111;
-        ////int j = 0;
-        //t.Restart();
-        //UnityEngine.Debug.Log("Nearest to " + j + " is " + l[l.GetNearestIndex(j)]);
-        //t.Stop();
-        //debug("search took: " + t.Elapsed);
-
-        //UnityEngine.Debug.Log("Count: " + l.Count);
-        //foreach (int k in l) {
-        //    UnityEngine.Debug.Log(k);
-        //}
-
-        Initialize();
-
-        //SetTexture("potentialOak_png_alpha");
-        //SetTexture("texture");
-        //SetTexture("brown_green");
-        //SetTexture("orange_green");
-        //SetTexture("dark_brown_green");
-        SetTexture("dark_brown_light_blue");
-        //SetTexture("dark_brown_red");
-
-        //EnableTransparentTextures();
-
-        //SetNormalMap("potentialOak_normal");
-
-
-
 
         //smallTree_hangingBranches(); //TODO
         //normalTree();
@@ -133,39 +72,70 @@ public class TreeCreator : MonoBehaviour {
         tree.Grow();
     }
 
-    void Initialize() {
-        Application.targetFrameRate = 60;
+    //#######################################################################################
+    //##########                              MESH AGENT                           ##########
+    //#######################################################################################
 
-        mesh = new Mesh();
-        //GetComponent<MeshFilter>().mesh = mesh; //also works, but definately use sharedMesh for reading in ObjExporter!
-        GetComponent<MeshFilter>().sharedMesh = mesh;
-        renderer_ = GetComponent<MeshRenderer>();
+    Vector3[] vertices;
+    Vector3[] normals;
+    Vector2[] uvs;
+    int[] triangles;
+
+    bool meshReady;
+
+    object getMeshLock = new object();
+
+    public void OnMeshReady(Vector3[] vertices, Vector3[] normals, Vector2[] uvs, int[] triangles) {
+        lock (getMeshLock) {
+            this.vertices = vertices;
+            this.normals = normals;
+            this.uvs = uvs;
+            this.triangles = triangles;
+
+            meshReady = true;
+        }
     }
 
-    void SetTexture(string textureFileName) {
-        Texture2D texture = Resources.Load(textureFileName) as Texture2D;
-        renderer_.material.SetTexture("_MainTex", texture);
+    public bool MeshReady() {
+        return meshReady;
     }
 
-    void EnableTransparentTextures() {
-        //https://answers.unity.com/questions/1004666/change-material-rendering-mode-in-runtime.html
-        //for cutting out empty background of png
-        renderer_.material.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.One);
-        renderer_.material.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.Zero);
-        renderer_.material.SetInt("_ZWrite", 1);
-        renderer_.material.EnableKeyword("_ALPHATEST_ON");
-        renderer_.material.DisableKeyword("_ALPHABLEND_ON");
-        renderer_.material.DisableKeyword("_ALPHAPREMULTIPLY_ON");
-        renderer_.material.renderQueue = 2450;
-        //also see https://answers.unity.com/questions/1016155/standard-material-shader-ignoring-setfloat-propert.html
+    public void GetMesh(ref Vector3[] vertices, ref Vector3[] normals, ref Vector2[] uvs, ref int[] triangles) {
+        lock (getMeshLock) {
+            vertices = this.vertices;
+            normals = this.normals;
+            uvs = this.uvs;
+            triangles = this.triangles;
+        }
+        meshReady = false;
     }
 
-    void SetNormalMap(string normalMapFileName) {
-        Texture2D normalMap = Resources.Load(normalMapFileName) as Texture2D;
-        renderer_.material.EnableKeyword("_NORMALMAP");
-        renderer_.material.SetTexture("_BumpMap", normalMap);
+
+    //#######################################################################################
+    //##########                           POINT CLOUD AGENT                       ##########
+    //#######################################################################################
+
+    bool pointCloudReady;
+
+    //object getPointCloudLock = new object();
+
+    public void OnAttractionPointsChanged() {
+        pointCloudReady = true;
     }
 
+    public bool PointCloudReady() {
+        return pointCloudReady;
+    }
+
+    public List<Vector3> GetPointCloud() {
+        pointCloudReady = false;
+        return attractionPoints.GetBackup();
+    }
+
+
+    //#######################################################################################
+    //##########                         UI ELEMENT LISTENER                       ##########
+    //#######################################################################################
 
     public void OnAge(int value) {
         //debug("received");
@@ -204,15 +174,13 @@ public class TreeCreator : MonoBehaviour {
 
     //TODO: specify location &| unique naming
     public void OnSave() {
-        ObjExporter.MeshToFile(GetComponent<MeshFilter>(), "tree_" + mesh.vertices.Length + "_" + mesh.triangles.Length + ".obj");
-        //ObjExporter.MeshToFile(GetComponent<MeshFilter>().name, mesh, "tree_" + mesh.vertices.Length + "_" + mesh.triangles.Length + ".obj");
+        ObjExporter.MeshToFile(vertices, normals, uvs, triangles, "tree_" + vertices.Length + "_" + triangles.Length + ".obj");
     }
 
     public void OnApplicationQuit() {
         //UnityEngine.Debug.Log("Application ending after " + Time.time + " seconds");
         grower.Stop();
         ThreadManager.Join();
-        //ThreadManager.Reset();
     }
 
     //void smallTree_hangingBranches() {
@@ -301,6 +269,8 @@ public class TreeCreator : MonoBehaviour {
         //SET LISTENER
         grower.SetGrowerListener(tree);
     }
+
+
 
     void load_normalTree(int age, float radius_x, float radius_y, float radius_z) {
         //Vector3 center = new Vector3(0, 5f, 0);
@@ -521,43 +491,6 @@ public class TreeCreator : MonoBehaviour {
     }
 
 
-    // Update is called once per frame
-    void Update() {
-        //tree.GetEverything(ref vertices, ref normals, ref uvs, ref triangles);
-
-        if (meshReady) {
-            UpdateMesh();
-            meshReady = false;
-        }
-
-    }
-
-    //private void OnDrawGizmos() {
-    //    Gizmos.color = Color.yellow;
-    //    Gizmos.DrawSphere(Vector3.up, 3);
-    //}
-
-    public void OnMeshReady(Vector3[] vertices, Vector3[] normals, Vector2[] uvs, int[] triangles) {
-        lock (mesh) {
-            this.vertices = vertices;
-            this.normals = normals;
-            this.uvs = uvs;
-            this.triangles = triangles;
-
-            meshReady = true;
-        }
-    }
-
-    void UpdateMesh() {
-        lock (mesh) {
-            mesh.Clear();
-
-            mesh.vertices = vertices;
-            mesh.uv = uvs;
-            mesh.triangles = triangles;
-            mesh.normals = normals;
-        }
-    }
 }
 
 

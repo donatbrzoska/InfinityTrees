@@ -18,7 +18,7 @@ public class Age : MonoBehaviour {
         if (Input.GetMouseButtonUp(0)) {
             int value = (int) GetComponent<Slider>().value;
             if (sentValue != value) {
-                GameObject.Find("TreeMesh").GetComponent<TreeCreator>().OnAge(value);
+                GameObject.Find("Core").GetComponent<Core>().OnAge(value);
                 sentValue = value;
             }
 
