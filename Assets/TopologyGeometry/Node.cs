@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using UnityEngine;
 
-public class Node : IEquatable<Node>{
+public class Node : IEquatable<Node>, GeometryPropertiesObserver {
 
     private static bool debugEnabled = true;
     private static void debug(string message, [CallerMemberName]string callerName = "") {
@@ -51,13 +51,49 @@ public class Node : IEquatable<Node>{
         this.radius = geometryProperties.GetTipRadius();
 
         this.geometryProperties = geometryProperties;
+        geometryProperties.Subscribe(this);
 
         CalculateNormal();
 
+        UpdateLeaves();
+    }
 
-        //add leaves
-        for (int i = 0; i < geometryProperties.GetLeavesPerNode(); i++) {
+    private void UpdateLeaves() {
+        if (leaves.Count < geometryProperties.GetLeavesPerNode()) {
+            AddLeaves(geometryProperties.GetLeavesPerNode() - leaves.Count);
+        } else if (leaves.Count > geometryProperties.GetLeavesPerNode()) {
+            RemoveLeaves(leaves.Count - geometryProperties.GetLeavesPerNode());
+        }
+    }
+
+    //adds leavesPerNode leaves
+    private void AddLeaves(float leavesPerNode) {
+        int integer_part = (int)leavesPerNode;
+        float floating_part = leavesPerNode - integer_part;
+
+        float r = Util.RandomInRange(0, 1);
+        if (r <= floating_part) {
+            integer_part++;
+        }
+
+        for (int i = 0; i < integer_part; i++) {
             leaves.Add(new Leaf(position, geometryProperties));
+        }
+    }
+
+    //removes leavesPerNode leaves
+    private void RemoveLeaves(float leavesPerNode) {
+        int integer_part = (int)leavesPerNode;
+        float floating_part = leavesPerNode - integer_part;
+
+        float r = Util.RandomInRange(0, 1);
+        if (r <= floating_part) {
+            integer_part++;
+        }
+
+        for (int i = 0; i < integer_part; i++) {
+            geometryProperties.Unsubsribe(leaves[leaves.Count - 1]);
+            leaves.RemoveAt(leaves.Count-1);
         }
     }
 
@@ -232,5 +268,25 @@ public class Node : IEquatable<Node>{
 
     public bool Equals(Node other) {
         return (other!=null) && this.position.Equals(other.position);
+    }
+
+    //#######################################################################################
+    //##########                     GEOMETRY PROPERTIES OBSERVER                  ##########
+    //#######################################################################################
+
+    public void OnLeafTypeChanged() {
+        // do nothing
+    }
+
+    public void OnLeavesPerNodeChanged() {
+        UpdateLeaves();
+    }
+
+    public void OnLeavesEnabledChanged() {
+        // do nothing
+    }
+
+    public void OnLeafSizeChanged() {
+        // do nothing
     }
 }

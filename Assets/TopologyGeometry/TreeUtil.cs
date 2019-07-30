@@ -201,7 +201,7 @@ public static class TreeUtil
 				Vector3 associatedVertex = vertices[i];
                 try {
                     normals[i] = verticesToSummedNormals[associatedVertex];
-                } catch (KeyNotFoundException e) {
+                } catch (KeyNotFoundException) {
                     debug("Root's vertices are stored once too much. If this occurrs more circleResolution+1 times per normal calculation, there is a bug in the code!");
                 }
 			}

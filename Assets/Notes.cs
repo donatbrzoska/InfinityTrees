@@ -2,6 +2,19 @@
  *
  * Blätter als Partikel
  * Blattfarbe und Anzahl einstellen
+ *
+ * >Dreiecke
+ * - Größe der Dreiecke
+ * - Anzahl der Blätter
+ * 
+ * >Partikel:
+ * - Größe der Ellipsen
+ * - Größe der Lappen
+ * - Anzahl der Blätter
+ *
+ * Blätter an/aus
+ * Blattfarbe
+ *
  * 
  * Distanzberechnungen optimieren
  *
@@ -62,7 +75,8 @@
  * - - über Änderung des PerceptionVolumes -> Achse in Abhängigkeit der Noderichtung
  * - - bei Wachstum nach oben: Rotation um Winkel nach unten statt "Verschiebung der Wuchsrichtung" nach unten
  * - - über neue AttractionPoints, Persistenz durch Seed?
- *
+ * - >kleinere ClearDistance macht Tropismen hinfällig, viele AttractionPoints auch
+ * - - vermutlich weil es einfach unten keine AttractionPoints mehr gibt
  * 
  *
  * Space Colonization

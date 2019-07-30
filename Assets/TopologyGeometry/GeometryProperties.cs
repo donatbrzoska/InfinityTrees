@@ -1,9 +1,29 @@
-﻿using System;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 public class GeometryProperties {
 
     System.Random random = new System.Random();
+
+    List<GeometryPropertiesObserver> geometryPropertiesObservers = new List<GeometryPropertiesObserver>();
+
+    public void Subscribe(GeometryPropertiesObserver geometryPropertiesObserver) {
+        this.geometryPropertiesObservers.Add(geometryPropertiesObserver);
+        //Debug.Log(geometryPropertiesObservers.Count);
+    }
+
+    public void Unsubsribe(GeometryPropertiesObserver gpo) {
+        geometryPropertiesObservers.Remove(gpo);
+    }
+
+    public void UnsubscribeAll() {
+        geometryPropertiesObservers.Clear();
+    }
+
+    //GeometryPropertiesListener geometryPropertiesListener;
+    //public void SetGeometryPropertiesListener(GeometryPropertiesListener geometryPropertiesListener) {
+    //    this.geometryPropertiesListener = geometryPropertiesListener;
+    //}
 
     //############################
     //########## TWIGS  ##########
@@ -61,10 +81,10 @@ public class GeometryProperties {
     //############################
 
     private float maxTwigRadiusForLeaves; //DEPENDS on tipRadius?
-    private float minLeafSize; //FREE
-    private float maxLeafSize; //FREE
-    private LeafType leafType;
-    private int leavesPerNode; //TODO: move to growthProperties
+    private float leafSize; //FREE
+    private float leafSizeStdDev;
+    private Leaf.LeafType leafType;
+    private float leavesPerNode; //TODO: move to growthProperties
     private bool leavesEnabled;
 
 
@@ -80,38 +100,61 @@ public class GeometryProperties {
 
 
 
-    public void SetMinLeafSize(float minLeafSize) {
-        this.minLeafSize = minLeafSize;
+    public void SetLeafSize(float leafSize) {
+        this.leafSize = leafSize;
+        this.leafSizeStdDev = 0.2f * leafSize;
     }
 
-    public void SetMaxLeafSize(float maxLeafSize) {
-        this.maxLeafSize = maxLeafSize;
+    public void UpdateLeafSize(float leafSize) {
+        SetLeafSize(leafSize);
+        foreach (GeometryPropertiesObserver gpo in geometryPropertiesObservers) {
+            gpo.OnLeafSizeChanged();
+        }
     }
 
     public float GetLeafSize() {
-        return Util.RandomInRange(minLeafSize, maxLeafSize);
+        return Util.RandomInRangeNormal(leafSize, leafSizeStdDev);
     }
 
 
 
-    public void SetLeavesPerNode(int leavesPerNode) {
+    public void SetLeavesPerNode(float leavesPerNode) {
         this.leavesPerNode = leavesPerNode;
     }
 
-    public int GetLeavesPerNode() {
+    public void UpdateLeavesPerNode(float leavesPerNode) {
+        this.leavesPerNode = leavesPerNode;
+        //geometryPropertiesListener.OnLeavesPerNodeChanged();
+        for (int i=0; i<geometryPropertiesObservers.Count; i++) {
+            geometryPropertiesObservers[i].OnLeavesPerNodeChanged();
+        }
+    }
+
+    public float GetLeavesPerNode() {
         return leavesPerNode;
     }
 
 
 
-    public void SetLeafType(LeafType leafType) {
+    public List<string> LeafTypeStrings { get; set; }
+    public int CurrentLeafTypeStringsIndex { get; set; }
+
+    public void SetLeafType(Leaf.LeafType leafType) {
         this.leafType = leafType;
     }
 
-    public LeafType GetLeafType() {
-        return leafType;
+    public void UpdateLeafType(int leafTypeStringsIndex) {
+        this.CurrentLeafTypeStringsIndex = leafTypeStringsIndex;
+        this.leafType = Leaf.LeafTypeStringToLeafType[LeafTypeStrings[leafTypeStringsIndex]];
+        //geometryPropertiesListener.OnLeafTypeChanged();
+        foreach (GeometryPropertiesObserver gpo in geometryPropertiesObservers) {
+            gpo.OnLeafTypeChanged();
+        }
     }
 
+    public Leaf.LeafType GetLeafType() {
+        return leafType;
+    }
 
 
 
@@ -132,12 +175,52 @@ public class GeometryProperties {
 
 
 
-    public void SetLeavesEnabled(bool leavesEnabled) {
+	public void SetLeavesEnabled(bool leavesEnabled) {
+		this.leavesEnabled = leavesEnabled;
+	}
+
+    public void UpdateLeavesEnabled(bool leavesEnabled) {
         this.leavesEnabled = leavesEnabled;
+        //geometryPropertiesListener.OnLeavesEnabledChanged();
+        foreach (GeometryPropertiesObserver gpo in geometryPropertiesObservers) {
+            gpo.OnLeavesEnabledChanged();
+        }
     }
 
-    public bool GetLeavesEnabled() {
+	public bool GetLeavesEnabled() {
         return leavesEnabled;
     }
+
+
+
+    //##############################
+    //########## RENDERER ##########
+    //##############################
+
+    public List<string> StemColorStrings { get; set; }
+    public int CurrentStemColorStringsIndex { get; set; }
+
+    public List<string> LeafColorStrings { get; set; }
+    public int CurrentLeafColorStringsIndex { get; set; }
+
+    //public void SetStemColors(List<string> stemColors) {
+    //    this.stemColors = stemColors;
+    //}
+
+    //public void SetCurrentStemColor(int currentStemColor) {
+    //    this.currentStemColor = currentStemColor;
+    //}
+
+    //public void SetLeafColors(List<string> leafColors) {
+    //    this.leafColors = leafColors;
+    //}
+
+    //public void SetCurrentLeafColor(int currentLeafColor) {
+    //    this.currentLeafColor = currentLeafColor;
+    //}
+
+
+
+
 
 }

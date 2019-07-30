@@ -62,11 +62,6 @@ public sealed class PseudoEllipsoid : AttractionPoints {
         //3. Calculate the amount of points for the given density
         int n_points = (int)(volume * density);
 
-        //float smallestx = float.MaxValue;
-        //float biggestx = float.MinValue;
-        //float smallestz = float.MaxValue;
-        //float biggestz = float.MinValue;
-
         //4. Generate n_points attraction points
         while (base.Count < n_points) {
             //4.1 generate points within the sphere with radius 1
@@ -79,19 +74,8 @@ public sealed class PseudoEllipsoid : AttractionPoints {
             }
 
             float x = RandomInRange(-1, 1);
-            //if (x < smallestx) {
-            //    smallestx = x;
-            //}
-            //if (x > biggestx) {
-            //    biggestx = x;
-            //}
+
             float z = RandomInRange(-1, 1);
-            //if (z < smallestz) {
-            //    smallestz = z;
-            //}
-            //if (z > biggestz) {
-            //    biggestz = z;
-            //}
 
             Vector3 point = new Vector3(x, y, z);
 
@@ -109,58 +93,28 @@ public sealed class PseudoEllipsoid : AttractionPoints {
                 backup.Add(point + targetCenter);
             }
         }
-
-        //Debug.Log("smallest x: " + smallestx);
-        //Debug.Log("biggest x: " + biggestx);
-        //Debug.Log("smallest z: " + smallestz);
-        //Debug.Log("biggest z: " + biggestz);
     }
 
-    //private void Generate() {
-    //    //1. Calculate volume of sphere with radius 1
-    //    float radius = 1;
+    public float GetRadius_x() {
+        return radius_x;
+    }
 
-    //    float cutoffThreshhold = 2 * radius * cutoffRatio;
+    public float GetRadius_y() {
+        return radius_y;
+    }
 
-    //    float h = 2 * radius - cutoffThreshhold;
-    //    float roh = (float)Math.Sqrt(h * (2 * radius - h));
-    //    float volume = (float)((1f / 6f) * Math.PI * h * (3f * roh * roh + h * h));
+    public float GetRadius_z() {
+        return radius_z;
+    }
 
-    //    //2. Calculate volume of sphere with given radii
-    //    //generate transformation matrix
-    //    Matrix4x4 transformation = Matrix4x4.Scale(new Vector3(radius_x, radius_y, radius_z));
-    //    //determine the volume of the target ellipsoid
-    //    volume = volume * transformation.determinant; //https://youtu.be/Ip3X9LOh2dk?list=PLZHQObOWTQDPD3MizzM2xVFitgF8hE_ab
+    public float GetCutoffRatio_bottom() {
+        return cutoffRatio_bottom;
+    }
 
-    //    //3. Calculate the amount of points for the given density
-    //    int n_points = (int)(volume * density);
+    public float GetCutoffRatio_top() {
+        return cutoffRatio_top;
+    }
 
-    //    //4. Generate n_points attraction points
-    //    while (base.Count < n_points) {
-    //        //4.1 generate points within the sphere with radius 1
-    //        float y = RandomInRange(-1, 1);
-    //        if (y<0-radius+cutoffThreshhold) {
-    //            continue;
-    //        }
-    //        float x = RandomInRange(-1, 1);
-    //        float z = RandomInRange(-1, 1);
-
-    //        Vector3 point = new Vector3(x, y, z);
-
-    //        float distance = (point - Vector3.zero).magnitude;
-    //        if (distance <= radius) {
-    //            //4.2 Scale the points with the transformation matrix
-    //            point = transformation.MultiplyVector(point);
-
-    //            //4.3 Translate the points based on the real cutoff threshhold (it is a different one than the one for the sphere with radius 1!)
-    //            float real_cutoffThreshhold = 2 * radius_y * cutoffRatio;
-    //            Vector3 targetCenter = new Vector3(position.x, position.y + radius_y - real_cutoffThreshhold, position.z);// Vector3.up*radius + position;
-
-    //            base.Add(point + targetCenter);
-    //            backup.Add(point + targetCenter);
-    //        }
-    //    }
-    //}
 
     public void UpdateRadius_x(float radius_x) {
         this.radius_x = radius_x;
@@ -186,3 +140,52 @@ public sealed class PseudoEllipsoid : AttractionPoints {
         attractionPointsListener.OnAttractionPointsChanged();
     }
 }
+
+
+
+
+//private void Generate() {
+//    //1. Calculate volume of sphere with radius 1
+//    float radius = 1;
+
+//    float cutoffThreshhold = 2 * radius * cutoffRatio;
+
+//    float h = 2 * radius - cutoffThreshhold;
+//    float roh = (float)Math.Sqrt(h * (2 * radius - h));
+//    float volume = (float)((1f / 6f) * Math.PI * h * (3f * roh * roh + h * h));
+
+//    //2. Calculate volume of sphere with given radii
+//    //generate transformation matrix
+//    Matrix4x4 transformation = Matrix4x4.Scale(new Vector3(radius_x, radius_y, radius_z));
+//    //determine the volume of the target ellipsoid
+//    volume = volume * transformation.determinant; //https://youtu.be/Ip3X9LOh2dk?list=PLZHQObOWTQDPD3MizzM2xVFitgF8hE_ab
+
+//    //3. Calculate the amount of points for the given density
+//    int n_points = (int)(volume * density);
+
+//    //4. Generate n_points attraction points
+//    while (base.Count < n_points) {
+//        //4.1 generate points within the sphere with radius 1
+//        float y = RandomInRange(-1, 1);
+//        if (y<0-radius+cutoffThreshhold) {
+//            continue;
+//        }
+//        float x = RandomInRange(-1, 1);
+//        float z = RandomInRange(-1, 1);
+
+//        Vector3 point = new Vector3(x, y, z);
+
+//        float distance = (point - Vector3.zero).magnitude;
+//        if (distance <= radius) {
+//            //4.2 Scale the points with the transformation matrix
+//            point = transformation.MultiplyVector(point);
+
+//            //4.3 Translate the points based on the real cutoff threshhold (it is a different one than the one for the sphere with radius 1!)
+//            float real_cutoffThreshhold = 2 * radius_y * cutoffRatio;
+//            Vector3 targetCenter = new Vector3(position.x, position.y + radius_y - real_cutoffThreshhold, position.z);// Vector3.up*radius + position;
+
+//            base.Add(point + targetCenter);
+//            backup.Add(point + targetCenter);
+//        }
+//    }
+//}

@@ -4,7 +4,7 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using UnityEngine;
 
-public class Tree : GrowerListener {
+public class Tree : GrowerListener, GeometryPropertiesObserver {
 
     private static bool debugEnabled = true;
     private static void debug(string message, [CallerMemberName]string callerName = "") {
@@ -52,7 +52,10 @@ public class Tree : GrowerListener {
 
     public Tree(Vector3 position, Grower grower, GeometryProperties geometryProperties, Core treeCreator) {
         this.grower = grower;
+
         this.geometryProperties = geometryProperties;
+        geometryProperties.Subscribe(this);
+
         this.treeCreator = treeCreator;
 
         root = new Node(position, geometryProperties);
@@ -77,6 +80,7 @@ public class Tree : GrowerListener {
 
     private void Regrow() {
         //age = 0;
+        geometryProperties.UnsubscribeAll();
         root = new Node(Vector3.zero, geometryProperties);
         Grow();
     }
@@ -254,7 +258,7 @@ public class Tree : GrowerListener {
 
 
     //#######################################################################################
-    //##########                     INTERFACE IMPLEMENTIATION                     ##########
+    //##########                     GROWTH PROPERTIES LISTENER                    ##########
     //#######################################################################################
 
     public void OnAttractionPointsChanged() {
@@ -271,7 +275,28 @@ public class Tree : GrowerListener {
 
     public void OnIterationFinished() {
         CalculateEverything();
-        //finishedPointer.Done();
         treeCreator.OnMeshReady(this.vertices, this.normals, this.uvs, this.triangles);
+    }
+
+    //#######################################################################################
+    //##########                     GEOMETRY PROPERTIES LISTENER                  ##########
+    //#######################################################################################
+
+    public void OnLeafTypeChanged() {
+        CalculateEverything();
+        treeCreator.OnMeshReady(this.vertices, this.normals, this.uvs, this.triangles);
+    }
+
+    public void OnLeavesPerNodeChanged() {
+        // do nothing
+    }
+
+    public void OnLeavesEnabledChanged() {
+        CalculateEverything();
+        treeCreator.OnMeshReady(this.vertices, this.normals, this.uvs, this.triangles);
+    }
+
+    public void OnLeafSizeChanged() {
+        // do nothing
     }
 }
