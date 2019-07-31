@@ -121,24 +121,24 @@ public sealed class PseudoEllipsoid : AttractionPoints {
         base.random = new System.Random(base.seed);
         Generate();
 
-        attractionPointsListener.OnAttractionPointsChanged();
-    }
+		attractionPointsListener.OnAttractionPointsChanged();
+	}
 
     public void UpdateRadius_y(float radius_y) {
         this.radius_y = radius_y;
         base.random = new System.Random(base.seed);
         Generate();
 
-        attractionPointsListener.OnAttractionPointsChanged();
-    }
+		attractionPointsListener.OnAttractionPointsChanged();
+	}
 
     public void UpdateRadius_z(float radius_z) {
         this.radius_z = radius_z;
         base.random = new System.Random(base.seed);
         Generate();
 
-        attractionPointsListener.OnAttractionPointsChanged();
-    }
+		attractionPointsListener.OnAttractionPointsChanged();
+	}
 }
 
 

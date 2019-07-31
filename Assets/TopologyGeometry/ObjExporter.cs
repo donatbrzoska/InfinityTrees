@@ -75,7 +75,6 @@ public static class ObjExporter {
         using (StreamWriter sw = new StreamWriter(filename)) {
             sw.Write(MeshToString(vertices, normals, uvs, triangles));
         }
-        Debug.Log("Saved mesh to " + filename);
     }
 
 

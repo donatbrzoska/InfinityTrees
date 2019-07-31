@@ -183,6 +183,9 @@ def generate_for_parameters(texture_type_list,
                             leaf_color_list,
                             leaf_color_name_list,
                             leaf_size_list):
+    n_textures = len(texture_type_list) * len(stem_color_list) * len(leaf_color_list)
+    n_done = 0;
+    
     for i, texture_type in enumerate(texture_type_list):
         for j, stem_color in enumerate(stem_color_list):
             for k, leaf_color in enumerate(leaf_color_list):
@@ -193,12 +196,14 @@ def generate_for_parameters(texture_type_list,
                                 leaf_color_list[k],
                                 leaf_color_name_list[k],
                                 leaf_size_list[0])
+                n_done += 1
+                print("\r"+str(int(100 * n_done / n_textures)) + "%", end='', flush=True)
 
-stem_color_list = [(10, 31, 50), (14, 44, 72), (235, 241, 237)]
-stem_color_name_list = ["dark_brown", "brown", "greyish"]
+stem_color_list = [(10, 31, 50), (52, 84, 122), (88, 165, 220), (92, 111, 122), (235, 241, 237)]
+stem_color_name_list = ["dark_brown", "brown", "light_brown", "grey_brown", "greyish"]
 
-leaf_color_list = [(30, 226, 255), (38, 172, 255), (46, 26, 198), (0, 177, 29), (241, 211, 56)]
-leaf_color_name_list = ["yellow", "orange", "red", "green", "blue"]
+leaf_color_list = [(30, 226, 255), (40, 98, 237), (46, 26, 198), (0, 255, 153), (18, 204, 92), (0, 177, 29), (24, 97, 0), (165, 165, 0), (94, 94, 0), (241, 211, 56)]
+leaf_color_name_list = ["yellow", "orange", "red", "lime_green", "light_green", "green", "dark_green", "light_turquoise", "dark_turquoise", "blue"]
 
 texture_type_list = ["triangle", "particle"]
 

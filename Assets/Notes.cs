@@ -1,20 +1,8 @@
 ﻿/* NEXT STEPS
  *
- * Blätter als Partikel
- * Blattfarbe und Anzahl einstellen
- *
- * >Dreiecke
- * - Größe der Dreiecke
- * - Anzahl der Blätter
+ * QUIT Button
  * 
- * >Partikel:
- * - Größe der Ellipsen
- * - Größe der Lappen
- * - Anzahl der Blätter
- *
- * Blätter an/aus
- * Blattfarbe
- *
+ * UI Elemente größer machen
  * 
  * Distanzberechnungen optimieren
  *
@@ -25,8 +13,16 @@
  */
 
 /* TODO
+ *
+ * UI Elemente mit Bildern
+ * 
+ * LeafType:Triangle -> Anzahl der Blätter einstellbar machen
+ * 
  * Random Parameter Configurations
  *
+ * investigate on .mtl -> mehrere Texturen sind so referenzierbar
+ * 
+ * Sigmoid Clear Distance parametrisieren
  * 
  *
  * CameraMovement

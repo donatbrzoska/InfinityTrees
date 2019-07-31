@@ -124,7 +124,7 @@ public class SpaceColonization : Grower {
 
                 if (!IsDuplicateNode(happyNodePosition, currentNode)) {
                     //add new node to currentNode
-                    currentNode.Add(happyNodePosition);
+                    currentNode.Add(happyNodePosition).AddLeaves(growthProperties.GetLeavesPerNode());
                     //add to the nodeList
                     if (!advanced_algorithm) {
                         nodeList.Add(currentNode.GetSubnodes()[currentNode.GetSubnodes().Count - 1]);
@@ -252,13 +252,13 @@ public class SpaceColonization : Grower {
     //##########        INTERFACE IMPLEMENTATION : GrowthPropertiesListener        ##########
     //#######################################################################################
 
-    public void OnAttractionPointsChanged() {
-        growerListener.OnAttractionPointsChanged();
-    }
+    //public void OnAttractionPointsChanged() {
+    //    growerListener.OnAttractionPointsChanged();
+    //}
 
-    public void OnAgeChanged() {
-        growerListener.OnAgeChanged();
-    }
+    //public void OnAgeChanged() {
+    //    growerListener.OnAgeChanged();
+    //}
 }
 
 

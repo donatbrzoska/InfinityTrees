@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GrowthProperties : AttractionPointsListener {
+public class GrowthProperties {
     private float influenceDistance; //FREE
     private float perceptionAngle; //SET
 
@@ -16,16 +16,18 @@ public class GrowthProperties : AttractionPointsListener {
 
     private float growthDistance; //SET
 
+    private int leavesPerNode;
+
     //private List<Vector3> attractionPointsBackup;
     private AttractionPoints attractionPoints;
 
     private int iterations;
 
-    GrowthPropertiesListener growthPropertiesListener;
+    //GrowthPropertiesListener growthPropertiesListener;
 
-    public void SetGrowthPropertiesListener(GrowthPropertiesListener growthPropertiesListener) {
-        this.growthPropertiesListener = growthPropertiesListener;
-    }
+    //public void SetGrowthPropertiesListener(GrowthPropertiesListener growthPropertiesListener) {
+    //    this.growthPropertiesListener = growthPropertiesListener;
+    //}
 
     //THIS OR clearDistance
     public void SetInfluenceDistance(float influenceDistance) {
@@ -155,14 +157,18 @@ public class GrowthProperties : AttractionPointsListener {
 
 
 
+    public void SetLeavesPerNode(int leavesPerNode) {
+        this.leavesPerNode = leavesPerNode;
+    }
+
+    public int GetLeavesPerNode() {
+        return leavesPerNode;
+    }
+
+
+
     public void SetAttractionPoints(AttractionPoints attractionPoints) {
         this.attractionPoints = attractionPoints;
-
-        ////store the attraction points, so you can also decrement the amount of iterations afterwards
-        //this.attractionPointsBackup = new List<Vector3>();
-        //foreach (Vector3 p in attractionPoints) {
-        //    this.attractionPointsBackup.Add(p);
-        //}
     }
 
     public AttractionPoints GetAttractionPoints() {
@@ -173,15 +179,6 @@ public class GrowthProperties : AttractionPointsListener {
 
     public void SetIterations(int iterations) {
         this.iterations = iterations;
-    }
-
-    public void UpdateIterations(int iterations) {
-        this.iterations = iterations;
-
-        //TODO: only reset when iterations is less than current iterations
-        // -> implement regrow and grow on Tree
-        attractionPoints.Reset();
-        growthPropertiesListener.OnAgeChanged();
     }
 
     public int GetIterations() {
@@ -195,14 +192,5 @@ public class GrowthProperties : AttractionPointsListener {
         this.tropisms.x = tropismsBackup.x;
         this.tropisms.y = tropismsBackup.y;
         this.tropisms.z = tropismsBackup.z;
-    }
-
-
-    //#######################################################################################
-    //##########                     INTERFACE IMPLEMENTIATION                     ##########
-    //#######################################################################################
-
-    public void OnAttractionPointsChanged() {
-        growthPropertiesListener.OnAttractionPointsChanged();
     }
 }

@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System;
+using System.IO;
+using UnityEngine;
 
 [RequireComponent(typeof(MeshFilter))]
 public class TreeRenderer : MonoBehaviour {
@@ -12,26 +14,14 @@ public class TreeRenderer : MonoBehaviour {
     Vector2[] uvs;
     int[] triangles;
 
+    public Texture2D texture;
     Renderer renderer_;
+
 
     // Start is called before the first frame update
     void Start() {
         Initialize();
         EnableTransparentTextures();
-        //SetTexture("potentialOak_png_alpha");
-        //SetTexture("texture");
-        //SetTexture("brown_green");
-        //SetTexture("orange_green");
-        //SetTexture("dark_brown_green");
-        //SetTexture("dark_brown_light_blue");
-        //SetTexture("dark_brown_green_particles");
-        //SetTexture("particle/dark_brown_green");
-        //SetTexture("particle/dark_brown_red_tiny");
-        SetTexture("particle/dark_brown_red_small");
-        //SetTexture("particle/dark_brown_red_medium");
-        //SetTexture("particle/dark_brown_red_big");
-        //SetTexture("particle/dark_brown_red_huge");
-        //SetTexture("dark_brown_red");
     }
 
     void Initialize() {
@@ -46,6 +36,11 @@ public class TreeRenderer : MonoBehaviour {
         renderer_ = GetComponent<MeshRenderer>();
     }
 
+    //https://docs.unity3d.com/500/Documentation/ScriptReference/ShaderVariantCollection.html
+    //Important for this to work:
+    //1. Run in Unity until it works
+    //2. Unity -> Edit -> Project Settings ... -> Graphics -> Save to asset...
+    //3. Unity -> Edit -> Project Settings ... -> Graphics -> Preloaded Shaders: Size := 1; Element 0 := saved_shader_variant_collection
     void EnableTransparentTextures() {
         //https://answers.unity.com/questions/1004666/change-material-rendering-mode-in-runtime.html
         //for cutting out empty background of png
@@ -59,13 +54,24 @@ public class TreeRenderer : MonoBehaviour {
         //also see https://answers.unity.com/questions/1016155/standard-material-shader-ignoring-setfloat-propert.html
     }
 
-    void SetTexture(string textureFileName) {
-        Texture2D texture = Resources.Load(textureFileName) as Texture2D;
+    void SetTexture(string textureFilename) {
+        texture = Resources.Load(textureFilename) as Texture2D;
+
+        ////https://forum.unity.com/threads/possible-to-import-custom-user-textures-from-file-system-at-runtime.265862/
+        //string texture_path = "/Users/donatdeva/Documents/Studium/6. Semester/Bachelorarbeit/Unity/AnimationTrees/Assets/Resources/" + textureFilename + ".png";
+        //byte[] byteFile = File.ReadAllBytes(texture_path);
+        //texture.LoadImage(byteFile);
+
+        ////Tex = new Texture2D(256, 256);
+        ////Tex.LoadImage(byteFile);
+
         renderer_.material.SetTexture("_MainTex", texture);
     }
 
     // Update is called once per frame
     void Update() {
+        SetTexture(core.GetTexture());
+
         if (core.MeshReady()) {
             core.GetMesh(ref vertices, ref normals, ref uvs, ref triangles);
 
@@ -75,8 +81,6 @@ public class TreeRenderer : MonoBehaviour {
             mesh.uv = uvs;
             mesh.triangles = triangles;
         }
-
-        SetTexture(core.GetTexture());
     }
 }
 

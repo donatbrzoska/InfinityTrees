@@ -6,7 +6,7 @@ using UnityEngine;
 // wichtig ist vor allem, dass geometryProperties geändert werden können
 // >> ohne, dass der ganze Baum neu berechnet werden muss
 // >> 
-public class Leaf : GeometryPropertiesObserver {
+public class Leaf {
 
     public enum LeafType {
         Square,
@@ -78,7 +78,6 @@ public class Leaf : GeometryPropertiesObserver {
     public Leaf(Vector3 position, GeometryProperties geometryProperties) {
         this.position = position;
         this.geometryProperties = geometryProperties;
-        geometryProperties.Subscribe(this);
     }
 
     public void CalculateAndStoreGeometry(List<Vector3> verticesResult, List<Vector2> uvsResult, List<int> trianglesResult) {
@@ -86,10 +85,11 @@ public class Leaf : GeometryPropertiesObserver {
         if (!propertiesCalculated) { //calculate these here, because only the main thread can make use of Unitys Range() and Random() functions
             rotationAngle = geometryProperties.GetRandomLeafRotationAngle();
             rotationAxis = geometryProperties.GetRandomLeafRotationAxis();
-            size = geometryProperties.GetLeafSize();
 
             propertiesCalculated = true;
         }
+
+        size = geometryProperties.GetLeafSize();
 
         int verticesOffset = verticesResult.Count;
         Quaternion rotation = Quaternion.AngleAxis(rotationAngle, rotationAxis);
@@ -236,19 +236,19 @@ public class Leaf : GeometryPropertiesObserver {
     //##########                     GEOMETRY PROPERTIES OBSERVER                  ##########
     //#######################################################################################
 
-    public void OnLeafTypeChanged() {
-        // do nothing
-    }
+    //public void OnLeafTypeChanged() {
+    //    // do nothing
+    //}
 
-    public void OnLeavesPerNodeChanged() {
-        // do nothing
-    }
+    //public void OnLeavesPerNodeChanged() {
+    //    // do nothing
+    //}
 
-    public void OnLeavesEnabledChanged() {
-        // do nothing
-    }
+    //public void OnLeavesEnabledChanged() {
+    //    // do nothing
+    //}
 
-    public void OnLeafSizeChanged() {
-        size = geometryProperties.GetLeafSize();
-    }
+    //public void OnLeafSizeChanged() {
+    //    size = geometryProperties.GetLeafSize();
+    //}
 }

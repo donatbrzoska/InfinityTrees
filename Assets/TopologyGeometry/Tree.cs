@@ -4,7 +4,7 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using UnityEngine;
 
-public class Tree : GrowerListener, GeometryPropertiesObserver {
+public class Tree : GrowerListener {
 
     private static bool debugEnabled = true;
     private static void debug(string message, [CallerMemberName]string callerName = "") {
@@ -48,16 +48,13 @@ public class Tree : GrowerListener, GeometryPropertiesObserver {
     private Vector2[] uvs;
     private int[] triangles;
 
-    Core treeCreator;
+    MeshListener meshListener;
 
-    public Tree(Vector3 position, Grower grower, GeometryProperties geometryProperties, Core treeCreator) {
+    public Tree(Vector3 position, Grower grower, GeometryProperties geometryProperties, MeshListener meshListener) {
         this.grower = grower;
 
         this.geometryProperties = geometryProperties;
-        geometryProperties.Subscribe(this);
-
-        this.treeCreator = treeCreator;
-
+        this.meshListener = meshListener;
         root = new Node(position, geometryProperties);
     }
 
@@ -78,9 +75,7 @@ public class Tree : GrowerListener, GeometryPropertiesObserver {
         t.Start();
     }
 
-    private void Regrow() {
-        //age = 0;
-        geometryProperties.UnsubscribeAll();
+    public void Regrow() {
         root = new Node(Vector3.zero, geometryProperties);
         Grow();
     }
@@ -104,7 +99,7 @@ public class Tree : GrowerListener, GeometryPropertiesObserver {
     //    }
     //}
 
-    private void CalculateEverything() {
+    public void CalculateEverything() {
         twigVertices = 0;
         twigTriangles = 0;
         leafVertices = 0;
@@ -120,21 +115,6 @@ public class Tree : GrowerListener, GeometryPropertiesObserver {
         CalculateEverythingHelper(root, nodeVerticesPositions, 0, verticesTmp, uvsTmp, trianglesTmp);
 
 
-        //int write = finishedPointer.GetWrite();
-        ////What happens, when a new node is added while iterating through the TMP List?
-        //// -> it won't be drawn
-        //this.vertices[write] = new Vector3[verticesTmp.Count];
-        //verticesTmp.CopyTo(this.vertices[write]);
-
-        //this.uvs[write] = new Vector2[uvsTmp.Count];
-        //uvsTmp.CopyTo(this.uvs[write]);
-
-        //this.triangles[write] = new int[trianglesTmp.Count];
-        //trianglesTmp.CopyTo(this.triangles[write]);
-
-        //int read = finishedPointer.GetRead();
-        //this.normals[write] = TreeUtil.CalculateNormals(this.vertices[read], this.triangles[read]);
-
         this.vertices = new Vector3[verticesTmp.Count];
         verticesTmp.CopyTo(this.vertices);
 
@@ -145,6 +125,9 @@ public class Tree : GrowerListener, GeometryPropertiesObserver {
         trianglesTmp.CopyTo(this.triangles);
 
         this.normals = TreeUtil.CalculateNormals(this.vertices, this.triangles);
+
+
+        meshListener.OnMeshReady(this.vertices, this.normals, this.uvs, this.triangles);
     }
 
     //looks at the current node, builds cylinders to it's subnodes and recursively calls the function for all subnodes
@@ -256,47 +239,11 @@ public class Tree : GrowerListener, GeometryPropertiesObserver {
     }
 
 
-
     //#######################################################################################
-    //##########                     GROWTH PROPERTIES LISTENER                    ##########
+    //##########                           GROWER LISTENER                         ##########
     //#######################################################################################
-
-    public void OnAttractionPointsChanged() {
-        //grower.GetGrowthProperties().ResetTropisms();
-        //grower.GetGrowthProperties().ResetAttractionPoints();
-        treeCreator.OnAttractionPointsChanged();
-        Regrow();
-    }
-
-    public void OnAgeChanged() {
-        //grower.GetGrowthProperties().ResetTropisms();
-        Regrow();
-    }
 
     public void OnIterationFinished() {
         CalculateEverything();
-        treeCreator.OnMeshReady(this.vertices, this.normals, this.uvs, this.triangles);
-    }
-
-    //#######################################################################################
-    //##########                     GEOMETRY PROPERTIES LISTENER                  ##########
-    //#######################################################################################
-
-    public void OnLeafTypeChanged() {
-        CalculateEverything();
-        treeCreator.OnMeshReady(this.vertices, this.normals, this.uvs, this.triangles);
-    }
-
-    public void OnLeavesPerNodeChanged() {
-        // do nothing
-    }
-
-    public void OnLeavesEnabledChanged() {
-        CalculateEverything();
-        treeCreator.OnMeshReady(this.vertices, this.normals, this.uvs, this.triangles);
-    }
-
-    public void OnLeafSizeChanged() {
-        // do nothing
     }
 }

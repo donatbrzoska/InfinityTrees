@@ -5,13 +5,15 @@ using UnityEngine.UI;
 using System;
 using System.Diagnostics;
 using System.Threading;
+using System.IO;
 
 //https://gamedev.stackexchange.com/questions/133372/system-drawing-dll-not-found
 //System.Drawing.dll FROM Unity.app -> Contents -> Mono -> lib -> mono -> 2.0 -> System.Drawing
 //https://stackoverflow.com/a/17061246
 //Configure: File -> Build Settings -> Player Settings -> Other Settings -> API Compatibility := .NET 4.x
 
-public class Core : MonoBehaviour {
+
+public class Core : MonoBehaviour, MeshListener, AttractionPointsListener {
     private static void debug(string message, [CallerMemberName]string callerName = "") {
         if (true) {
             UnityEngine.Debug.Log("DEBUG: TreeCreator: " + callerName + "(): " + message);
@@ -69,27 +71,24 @@ public class Core : MonoBehaviour {
         //load_bugTree();
         //load_normalTree(initialAge, initialRadius_x, initialRadius_y, initialRadius_z);
         //load_advancedNormalTree(initialAge, initialRadius_x, initialRadius_y, initialRadius_z);
-        //load_advancedNormalTree_particleTest(initialAge, initialRadius_x, initialRadius_y, initialRadius_z);
-        load_advancedNormalTree_particleTest_lowVertices(initialAge, initialRadius_x, initialRadius_y, initialRadius_z);
-
-        geometryProperties.StemColorStrings = new List<string> { "dark_brown", "brown", "greyish"};
-        geometryProperties.CurrentStemColorStringsIndex = 1;
-        geometryProperties.CurrentStemColorStringsIndex = 0;
-
-        geometryProperties.LeafColorStrings = new List<string> { "yellow", "orange", "red", "green", "blue" };
-        geometryProperties.CurrentLeafColorStringsIndex = 3;
-
-        geometryProperties.LeafTypeStrings = Leaf.LeafTypeStrings;
-        geometryProperties.CurrentLeafTypeStringsIndex = 1;
-        geometryProperties.CurrentLeafTypeStringsIndex = 0;
+        load_advancedNormalTree_particleTest(initialAge, initialRadius_x, initialRadius_y, initialRadius_z);
+        //load_advancedNormalTree_particleTest_lowVertices(initialAge, initialRadius_x, initialRadius_y, initialRadius_z);
         //load_excurrentTree(initialAge, initialRadius_x, initialRadius_y, initialRadius_z);
         //load_testTree(initialAge, initialRadius_x, initialRadius_y, initialRadius_z);
 
 
-        // UI HAS TO BE SET TO THE SAME VALUES AS SPECIFIED IN DATASTRUCTURES
+        geometryProperties.StemColorStrings = new List<string> { "dark_brown", "brown", "light_brown", "grey_brown", "greyish" };
+        geometryProperties.CurrentStemColorStringsIndex = 0;
+
+        geometryProperties.LeafColorStrings = new List<string> { "yellow", "orange", "red", "lime_green", "light_green", "green", "dark_green", "light_turquoise", "dark_turquoise", "blue" };
+        geometryProperties.CurrentLeafColorStringsIndex = 3;
+
+        geometryProperties.LeafTypeStrings = Leaf.LeafTypeStrings;
+        geometryProperties.CurrentLeafTypeStringsIndex = 0;
+
 
         tree.Grow();
-    }
+	}
 
     bool initialized;
     void Update() {
@@ -134,6 +133,7 @@ public class Core : MonoBehaviour {
 
     object getMeshLock = new object();
 
+    //called by Tree
     public void OnMeshReady(Vector3[] vertices, Vector3[] normals, Vector2[] uvs, int[] triangles) {
         lock (getMeshLock) {
             this.vertices = vertices;
@@ -145,10 +145,12 @@ public class Core : MonoBehaviour {
         }
     }
 
+    //called by TreeRenderer
     public bool MeshReady() {
         return meshReady;
     }
 
+    //called by TreeRenderer
     public void GetMesh(ref Vector3[] vertices, ref Vector3[] normals, ref Vector2[] uvs, ref int[] triangles) {
         lock (getMeshLock) {
             vertices = this.vertices;
@@ -166,16 +168,19 @@ public class Core : MonoBehaviour {
 
     bool pointCloudReady;
 
-    //object getPointCloudLock = new object();
+    //object getPointCloudLock = new object(); //TODO: needed?
 
+    // called by AttractionPoints / PseudoEllipsoid
     public void OnAttractionPointsChanged() {
         pointCloudReady = true;
     }
 
+    // called by PointCloudRenderer
     public bool PointCloudReady() {
         return pointCloudReady;
     }
 
+    // called by PointCloudRenderer
     public List<Vector3> GetPointCloud() {
         pointCloudReady = false;
         return attractionPoints.GetBackup();
@@ -187,31 +192,36 @@ public class Core : MonoBehaviour {
     //#######################################################################################
 
     public void OnAge(int value) {
-        //debug("received");
         grower.Stop();
 
-        growthProperties.UpdateIterations(value);
+        growthProperties.SetIterations(value);
+        attractionPoints.Reset();
+
+        tree.Regrow();
     }
 
     public void OnCrownRadius_x(float value) {
-        //debug("received");
         grower.Stop();
 
         ((PseudoEllipsoid)attractionPoints).UpdateRadius_x(value);
+
+        tree.Regrow();
     }
 
     public void OnCrownRadius_y(float value) {
-        //debug("received");
         grower.Stop();
 
         ((PseudoEllipsoid)attractionPoints).UpdateRadius_y(value);
+
+        tree.Regrow();
     }
 
     public void OnCrownRadius_z(float value) {
-        //debug("received");
         grower.Stop();
 
         ((PseudoEllipsoid)attractionPoints).UpdateRadius_z(value);
+
+        tree.Regrow();
     }
 
 
@@ -221,13 +231,15 @@ public class Core : MonoBehaviour {
 
     public void OnLeafType(int value) {
         if (geometryProperties.LeafTypeStrings[value] .Equals (Leaf.LeafTypeToString[Leaf.LeafType.Triangle])) {
-            geometryProperties.UpdateLeafSize(0.5f);
-            geometryProperties.UpdateLeavesPerNode(2f);
+            geometryProperties.SetLeafSize(0.5f);
+            geometryProperties.SetDisplayedLeavesPerNode(2f);
         } else if (geometryProperties.LeafTypeStrings[value] .Equals (Leaf.LeafTypeToString[Leaf.LeafType.ParticleSquare])) {
-            geometryProperties.UpdateLeafSize(1.6f);
-            geometryProperties.UpdateLeavesPerNode(0.5f);
+            geometryProperties.SetLeafSize(1.6f);
+            geometryProperties.SetDisplayedLeavesPerNode(0.5f);
         }
         geometryProperties.UpdateLeafType(value);
+
+        tree.CalculateEverything();
     }
 
     public void OnStemColor(int value) {
@@ -243,7 +255,9 @@ public class Core : MonoBehaviour {
     }
 
     public void OnLeavesEnabled(bool enabled) {
-        geometryProperties.UpdateLeavesEnabled(enabled);
+        geometryProperties.SetLeavesEnabled(enabled);
+
+        tree.CalculateEverything();
     }
 
     //#######################################################################################
@@ -251,198 +265,218 @@ public class Core : MonoBehaviour {
     //#######################################################################################
 
     public void OnNewSeed() {
-        //debug("received");
         grower.Stop();
 
         attractionPoints.NewSeed();
+
+        tree.Regrow();
+    }
+
+    //https://stackoverflow.com/questions/44733841/how-to-make-texture2d-readable-via-script?noredirect=1&lq=1
+    //https://stackoverflow.com/a/44734346
+    Texture2D DuplicateTexture(Texture2D source) {
+        RenderTexture renderTex = RenderTexture.GetTemporary(
+                    source.width,
+                    source.height,
+                    0,
+                    RenderTextureFormat.Default,
+                    RenderTextureReadWrite.Linear);
+
+        Graphics.Blit(source, renderTex);
+        RenderTexture previous = RenderTexture.active;
+        RenderTexture.active = renderTex;
+        Texture2D readableText = new Texture2D(source.width, source.height);
+        readableText.ReadPixels(new Rect(0, 0, renderTex.width, renderTex.height), 0, 0);
+        readableText.Apply();
+        RenderTexture.active = previous;
+        RenderTexture.ReleaseTemporary(renderTex);
+        return readableText;
     }
 
     //TODO: specify location &| unique naming
     public void OnSave() {
-        ObjExporter.MeshToFile(vertices, normals, uvs, triangles, "tree_" + vertices.Length + "_" + triangles.Length + ".obj");
+        string meshFilename = "tree_" + vertices.Length + "_" + triangles.Length + ".obj";
+        ObjExporter.MeshToFile(vertices, normals, uvs, triangles, meshFilename);
+
+        //Important: make sure that the textures have "Alpha is Transparency" checked, otherwise there are black borders
+        //string textureFilename = geometryProperties.StemColorStrings[geometryProperties.CurrentStemColorStringsIndex] + "_" + geometryProperties.LeafColorStrings[geometryProperties.CurrentLeafColorStringsIndex] + "_" + Leaf.LeafTypeToFilename[geometryProperties.GetLeafType()] + ".png";
+        string textureFilename = GetTexture().Replace("/", "_") + ".png";
+        byte[] texture_bytes = DuplicateTexture(Resources.Load(GetTexture()) as Texture2D).EncodeToPNG();
+        File.WriteAllBytes(textureFilename, texture_bytes);
+
+        UnityEngine.Debug.Log("Saved mesh to " + meshFilename);
+        UnityEngine.Debug.Log("Saved texture to " + textureFilename);
     }
 
     public void OnApplicationQuit() {
         //UnityEngine.Debug.Log("Application ending after " + Time.time + " seconds");
         grower.Stop();
-        ThreadManager.Join();
     }
 
-    void load_bugTree(int age=30, float radius_x=3, float radius_y=5, float radius_z=3.5f) {
+    //void load_bugTree(int age=30, float radius_x=3, float radius_y=5, float radius_z=3.5f) {
 
-        //influence distance und cleardistance müssen auf jeden Fall von density / Radien abhängen
+    //    //influence distance und cleardistance müssen auf jeden Fall von density / Radien abhängen
 
-        attractionPoints = new PseudoEllipsoid(new Vector3(0, 0, 0), radius_x, radius_y, radius_z, 15, 0.15f, 0.05f);
-
-
-        growthProperties = new GrowthProperties();
-        growthProperties.SetInfluenceDistance(1f);
-        growthProperties.SetPerceptionAngle(160f);
-        growthProperties.SetClearDistance(0.9f, 0.9f);
-        growthProperties.SetTropisms(new Vector3(0, 1f, 0));
-        growthProperties.SetGrowthDistance(0.25f);
-        growthProperties.SetAttractionPoints(attractionPoints);
-        growthProperties.SetIterations(age);
-        //SET LISTENER
-        attractionPoints.SetAttractionPointsListener(growthProperties);
+    //    attractionPoints = new PseudoEllipsoid(new Vector3(0, 0, 0), radius_x, radius_y, radius_z, 15, 0.15f, 0.05f);
 
 
-        grower = new SpaceColonization(growthProperties);
-        //SET LISTENER
-        growthProperties.SetGrowthPropertiesListener(grower);
+    //    growthProperties = new GrowthProperties();
+    //    growthProperties.SetInfluenceDistance(1f);
+    //    growthProperties.SetPerceptionAngle(160f);
+    //    growthProperties.SetClearDistance(0.9f, 0.9f);
+    //    growthProperties.SetTropisms(new Vector3(0, 1f, 0));
+    //    growthProperties.SetGrowthDistance(0.25f);
+    //    growthProperties.SetAttractionPoints(attractionPoints);
+    //    growthProperties.SetIterations(age);
 
 
-        Vector3 position = Vector3.zero;
-
-        geometryProperties = new GeometryProperties();
-        geometryProperties.SetTipRadius(0.007f);
-        geometryProperties.SetNthRoot(1.3f);
-        geometryProperties.SetCircleResolution(3);
-        //geometryProperties.SetMinRadiusRatioForNormalConnection(0.49f);
-        geometryProperties.SetMinRadiusRatioForNormalConnection(0.75f);
-
-        geometryProperties.SetMaxTwigRadiusForLeaves(0.02f);
-        geometryProperties.SetLeafSize(0.5f);
-        geometryProperties.SetLeafType(Leaf.LeafType.Triangle);
-        geometryProperties.SetLeavesPerNode(2);
-        geometryProperties.SetLeavesEnabled(false);
+    //    grower = new SpaceColonization(growthProperties);
 
 
-        tree = new Tree(position, grower, geometryProperties, this);
-        //SET LISTENER
-        grower.SetGrowerListener(tree);
-        //geometryProperties.SetGeometryPropertiesListener(tree);
-    }
+    //    Vector3 position = Vector3.zero;
+
+    //    geometryProperties = new GeometryProperties();
+    //    geometryProperties.SetTipRadius(0.007f);
+    //    geometryProperties.SetNthRoot(1.3f);
+    //    geometryProperties.SetCircleResolution(3);
+    //    //geometryProperties.SetMinRadiusRatioForNormalConnection(0.49f);
+    //    geometryProperties.SetMinRadiusRatioForNormalConnection(0.75f);
+
+    //    geometryProperties.SetMaxTwigRadiusForLeaves(0.02f);
+    //    geometryProperties.SetLeafSize(0.5f);
+    //    geometryProperties.SetLeafType(Leaf.LeafType.Triangle);
+    //    geometryProperties.SetLeavesPerNode(2);
+    //    geometryProperties.SetLeavesEnabled(false);
+
+
+    //    tree = new Tree(position, grower, geometryProperties, this);
+    //    //SET LISTENER
+    //    grower.SetGrowerListener(tree);
+    //    //geometryProperties.SetGeometryPropertiesListener(tree);
+    //}
 
 
 
-    void load_normalTree(int age, float radius_x, float radius_y, float radius_z) {
-        //Vector3 center = new Vector3(0, 5f, 0);
-        //float maxDistance = 5f;
-        //int amount = 8000;
-        ////int amount = 30000;
-        //List<Vector3> attractionPoints = GenerateAttractionPoints(center, maxDistance, amount);
-        //AttractionPoints attractionPoints = new AttractionPoints(Vector3.zero, 0, 5, 8000, 0.2f);
+    //void load_normalTree(int age, float radius_x, float radius_y, float radius_z) {
+    //    //Vector3 center = new Vector3(0, 5f, 0);
+    //    //float maxDistance = 5f;
+    //    //int amount = 8000;
+    //    ////int amount = 30000;
+    //    //List<Vector3> attractionPoints = GenerateAttractionPoints(center, maxDistance, amount);
+    //    //AttractionPoints attractionPoints = new AttractionPoints(Vector3.zero, 0, 5, 8000, 0.2f);
 
-        //AttractionPoints attractionPoints = new AttractionPoints(new Vector3(0, 0, 0), 5, 8000, 0.15f);
-        //AttractionPoints attractionPoints = new SphereCut(new Vector3(0, 0, 0), 5, 15, 0.2f);
+    //    //AttractionPoints attractionPoints = new AttractionPoints(new Vector3(0, 0, 0), 5, 8000, 0.15f);
+    //    //AttractionPoints attractionPoints = new SphereCut(new Vector3(0, 0, 0), 5, 15, 0.2f);
 
-        //also not working yet:
-        //AttractionPoints attractionPoints = new SpheroidAttractionPoints(new Vector3(0, 0, 0), 5, 2, 20);
+    //    //also not working yet:
+    //    //AttractionPoints attractionPoints = new SpheroidAttractionPoints(new Vector3(0, 0, 0), 5, 2, 20);
 
-        //not working yet:
-        //AttractionPoints attractionPoints = new EllipsoidAttractionPoints(new Vector3(0, 0, 0), 1.5f, 5, 1.5f, 15);
+    //    //not working yet:
+    //    //AttractionPoints attractionPoints = new EllipsoidAttractionPoints(new Vector3(0, 0, 0), 1.5f, 5, 1.5f, 15);
 
-        //AttractionPoints attractionPoints = new PseudoEllipsoid(new Vector3(0, 0, 0), 2f, 4f, 2f, 15, 0.2f);
-        //AttractionPoints attractionPoints = new PseudoEllipsoid(new Vector3(0, 0, 0), 2f, 4f, 2f, 15, 0.0f);
+    //    //AttractionPoints attractionPoints = new PseudoEllipsoid(new Vector3(0, 0, 0), 2f, 4f, 2f, 15, 0.2f);
+    //    //AttractionPoints attractionPoints = new PseudoEllipsoid(new Vector3(0, 0, 0), 2f, 4f, 2f, 15, 0.0f);
 
-        //AttractionPoints attractionPoints = new PseudoEllipsoid(new Vector3(0, 0, 0), 2f, 8f, 4f, 15, 0.3f);
+    //    //AttractionPoints attractionPoints = new PseudoEllipsoid(new Vector3(0, 0, 0), 2f, 8f, 4f, 15, 0.3f);
 
-        //AttractionPoints attractionPoints = new PseudoEllipsoid(new Vector3(0, 0, 0), 3f, 10f, 3f, 15, 0.15f, 0.1f);
-
-
-        //influence distance und cleardistance müssen auf jeden Fall von density / Radien abhängen
-
-        attractionPoints = new PseudoEllipsoid(new Vector3(0, 0, 0), radius_x, radius_y, radius_z, 15, 0.15f, 0.05f);
+    //    //AttractionPoints attractionPoints = new PseudoEllipsoid(new Vector3(0, 0, 0), 3f, 10f, 3f, 15, 0.15f, 0.1f);
 
 
-        growthProperties = new GrowthProperties();
-        growthProperties.SetInfluenceDistance(1f);
-        //growthProperties.SetInfluenceDistance(1.1f);
-        //growthProperties.SetInfluenceDistance(1.2f);
-        growthProperties.SetPerceptionAngle(160f);
-        growthProperties.SetClearDistance(0.9f, 0.9f);
-        //growthProperties.SetClearDistance(1f);
-        //growthProperties.SetTropisms(new Vector3(-0.25f, 0.5f, 0));
-        //growthProperties.SetTropisms(new Vector3(0, 0.5f, 0));
-        growthProperties.SetTropisms(new Vector3(0, 1f, 0));
-        growthProperties.SetGrowthDistance(0.25f);
-        growthProperties.SetAttractionPoints(attractionPoints);
-        growthProperties.SetIterations(age);
-        //SET LISTENER
-        attractionPoints.SetAttractionPointsListener(growthProperties);
+    //    //influence distance und cleardistance müssen auf jeden Fall von density / Radien abhängen
+
+    //    attractionPoints = new PseudoEllipsoid(new Vector3(0, 0, 0), radius_x, radius_y, radius_z, 15, 0.15f, 0.05f);
 
 
-        grower = new SpaceColonization(growthProperties);
-        //SET LISTENER
-        growthProperties.SetGrowthPropertiesListener(grower);
+    //    growthProperties = new GrowthProperties();
+    //    growthProperties.SetInfluenceDistance(1f);
+    //    //growthProperties.SetInfluenceDistance(1.1f);
+    //    //growthProperties.SetInfluenceDistance(1.2f);
+    //    growthProperties.SetPerceptionAngle(160f);
+    //    growthProperties.SetClearDistance(0.9f, 0.9f);
+    //    //growthProperties.SetClearDistance(1f);
+    //    //growthProperties.SetTropisms(new Vector3(-0.25f, 0.5f, 0));
+    //    //growthProperties.SetTropisms(new Vector3(0, 0.5f, 0));
+    //    growthProperties.SetTropisms(new Vector3(0, 1f, 0));
+    //    growthProperties.SetGrowthDistance(0.25f);
+    //    growthProperties.SetAttractionPoints(attractionPoints);
+    //    growthProperties.SetIterations(age);
 
 
-        Vector3 position = Vector3.zero;
-
-        geometryProperties = new GeometryProperties();
-        geometryProperties.SetTipRadius(0.007f);
-        geometryProperties.SetNthRoot(1.3f);
-        geometryProperties.SetCircleResolution(3);
-        geometryProperties.SetMinRadiusRatioForNormalConnection(0.49f);
-
-        geometryProperties.SetMaxTwigRadiusForLeaves(0.02f);
-        geometryProperties.SetLeafSize(0.5f);
-        geometryProperties.SetLeafType(Leaf.LeafType.Triangle);
-        geometryProperties.SetLeavesPerNode(2);
-        geometryProperties.SetLeavesEnabled(true);
+    //    grower = new SpaceColonization(growthProperties);
 
 
-        tree = new Tree(position, grower, geometryProperties, this);
-        //SET LISTENER
-        grower.SetGrowerListener(tree);
-        //geometryProperties.SetGeometryPropertiesListener(tree);
-    }
+    //    Vector3 position = Vector3.zero;
 
-    void load_advancedNormalTree(int age, float radius_x, float radius_y, float radius_z) {
-        attractionPoints = new PseudoEllipsoid(new Vector3(0, 0, 0), radius_x, radius_y, radius_z, 15, 0.15f, 0.05f);
+    //    geometryProperties = new GeometryProperties();
+    //    geometryProperties.SetTipRadius(0.007f);
+    //    geometryProperties.SetNthRoot(1.3f);
+    //    geometryProperties.SetCircleResolution(3);
+    //    geometryProperties.SetMinRadiusRatioForNormalConnection(0.49f);
 
-
-        growthProperties = new GrowthProperties();
-
-        growthProperties.SetInfluenceDistance(1);
-        growthProperties.SetPerceptionAngle(160f);
-        growthProperties.SetClearDistance(0.925f, 0.7f);
+    //    geometryProperties.SetMaxTwigRadiusForLeaves(0.02f);
+    //    geometryProperties.SetLeafSize(0.5f);
+    //    geometryProperties.SetLeafType(Leaf.LeafType.Triangle);
+    //    geometryProperties.SetLeavesPerNode(2);
+    //    geometryProperties.SetLeavesEnabled(true);
 
 
-        //growthProperties.SetInfluenceDistance(1.3f);
-        //growthProperties.SetPerceptionAngle(160f);
-        //growthProperties.SetClearDistance(1.25f);
-        //growthProperties.SetClearDistance_2(0.5f);
-        //growthProperties.SetClearDistance(1f);
-        //growthProperties.SetTropisms(new Vector3(-0.25f, 0.5f, 0));
-        growthProperties.SetTropisms(new Vector3(0, 0.5f, 0));
-        //growthProperties.SetTropisms(new Vector3(0, 1f, 0));
-        growthProperties.SetGrowthDistance(0.25f);
-        growthProperties.SetAttractionPoints(attractionPoints);
-        growthProperties.SetIterations(age);
-        //SET LISTENER
-        attractionPoints.SetAttractionPointsListener(growthProperties);
+    //    tree = new Tree(position, grower, geometryProperties, this);
+    //    //SET LISTENER
+    //    grower.SetGrowerListener(tree);
+    //    //geometryProperties.SetGeometryPropertiesListener(tree);
+    //}
+
+    //void load_advancedNormalTree(int age, float radius_x, float radius_y, float radius_z) {
+    //    attractionPoints = new PseudoEllipsoid(new Vector3(0, 0, 0), radius_x, radius_y, radius_z, 15, 0.15f, 0.05f);
 
 
-        grower = new SpaceColonization(growthProperties);
-        //SET LISTENER
-        growthProperties.SetGrowthPropertiesListener(grower);
+    //    growthProperties = new GrowthProperties();
+
+    //    growthProperties.SetInfluenceDistance(1);
+    //    growthProperties.SetPerceptionAngle(160f);
+    //    growthProperties.SetClearDistance(0.925f, 0.7f);
 
 
-        Vector3 position = Vector3.zero;
-
-        geometryProperties = new GeometryProperties();
-        geometryProperties.SetTipRadius(0.007f);
-        geometryProperties.SetNthRoot(1.7f);
-        geometryProperties.SetCircleResolution(3);
-        geometryProperties.SetMinRadiusRatioForNormalConnection(0.49f);
-
-        geometryProperties.SetMaxTwigRadiusForLeaves(0.02f);
-        geometryProperties.SetLeafSize(0.7f);
-        geometryProperties.SetLeafType(Leaf.LeafType.Triangle);
-        geometryProperties.SetLeavesPerNode(1);
-        geometryProperties.SetLeavesEnabled(true);
+    //    //growthProperties.SetInfluenceDistance(1.3f);
+    //    //growthProperties.SetPerceptionAngle(160f);
+    //    //growthProperties.SetClearDistance(1.25f);
+    //    //growthProperties.SetClearDistance_2(0.5f);
+    //    //growthProperties.SetClearDistance(1f);
+    //    //growthProperties.SetTropisms(new Vector3(-0.25f, 0.5f, 0));
+    //    growthProperties.SetTropisms(new Vector3(0, 0.5f, 0));
+    //    //growthProperties.SetTropisms(new Vector3(0, 1f, 0));
+    //    growthProperties.SetGrowthDistance(0.25f);
+    //    growthProperties.SetAttractionPoints(attractionPoints);
+    //    growthProperties.SetIterations(age);
 
 
-        tree = new Tree(position, grower, geometryProperties, this);
-        //SET LISTENER
-        grower.SetGrowerListener(tree);
-        //geometryProperties.SetGeometryPropertiesListener(tree);
-    }
+    //    grower = new SpaceColonization(growthProperties);
+
+
+    //    Vector3 position = Vector3.zero;
+
+    //    geometryProperties = new GeometryProperties();
+    //    geometryProperties.SetTipRadius(0.007f);
+    //    geometryProperties.SetNthRoot(1.7f);
+    //    geometryProperties.SetCircleResolution(3);
+    //    geometryProperties.SetMinRadiusRatioForNormalConnection(0.49f);
+
+    //    geometryProperties.SetMaxTwigRadiusForLeaves(0.02f);
+    //    geometryProperties.SetLeafSize(0.7f);
+    //    geometryProperties.SetLeafType(Leaf.LeafType.Triangle);
+    //    geometryProperties.SetLeavesPerNode(1);
+    //    geometryProperties.SetLeavesEnabled(true);
+
+
+    //    tree = new Tree(position, grower, geometryProperties, this);
+    //    //SET LISTENER
+    //    grower.SetGrowerListener(tree);
+    //    //geometryProperties.SetGeometryPropertiesListener(tree);
+    //}
 
     void load_advancedNormalTree_particleTest(int age, float radius_x, float radius_y, float radius_z) {
         attractionPoints = new PseudoEllipsoid(new Vector3(0, 0, 0), radius_x, radius_y, radius_z, 15, 0.15f, 0.05f);
+        attractionPoints.SetAttractionPointsListener(this);
 
 
         growthProperties = new GrowthProperties();
@@ -453,15 +487,12 @@ public class Core : MonoBehaviour {
         growthProperties.SetTropisms(new Vector3(0, 0.5f, 0));
         //growthProperties.SetTropisms(new Vector3(0, 1f, 0));
         growthProperties.SetGrowthDistance(0.25f);
+        growthProperties.SetLeavesPerNode(2);
         growthProperties.SetAttractionPoints(attractionPoints);
         growthProperties.SetIterations(age);
-        //SET LISTENER
-        attractionPoints.SetAttractionPointsListener(growthProperties);
 
 
         grower = new SpaceColonization(growthProperties);
-        //SET LISTENER
-        growthProperties.SetGrowthPropertiesListener(grower);
 
 
         Vector3 position = Vector3.zero;
@@ -475,151 +506,137 @@ public class Core : MonoBehaviour {
         geometryProperties.SetMaxTwigRadiusForLeaves(0.02f);
         geometryProperties.SetLeafSize(1.6f);
         geometryProperties.SetLeafType(Leaf.LeafType.ParticleSquare);
-        geometryProperties.SetLeavesPerNode(2);
+        geometryProperties.SetDisplayedLeavesPerNode(0.5f);
         geometryProperties.SetLeavesEnabled(true);
 
 
         tree = new Tree(position, grower, geometryProperties, this);
-        //SET LISTENER
         grower.SetGrowerListener(tree);
-        //geometryProperties.SetGeometryPropertiesListener(tree);
     }
 
-    void load_advancedNormalTree_particleTest_lowVertices(int age, float radius_x, float radius_y, float radius_z) {
-        attractionPoints = new PseudoEllipsoid(new Vector3(0, 0, 0), radius_x, radius_y, radius_z, 15, 0.15f, 0.05f);
+    //void load_advancedNormalTree_particleTest_lowVertices(int age, float radius_x, float radius_y, float radius_z) {
+    //    attractionPoints = new PseudoEllipsoid(new Vector3(0, 0, 0), radius_x, radius_y, radius_z, 15, 0.15f, 0.05f);
 
 
-        growthProperties = new GrowthProperties();
+    //    growthProperties = new GrowthProperties();
 
-        growthProperties.SetInfluenceDistance(1);
-        growthProperties.SetPerceptionAngle(160f);
-        growthProperties.SetClearDistance(0.925f, 0.7f);
-        growthProperties.SetTropisms(new Vector3(0, 0.5f, 0));
-        //growthProperties.SetTropisms(new Vector3(0, 1f, 0));
-        growthProperties.SetGrowthDistance(0.25f);
-        growthProperties.SetAttractionPoints(attractionPoints);
-        growthProperties.SetIterations(age);
-        //SET LISTENER
-        attractionPoints.SetAttractionPointsListener(growthProperties);
+    //    growthProperties.SetInfluenceDistance(1);
+    //    growthProperties.SetPerceptionAngle(160f);
+    //    growthProperties.SetClearDistance(0.925f, 0.7f);
+    //    growthProperties.SetTropisms(new Vector3(0, 0.5f, 0));
+    //    //growthProperties.SetTropisms(new Vector3(0, 1f, 0));
+    //    growthProperties.SetGrowthDistance(0.25f);
+    //    growthProperties.SetAttractionPoints(attractionPoints);
+    //    growthProperties.SetIterations(age);
 
 
-        grower = new SpaceColonization(growthProperties);
-        //SET LISTENER
-        growthProperties.SetGrowthPropertiesListener(grower);
+    //    grower = new SpaceColonization(growthProperties);
 
 
-        Vector3 position = Vector3.zero;
+    //    Vector3 position = Vector3.zero;
 
-        geometryProperties = new GeometryProperties();
-        geometryProperties.SetTipRadius(0.007f);
-        geometryProperties.SetNthRoot(1.7f);
-        geometryProperties.SetCircleResolution(3);
-        geometryProperties.SetMinRadiusRatioForNormalConnection(0.49f);
+    //    geometryProperties = new GeometryProperties();
+    //    geometryProperties.SetTipRadius(0.007f);
+    //    geometryProperties.SetNthRoot(1.7f);
+    //    geometryProperties.SetCircleResolution(3);
+    //    geometryProperties.SetMinRadiusRatioForNormalConnection(0.49f);
 
-        geometryProperties.SetMaxTwigRadiusForLeaves(0.02f);
-        geometryProperties.SetLeafSize(1.6f);
-        geometryProperties.SetLeafType(Leaf.LeafType.ParticleSquare);
-        geometryProperties.SetLeavesPerNode(0.5f);
-        //geometryProperties.SetLeavesPerNode(1.3f); // tiny
-        geometryProperties.SetLeavesEnabled(true);
-
-
-        tree = new Tree(position, grower, geometryProperties, this);
-        //SET LISTENER
-        grower.SetGrowerListener(tree);
-        //geometryProperties.SetGeometryPropertiesListener(tree);
-    }
-
-    void load_excurrentTree(int age, float radius_x, float radius_y, float radius_z) {
-        attractionPoints = new PseudoEllipsoid(new Vector3(0, 0, 0), radius_x, radius_y, radius_z, 2, 0.15f, 0.05f);
+    //    geometryProperties.SetMaxTwigRadiusForLeaves(0.02f);
+    //    geometryProperties.SetLeafSize(1.6f);
+    //    geometryProperties.SetLeafType(Leaf.LeafType.ParticleSquare);
+    //    geometryProperties.SetLeavesPerNode(0.5f);
+    //    //geometryProperties.SetLeavesPerNode(1.3f); // tiny
+    //    geometryProperties.SetLeavesEnabled(true);
 
 
-        growthProperties = new GrowthProperties();
-        growthProperties.SetInfluenceDistance(5f);
-        //growthProperties.SetInfluenceDistance(1.1f);
-        growthProperties.SetPerceptionAngle(160f);
-        growthProperties.SetClearDistance(0.8f, 0.8f);
-        //growthProperties.SetClearDistance(1f);
-        //growthProperties.SetTropisms(new Vector3(-0.25f, 0.5f, 0));
-        //growthProperties.SetTropisms(new Vector3(0, 0.5f, 0));
-        //growthProperties.SetTropisms(new Vector3(0, 1f, 0));
-        growthProperties.SetGrowthDistance(0.25f);
-        growthProperties.SetAttractionPoints(attractionPoints);
-        growthProperties.SetIterations(age);
-        //SET LISTENER
-        attractionPoints.SetAttractionPointsListener(growthProperties);
+    //    tree = new Tree(position, grower, geometryProperties, this);
+    //    //SET LISTENER
+    //    grower.SetGrowerListener(tree);
+    //    //geometryProperties.SetGeometryPropertiesListener(tree);
+    //}
+
+    //void load_excurrentTree(int age, float radius_x, float radius_y, float radius_z) {
+    //    attractionPoints = new PseudoEllipsoid(new Vector3(0, 0, 0), radius_x, radius_y, radius_z, 2, 0.15f, 0.05f);
 
 
-        grower = new SpaceColonization(growthProperties);
-        //SET LISTENER
-        growthProperties.SetGrowthPropertiesListener(grower);
+    //    growthProperties = new GrowthProperties();
+    //    growthProperties.SetInfluenceDistance(5f);
+    //    //growthProperties.SetInfluenceDistance(1.1f);
+    //    growthProperties.SetPerceptionAngle(160f);
+    //    growthProperties.SetClearDistance(0.8f, 0.8f);
+    //    //growthProperties.SetClearDistance(1f);
+    //    //growthProperties.SetTropisms(new Vector3(-0.25f, 0.5f, 0));
+    //    //growthProperties.SetTropisms(new Vector3(0, 0.5f, 0));
+    //    //growthProperties.SetTropisms(new Vector3(0, 1f, 0));
+    //    growthProperties.SetGrowthDistance(0.25f);
+    //    growthProperties.SetAttractionPoints(attractionPoints);
+    //    growthProperties.SetIterations(age);
 
 
-        Vector3 position = Vector3.zero;
-
-        geometryProperties = new GeometryProperties();
-        geometryProperties.SetTipRadius(0.007f);
-        geometryProperties.SetNthRoot(1.3f);
-        geometryProperties.SetCircleResolution(3);
-        geometryProperties.SetMinRadiusRatioForNormalConnection(0.49f);
-
-        geometryProperties.SetMaxTwigRadiusForLeaves(0.02f);
-        geometryProperties.SetLeafSize(0.5f);
-        geometryProperties.SetLeafType(Leaf.LeafType.Triangle);
-        geometryProperties.SetLeavesPerNode(2);
-        geometryProperties.SetLeavesEnabled(true);
+    //    grower = new SpaceColonization(growthProperties);
 
 
-        tree = new Tree(position, grower, geometryProperties, this);
-        //SET LISTENER
-        grower.SetGrowerListener(tree);
-        //geometryProperties.SetGeometryPropertiesListener(tree);
-    }
+    //    Vector3 position = Vector3.zero;
 
-    void load_testTree(int age, float radius_x, float radius_y, float radius_z) {
-        attractionPoints = new PseudoEllipsoid(new Vector3(0, 0, 0), radius_x, radius_y, radius_z, 7.5f, 0.15f, 0.05f);
+    //    geometryProperties = new GeometryProperties();
+    //    geometryProperties.SetTipRadius(0.007f);
+    //    geometryProperties.SetNthRoot(1.3f);
+    //    geometryProperties.SetCircleResolution(3);
+    //    geometryProperties.SetMinRadiusRatioForNormalConnection(0.49f);
 
-
-        growthProperties = new GrowthProperties();
-        growthProperties.SetInfluenceDistance(2f);
-        //growthProperties.SetInfluenceDistance(1.1f);
-        growthProperties.SetPerceptionAngle(160f);
-        growthProperties.SetClearDistance(1.8f, 1.8f);
-        //growthProperties.SetClearDistance(1f);
-        //growthProperties.SetTropisms(new Vector3(-0.25f, 0.5f, 0));
-        growthProperties.SetTropisms(new Vector3(0, 0.5f, 0));
-        growthProperties.SetGrowthDistance(0.25f);
-        growthProperties.SetAttractionPoints(attractionPoints);
-        growthProperties.SetIterations(age);
-        //SET LISTENER
-        attractionPoints.SetAttractionPointsListener(growthProperties);
+    //    geometryProperties.SetMaxTwigRadiusForLeaves(0.02f);
+    //    geometryProperties.SetLeafSize(0.5f);
+    //    geometryProperties.SetLeafType(Leaf.LeafType.Triangle);
+    //    geometryProperties.SetLeavesPerNode(2);
+    //    geometryProperties.SetLeavesEnabled(true);
 
 
-        grower = new SpaceColonization(growthProperties);
-        //SET LISTENER
-        growthProperties.SetGrowthPropertiesListener(grower);
+    //    tree = new Tree(position, grower, geometryProperties, this);
+    //    //SET LISTENER
+    //    grower.SetGrowerListener(tree);
+    //    //geometryProperties.SetGeometryPropertiesListener(tree);
+    //}
+
+    //void load_testTree(int age, float radius_x, float radius_y, float radius_z) {
+    //    attractionPoints = new PseudoEllipsoid(new Vector3(0, 0, 0), radius_x, radius_y, radius_z, 7.5f, 0.15f, 0.05f);
 
 
-        Vector3 position = Vector3.zero;
-
-        geometryProperties = new GeometryProperties();
-        geometryProperties.SetTipRadius(0.007f);
-        geometryProperties.SetNthRoot(1.3f);
-        geometryProperties.SetCircleResolution(3);
-        geometryProperties.SetMinRadiusRatioForNormalConnection(0.49f);
-
-        geometryProperties.SetMaxTwigRadiusForLeaves(0.02f);
-        geometryProperties.SetLeafSize(0.5f);
-        geometryProperties.SetLeafType(Leaf.LeafType.Triangle);
-        geometryProperties.SetLeavesPerNode(2);
-        geometryProperties.SetLeavesEnabled(true);
+    //    growthProperties = new GrowthProperties();
+    //    growthProperties.SetInfluenceDistance(2f);
+    //    //growthProperties.SetInfluenceDistance(1.1f);
+    //    growthProperties.SetPerceptionAngle(160f);
+    //    growthProperties.SetClearDistance(1.8f, 1.8f);
+    //    //growthProperties.SetClearDistance(1f);
+    //    //growthProperties.SetTropisms(new Vector3(-0.25f, 0.5f, 0));
+    //    growthProperties.SetTropisms(new Vector3(0, 0.5f, 0));
+    //    growthProperties.SetGrowthDistance(0.25f);
+    //    growthProperties.SetAttractionPoints(attractionPoints);
+    //    growthProperties.SetIterations(age);
 
 
-        tree = new Tree(position, grower, geometryProperties, this);
-        //SET LISTENER
-        grower.SetGrowerListener(tree);
-        //geometryProperties.SetGeometryPropertiesListener(tree);
-    }
+    //    grower = new SpaceColonization(growthProperties);
+
+
+    //    Vector3 position = Vector3.zero;
+
+    //    geometryProperties = new GeometryProperties();
+    //    geometryProperties.SetTipRadius(0.007f);
+    //    geometryProperties.SetNthRoot(1.3f);
+    //    geometryProperties.SetCircleResolution(3);
+    //    geometryProperties.SetMinRadiusRatioForNormalConnection(0.49f);
+
+    //    geometryProperties.SetMaxTwigRadiusForLeaves(0.02f);
+    //    geometryProperties.SetLeafSize(0.5f);
+    //    geometryProperties.SetLeafType(Leaf.LeafType.Triangle);
+    //    geometryProperties.SetLeavesPerNode(2);
+    //    geometryProperties.SetLeavesEnabled(true);
+
+
+    //    tree = new Tree(position, grower, geometryProperties, this);
+    //    //SET LISTENER
+    //    grower.SetGrowerListener(tree);
+    //    //geometryProperties.SetGeometryPropertiesListener(tree);
+    //}
 
 }
 

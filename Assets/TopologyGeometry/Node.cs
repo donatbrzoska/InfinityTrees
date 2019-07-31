@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using UnityEngine;
 
-public class Node : IEquatable<Node>, GeometryPropertiesObserver {
+public class Node : IEquatable<Node> {
 
     private static bool debugEnabled = true;
     private static void debug(string message, [CallerMemberName]string callerName = "") {
@@ -49,25 +49,21 @@ public class Node : IEquatable<Node>, GeometryPropertiesObserver {
         this.position = position;
         this.supernode = supernode;
         this.radius = geometryProperties.GetTipRadius();
-
         this.geometryProperties = geometryProperties;
-        geometryProperties.Subscribe(this);
 
         CalculateNormal();
-
-        UpdateLeaves();
     }
 
-    private void UpdateLeaves() {
-        if (leaves.Count < geometryProperties.GetLeavesPerNode()) {
-            AddLeaves(geometryProperties.GetLeavesPerNode() - leaves.Count);
-        } else if (leaves.Count > geometryProperties.GetLeavesPerNode()) {
-            RemoveLeaves(leaves.Count - geometryProperties.GetLeavesPerNode());
-        }
-    }
+    //private void UpdateLeaves() {
+    //    if (leaves.Count < geometryProperties.GetLeavesPerNode()) {
+    //        AddLeaves(geometryProperties.GetLeavesPerNode() - leaves.Count);
+    //    } else if (leaves.Count > geometryProperties.GetLeavesPerNode()) {
+    //        RemoveLeaves(leaves.Count - geometryProperties.GetLeavesPerNode());
+    //    }
+    //}
 
     //adds leavesPerNode leaves
-    private void AddLeaves(float leavesPerNode) {
+    public void AddLeaves(float leavesPerNode) {
         int integer_part = (int)leavesPerNode;
         float floating_part = leavesPerNode - integer_part;
 
@@ -82,20 +78,19 @@ public class Node : IEquatable<Node>, GeometryPropertiesObserver {
     }
 
     //removes leavesPerNode leaves
-    private void RemoveLeaves(float leavesPerNode) {
-        int integer_part = (int)leavesPerNode;
-        float floating_part = leavesPerNode - integer_part;
+    //private void RemoveLeaves(float leavesPerNode) {
+    //    int integer_part = (int)leavesPerNode;
+    //    float floating_part = leavesPerNode - integer_part;
 
-        float r = Util.RandomInRange(0, 1);
-        if (r <= floating_part) {
-            integer_part++;
-        }
+    //    float r = Util.RandomInRange(0, 1);
+    //    if (r <= floating_part) {
+    //        integer_part++;
+    //    }
 
-        for (int i = 0; i < integer_part; i++) {
-            geometryProperties.Unsubsribe(leaves[leaves.Count - 1]);
-            leaves.RemoveAt(leaves.Count-1);
-        }
-    }
+    //    for (int i = 0; i < integer_part; i++) {
+    //        leaves.RemoveAt(leaves.Count-1);
+    //    }
+    //}
 
     private Node(Vector3 position, Vector3 normal, float radius, GeometryProperties geometryProperties) {
         this.position = position;
@@ -108,7 +103,7 @@ public class Node : IEquatable<Node>, GeometryPropertiesObserver {
         return new Node(this.position, normal, radius, geometryProperties);
     }
 
-    public void Add(Vector3 position) {
+    public Node Add(Vector3 position) {
         Node completeNode = new Node(position, this, geometryProperties);
 
         //the following needs to be one atomic step, because as soon as there is a new subnode, the current normal is not valid anymore
@@ -121,6 +116,8 @@ public class Node : IEquatable<Node>, GeometryPropertiesObserver {
             CalculateNormal();
         }
         RecalculateRadii();
+
+        return completeNode;
     }
 
     public bool IsRoot() {
@@ -259,8 +256,19 @@ public class Node : IEquatable<Node>, GeometryPropertiesObserver {
     public void CalculateAndStoreLeafData(List<Vector3> verticesResult, List<Vector2> uvsResult, List<int> trianglesResult) {
         if (geometryProperties.GetLeavesEnabled()) {
             if (radius < geometryProperties.GetMaxTwigRadiusForLeaves()) {
-                foreach (Leaf leaf in leaves) {
-                    leaf.CalculateAndStoreGeometry(verticesResult, uvsResult, trianglesResult);
+                float displayedLeavesPerNode = geometryProperties.GetDisplayedLeavesPerNode();
+                int integerPart = (int)displayedLeavesPerNode;
+                float floatingPart = displayedLeavesPerNode - integerPart;
+
+                float r = Util.RandomInRange(0, 1);
+                if (r <= floatingPart) {
+                    integerPart++;
+                }
+
+                //debug("adding " + integerPart + " leaves");
+
+                for (int i=0; i<integerPart; i++) {
+                    leaves[i].CalculateAndStoreGeometry(verticesResult, uvsResult, trianglesResult);
                 }
             }
         }
@@ -279,7 +287,7 @@ public class Node : IEquatable<Node>, GeometryPropertiesObserver {
     }
 
     public void OnLeavesPerNodeChanged() {
-        UpdateLeaves();
+        //UpdateLeaves();
     }
 
     public void OnLeavesEnabledChanged() {
