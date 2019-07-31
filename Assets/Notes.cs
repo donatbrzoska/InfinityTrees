@@ -1,6 +1,7 @@
 ﻿/* BUGS
  *
- * manche kleinen Äste flippen immer noch over
+ * Twisting-Bug -> Frenet Frame?
+ * Manche kleinen Äste flippen immer noch over
  *
  */
 
@@ -10,8 +11,10 @@
  * Distanzberechnungen optimieren
  *
  * Shadowgrid
- * -> behebt evtl. perfekte Rundungen
+ * -> behebt evtl. perfekte Rundungen (Astdichte am Ende reduzieren könnte auch helfen)
  *
+ *
+ * ThreadManager lokal in SpaceColonization implementieren
  */
 
 /* RENDERING
@@ -27,8 +30,6 @@
  */
 
 /* UI
- *
- * Elemente die zusammengehören in Container packen und erst ausklappen wenn gewünscht?
  * 
  * Sigmoid Clear Distance parametrisieren -> evtl. gar nicht notwendig mit Shadowgrid Grower
  *
@@ -37,6 +38,9 @@
  * Ansonsten:
  * - Triangle: Anzahl Blätter / Blattgröße
  * - Particle: Anzahl Blätter, Lappengröße, Blattgröße
+ * - +++ Einfach nur in der Krone verteilen? -> Gar nicht mal an spezifischen Nodes?
+ * 
+ * Elemente die zusammengehören in Container packen und erst ausklappen wenn gewünscht?
  * 
  * Elemente mit Icons
  *

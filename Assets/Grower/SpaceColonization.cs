@@ -40,15 +40,18 @@ public class SpaceColonization : Grower {
     }
 
 
+    Thread growerThread;
+
     //interrupt thread nicely when growthProperties change
     private bool running;
 
     public void Stop() {
         if (running) {
             running = false;
-            ThreadManager.Join();
+            growerThread.Join();
         }
     }
+
 
     public void Grow(Node root) {
 
@@ -60,7 +63,7 @@ public class SpaceColonization : Grower {
         }
 
 
-        Thread t = new Thread(() => {
+        growerThread = new Thread(() => {
             Stopwatch growingStopwatch = new Stopwatch();
             growingStopwatch.Start();
 
@@ -69,8 +72,8 @@ public class SpaceColonization : Grower {
             growingStopwatch.Stop();
             debug(new FormatString("grew {0} times in {1}", growthProperties.GetIterations(), growingStopwatch.Elapsed));
         });
-        ThreadManager.Add(t);
-        t.Start();
+        growerThread.IsBackground = true;
+        growerThread.Start();
     }
 
     private void GrowHelper() {

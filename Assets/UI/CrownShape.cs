@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 public class CrownShape : MonoBehaviour {
@@ -14,44 +15,49 @@ public class CrownShape : MonoBehaviour {
         float value = GetComponent<Slider>().value;
         GameObject.Find("Core").GetComponent<Core>().OnCrownWidth(value);
 
-        middleware.DisableCameraMovement();
-        middleware.EnablePointCloudRenderer();
+        //middleware.DisableCameraMovement();
+        //middleware.EnablePointCloudRenderer();
     }
 
     public void OnValueChanged_Height() {
         float value = GetComponent<Slider>().value;
         GameObject.Find("Core").GetComponent<Core>().OnCrownHeight(value);
 
-        middleware.DisableCameraMovement();
-        middleware.EnablePointCloudRenderer();
+        //middleware.DisableCameraMovement();
+        //middleware.EnablePointCloudRenderer();
     }
 
     public void OnValueChanged_Depth() {
         float value = GetComponent<Slider>().value;
         GameObject.Find("Core").GetComponent<Core>().OnCrownDepth(value);
 
-        middleware.DisableCameraMovement();
-        middleware.EnablePointCloudRenderer();
+        //middleware.DisableCameraMovement();
+        //middleware.EnablePointCloudRenderer();
     }
 
     public void OnValueChanged_TopCutoff() {
         float value = GetComponent<Slider>().value;
         GameObject.Find("Core").GetComponent<Core>().OnCrownTopCutoff(value);
 
-        middleware.DisableCameraMovement();
-        middleware.EnablePointCloudRenderer();
+        //middleware.DisableCameraMovement();
+        //middleware.EnablePointCloudRenderer();
     }
 
     public void OnValueChanged_BottomCutoff() {
         float value = GetComponent<Slider>().value;
         GameObject.Find("Core").GetComponent<Core>().OnCrownBottomCutoff(value);
 
-        middleware.DisableCameraMovement();
-        middleware.EnablePointCloudRenderer();
+        //middleware.DisableCameraMovement();
+        //middleware.EnablePointCloudRenderer();
     }
 
 
     void Update() {
+        if (Input.GetMouseButtonDown(0) && GameObject.Find("EventSystem").GetComponent<EventSystem>().currentSelectedGameObject == gameObject) {
+            middleware.DisableCameraMovement();
+            middleware.EnablePointCloudRenderer();
+        }
+
         if (Input.GetMouseButtonUp(0)) {
             middleware.EnableCameraMovement();
             middleware.DisablePointCloudRenderer();

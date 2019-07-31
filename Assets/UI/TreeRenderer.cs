@@ -25,7 +25,7 @@ public class TreeRenderer : MonoBehaviour {
     }
 
     void Initialize() {
-        Application.targetFrameRate = 30;
+        Application.targetFrameRate = 42;
 
         core = GameObject.Find("Core").GetComponent<Core>();
 

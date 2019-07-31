@@ -20,7 +20,7 @@ public class CameraMovement : MonoBehaviour {
     void Start() {
         distanceToTreeCenter = 5;
         horizontalRotation = 270;
-        verticalRotation = 90;
+        verticalRotation = 85;
         y_position = 0; // this should immedeately get updated
 
         eventSystem = EventSystem.current;
@@ -87,7 +87,7 @@ public class CameraMovement : MonoBehaviour {
         // 2. update camera
         //// find out where to look at
         //Vector3 treeCenter = GameObject.Find("TreeMesh").GetComponent<TreeCreator>().GetAttractionPoints().GetCenter();
-        //http://mathworld.wolfram.com/SphericalCoordinates.html -> y und z tauschen
+        //http://mathworld.wolfram.com/SphericalCoordinates.html -> swap y and z
         // calculate position based on rotations and distance to the center of the tree
         float x = distanceToTreeCenter * Mathf.Cos(Util.DegreesToRadians(horizontalRotation)) * Mathf.Sin(Util.DegreesToRadians(verticalRotation));
         float y = distanceToTreeCenter * Mathf.Cos(Util.DegreesToRadians(verticalRotation));

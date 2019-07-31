@@ -74,7 +74,6 @@
     <Compile Include="Assets\Grower\SortedNodeList.cs" />
     <Compile Include="Assets\Grower\SpaceColonization.cs" />
     <Compile Include="Assets\Notes.cs" />
-    <Compile Include="Assets\ThreadManager.cs" />
     <Compile Include="Assets\TopologyGeometry\GeometryProperties.cs" />
     <Compile Include="Assets\TopologyGeometry\Leaf.cs" />
     <Compile Include="Assets\TopologyGeometry\Node.cs" />

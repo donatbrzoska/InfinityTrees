@@ -10,7 +10,6 @@ public class PointCloudRenderer : MonoBehaviour {
     Vector2[] uvs;
     int[] triangles;
     float triangleSize;
-    //int[] indizes;
 
     public bool Enabled { get; set; } = false;
 
@@ -27,34 +26,6 @@ public class PointCloudRenderer : MonoBehaviour {
         texture.Apply();
         GetComponent<MeshRenderer>().material.SetTexture("_MainTex", texture);
     }
-
-    //// Update is called once per frame
-    //void Update() {
-
-    //    //always get the latest point cloud
-    //    if (GameObject.Find("Core").GetComponent<Core>().PointCloudReady()) {
-    //        List<Vector3> pointCloud = GameObject.Find("Core").GetComponent<Core>().GetPointCloud();
-
-    //        vertices = new Vector3[pointCloud.Count];
-    //        indizes = new int[pointCloud.Count];
-    //        for (int i = 0; i < vertices.Length; i++) {
-    //            vertices[i] = pointCloud[i];
-    //            indizes[i] = i;
-    //        }
-
-    //        //Threadsafety is given, because the backup object never gets changed
-    //    }
-
-    //    //and display it, if Enabled
-    //    mesh.Clear();
-
-    //    if (Enabled) {
-    //        mesh.vertices = vertices;
-    //        mesh.SetIndices(indizes, MeshTopology.Points, 0);
-    //    } else {
-    //        mesh.vertices = null;
-    //    }
-    //}
 
     // Update is called once per frame
     void Update() {
@@ -83,8 +54,8 @@ public class PointCloudRenderer : MonoBehaviour {
                 triangles[vertexPointer - 1] = vertexPointer - 1;
 
                 uvs[vertexPointer - 3] = new Vector2(0, 0);
-                uvs[vertexPointer - 2] = new Vector2(0, 1);
-                uvs[vertexPointer - 1] = new Vector2(0, 1);
+                uvs[vertexPointer - 2] = new Vector2(0, 0);
+                uvs[vertexPointer - 1] = new Vector2(0, 0);
             }
         }
 

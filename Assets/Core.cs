@@ -141,7 +141,7 @@ public class Core : MonoBehaviour, GrowerListener {
     //##########                           POINT CLOUD AGENT                       ##########
     //#######################################################################################
 
-    bool pointCloudReady;
+    bool pointCloudReady = true;
 
     // called by PointCloudRenderer
     public bool PointCloudReady() {
