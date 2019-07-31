@@ -67,7 +67,6 @@
     <Compile Include="Assets\Grower\Grower.cs" />
     <Compile Include="Assets\Grower\GrowerListener.cs" />
     <Compile Include="Assets\Grower\GrowthProperties\AttractionPoints\AttractionPoints.cs" />
-    <Compile Include="Assets\Grower\GrowthProperties\AttractionPoints\AttractionPointsListener.cs" />
     <Compile Include="Assets\Grower\GrowthProperties\AttractionPoints\PseudoEllipsoid.cs" />
     <Compile Include="Assets\Grower\GrowthProperties\GrowthProperties.cs" />
     <Compile Include="Assets\Grower\NearestNodeAlgorithm.cs" />
@@ -78,7 +77,6 @@
     <Compile Include="Assets\ThreadManager.cs" />
     <Compile Include="Assets\TopologyGeometry\GeometryProperties.cs" />
     <Compile Include="Assets\TopologyGeometry\Leaf.cs" />
-    <Compile Include="Assets\TopologyGeometry\MeshListener.cs" />
     <Compile Include="Assets\TopologyGeometry\Node.cs" />
     <Compile Include="Assets\TopologyGeometry\ObjExporter.cs" />
     <Compile Include="Assets\TopologyGeometry\Tree.cs" />

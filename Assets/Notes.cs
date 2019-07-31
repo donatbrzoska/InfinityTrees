@@ -14,9 +14,17 @@
 
 /* TODO
  *
+ * perfekte Rundungen etwas verrauschen
+ *
+ * 
+ * 
  * UI Elemente mit Bildern
  * 
  * LeafType:Triangle -> Anzahl der Blätter einstellbar machen
+ * Ansonsten:
+ * - Triangle: Anzahl Blätter / Blattgröße
+ * - Particle: Anzahl Blätter, Lappengröße, Blattgröße
+ * 
  * 
  * Random Parameter Configurations
  *

@@ -24,10 +24,10 @@ public class Tree {
 
     public Node Root { get; private set; }
 
-    private Vector3[] vertices;
-    private Vector3[] normals;
-    private Vector2[] uvs;
-    private int[] triangles;
+    //private Vector3[] vertices;
+    //private Vector3[] normals;
+    //private Vector2[] uvs;
+    //private int[] triangles;
 
     private int twigVertices;
     private int twigTriangles;
@@ -35,19 +35,16 @@ public class Tree {
     private int leafTriangles;
 
 
-    MeshListener meshListener;
-
-    public Tree(Vector3 position, GeometryProperties geometryProperties, MeshListener meshListener) {
+    public Tree(Vector3 position, GeometryProperties geometryProperties) {
         this.Root = new Node(position, geometryProperties);
         this.geometryProperties = geometryProperties;
-        this.meshListener = meshListener;
     }
 
     public void Reset() {
         Root = new Node(Vector3.zero, geometryProperties);
     }
 
-    public void CalculateEverything() {
+    public void GetMesh(ref Vector3[] vertices, ref Vector3[] normals, ref Vector2[] uvs, ref int[] triangles) {
         twigVertices = 0;
         twigTriangles = 0;
         leafVertices = 0;
@@ -60,22 +57,20 @@ public class Tree {
         List<Vector2> uvsTmp = new List<Vector2>();// uvsTmp.Capacity = 5000;
         List<int> trianglesTmp = new List<int>();// trianglesTmp.Capacity = 5000;
 
-        CalculateEverythingHelper(Root, nodeVerticesPositions, 0, verticesTmp, uvsTmp, trianglesTmp);
+        CalculateEverything(Root, nodeVerticesPositions, 0, verticesTmp, uvsTmp, trianglesTmp);
 
 
-        this.vertices = new Vector3[verticesTmp.Count];
-        verticesTmp.CopyTo(this.vertices);
+        vertices = new Vector3[verticesTmp.Count];
+        verticesTmp.CopyTo(vertices);
 
-        this.uvs = new Vector2[uvsTmp.Count];
-        uvsTmp.CopyTo(this.uvs);
+        uvs = new Vector2[uvsTmp.Count];
+        uvsTmp.CopyTo(uvs);
 
-        this.triangles = new int[trianglesTmp.Count];
-        trianglesTmp.CopyTo(this.triangles);
+        triangles = new int[trianglesTmp.Count];
+        trianglesTmp.CopyTo(triangles);
 
-        this.normals = TreeUtil.CalculateNormals(this.vertices, this.triangles);
+        normals = TreeUtil.CalculateNormals(vertices, triangles);
 
-
-        meshListener.OnMeshReady(this.vertices, this.normals, this.uvs, this.triangles);
 
 
         debug(new FormatString("{0} vertices, {1} triangles", vertices.Length, triangles.Length / 3));
@@ -86,7 +81,7 @@ public class Tree {
     private float segmentLength;
 
     //looks at the current node, builds cylinders to it's subnodes and recursively calls the function for all subnodes
-    private void CalculateEverythingHelper(Node node, Dictionary<Node, int> nodeVerticesPositions, float vOffset, List<Vector3> verticesResult, List<Vector2> uvsResult, List<int> trianglesResult) {
+    private void CalculateEverything(Node node, Dictionary<Node, int> nodeVerticesPositions, float vOffset, List<Vector3> verticesResult, List<Vector2> uvsResult, List<int> trianglesResult) {
         if (node.IsRoot()) {
             CalculateAndStoreCircleVertices(node, nodeVerticesPositions, verticesResult);
             CalculateAndStoreCircleUVs(vOffset, uvsResult);
@@ -147,7 +142,7 @@ public class Tree {
             leafTriangles += trianglesResult.Count - leaf_triangles;
 
             //recursive call
-            CalculateEverythingHelper(subnode, nodeVerticesPositions, vOffset, verticesResult, uvsResult, trianglesResult);
+            CalculateEverything(subnode, nodeVerticesPositions, vOffset, verticesResult, uvsResult, trianglesResult);
         }
     }
 

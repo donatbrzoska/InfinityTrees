@@ -2,24 +2,14 @@
 using System.Runtime.CompilerServices;
 using UnityEngine;
 using UnityEngine.UI;
-using System;
-using System.Diagnostics;
-using System.Threading;
 using System.IO;
 
-//https://gamedev.stackexchange.com/questions/133372/system-drawing-dll-not-found
-//System.Drawing.dll FROM Unity.app -> Contents -> Mono -> lib -> mono -> 2.0 -> System.Drawing
-//https://stackoverflow.com/a/17061246
-//Configure: File -> Build Settings -> Player Settings -> Other Settings -> API Compatibility := .NET 4.x
-
-
-public class Core : MonoBehaviour, MeshListener, AttractionPointsListener, GrowerListener {
+public class Core : MonoBehaviour, GrowerListener {
     private static void debug(string message, [CallerMemberName]string callerName = "") {
         if (true) {
             UnityEngine.Debug.Log("DEBUG: TreeCreator: " + callerName + "(): " + message);
         }
     }
-
 
     PseudoEllipsoid attractionPoints;
 
@@ -34,14 +24,6 @@ public class Core : MonoBehaviour, MeshListener, AttractionPointsListener, Growe
 
     // Start is called before the first frame update
     void Start() {
-
-        //Bitmap bmp = new Bitmap(600, 600);
-
-        //smallTree_hangingBranches(); //TODO
-        //normalTree();
-        //testTree();
-        //bigTree();
-
 
         int initialAge = 30;
         float initialRadius_x = 3;
@@ -90,6 +72,7 @@ public class Core : MonoBehaviour, MeshListener, AttractionPointsListener, Growe
         grower.Grow(tree.Root);
 	}
 
+    //initialize UI at the beginning
     bool initialized;
     void Update() {
         if (!initialized) {
@@ -112,20 +95,9 @@ public class Core : MonoBehaviour, MeshListener, AttractionPointsListener, Growe
             GameObject.Find("Leaf Type Dropdown").GetComponent<Dropdown>().RefreshShownValue();
 
             GameObject.Find("Leaves Enabled Toggle").GetComponent<Toggle>().SetIsOnWithoutNotify(geometryProperties.GetLeavesEnabled());
-            //GameObject.Find("Leaf Color Dropdown").GetComponent<Dropdown>().value = 0;
-            //GameObject.Find("Leaf Type Dropdown").GetComponent<Dropdown>().value = 0;
-            //GameObject.Find("Leaves Enabled Toggle").GetComponent<Toggle>().enabled = true;
 
             initialized = true;
         }
-    }
-
-    //#######################################################################################
-    //##########                           GROWER LISTENER                         ##########
-    //#######################################################################################
-
-    public void OnIterationFinished() {
-        tree.CalculateEverything();
     }
 
     //#######################################################################################
@@ -137,36 +109,31 @@ public class Core : MonoBehaviour, MeshListener, AttractionPointsListener, Growe
     Vector2[] uvs;
     int[] triangles;
 
-    bool meshReady;
-
-    object getMeshLock = new object();
-
-    //called by Tree
-    public void OnMeshReady(Vector3[] vertices, Vector3[] normals, Vector2[] uvs, int[] triangles) {
-        lock (getMeshLock) {
-            this.vertices = vertices;
-            this.normals = normals;
-            this.uvs = uvs;
-            this.triangles = triangles;
-
-            meshReady = true;
-        }
-    }
+    bool recalculateMesh;
 
     //called by TreeRenderer
     public bool MeshReady() {
-        return meshReady;
+        return recalculateMesh;
     }
 
     //called by TreeRenderer
     public void GetMesh(ref Vector3[] vertices, ref Vector3[] normals, ref Vector2[] uvs, ref int[] triangles) {
-        lock (getMeshLock) {
-            vertices = this.vertices;
-            normals = this.normals;
-            uvs = this.uvs;
-            triangles = this.triangles;
-        }
-        meshReady = false;
+        tree.GetMesh(ref this.vertices, ref this.normals, ref this.uvs, ref this.triangles);
+
+        vertices = this.vertices;
+        normals = this.normals;
+        uvs = this.uvs;
+        triangles = this.triangles;
+
+        recalculateMesh = false;
+    }
+
+    //#######################################################################################
+    //##########                           GROWER LISTENER                         ##########
+    //#######################################################################################
+
+    public void OnIterationFinished() {
+        recalculateMesh = true;
     }
 
 
@@ -175,13 +142,6 @@ public class Core : MonoBehaviour, MeshListener, AttractionPointsListener, Growe
     //#######################################################################################
 
     bool pointCloudReady;
-
-    //object getPointCloudLock = new object(); //TODO: needed?
-
-    // called by AttractionPoints / PseudoEllipsoid
-    public void OnAttractionPointsChanged() {
-        pointCloudReady = true;
-    }
 
     // called by PointCloudRenderer
     public bool PointCloudReady() {
@@ -213,7 +173,8 @@ public class Core : MonoBehaviour, MeshListener, AttractionPointsListener, Growe
     public void OnCrownRadius_x(float value) {
         grower.Stop();
 
-        ((PseudoEllipsoid)attractionPoints).UpdateRadius_x(value);
+        attractionPoints.UpdateRadius_x(value);
+        pointCloudReady = true;
 
         tree.Reset();
 
@@ -223,7 +184,8 @@ public class Core : MonoBehaviour, MeshListener, AttractionPointsListener, Growe
     public void OnCrownRadius_y(float value) {
         grower.Stop();
 
-        ((PseudoEllipsoid)attractionPoints).UpdateRadius_y(value);
+        attractionPoints.UpdateRadius_y(value);
+        pointCloudReady = true;
 
         tree.Reset();
 
@@ -233,7 +195,8 @@ public class Core : MonoBehaviour, MeshListener, AttractionPointsListener, Growe
     public void OnCrownRadius_z(float value) {
         grower.Stop();
 
-        ((PseudoEllipsoid)attractionPoints).UpdateRadius_z(value);
+        attractionPoints.UpdateRadius_z(value);
+        pointCloudReady = true;
 
         tree.Reset();
 
@@ -255,7 +218,7 @@ public class Core : MonoBehaviour, MeshListener, AttractionPointsListener, Growe
         }
         geometryProperties.UpdateLeafType(value);
 
-        tree.CalculateEverything();
+        recalculateMesh = true;
     }
 
     public void OnStemColor(int value) {
@@ -273,7 +236,7 @@ public class Core : MonoBehaviour, MeshListener, AttractionPointsListener, Growe
     public void OnLeavesEnabled(bool enabled) {
         geometryProperties.SetLeavesEnabled(enabled);
 
-        tree.CalculateEverything();
+        recalculateMesh = true;
     }
 
     //#######################################################################################
@@ -493,11 +456,10 @@ public class Core : MonoBehaviour, MeshListener, AttractionPointsListener, Growe
     //}
 
     void load_advancedNormalTree_particleTest(int age, float radius_x, float radius_y, float radius_z) {
-        attractionPoints = new PseudoEllipsoid(new Vector3(0, 0, 0), radius_x, radius_y, radius_z, 15, 0.15f, 0.05f, this);
+        attractionPoints = new PseudoEllipsoid(new Vector3(0, 0, 0), radius_x, radius_y, radius_z, 15, 0.15f, 0.05f);
 
 
         growthProperties = new GrowthProperties();
-
         growthProperties.SetInfluenceDistance(1);
         growthProperties.SetPerceptionAngle(160f);
         growthProperties.SetClearDistance(0.925f, 0.7f);
@@ -512,7 +474,6 @@ public class Core : MonoBehaviour, MeshListener, AttractionPointsListener, Growe
         grower = new SpaceColonization(growthProperties, this);
 
 
-        Vector3 position = Vector3.zero;
 
         geometryProperties = new GeometryProperties();
         geometryProperties.SetTipRadius(0.007f);
@@ -526,8 +487,8 @@ public class Core : MonoBehaviour, MeshListener, AttractionPointsListener, Growe
         geometryProperties.SetDisplayedLeavesPerNode(0.5f);
         geometryProperties.SetLeavesEnabled(true);
 
-
-        tree = new Tree(position, geometryProperties, this);
+        Vector3 position = Vector3.zero;
+        tree = new Tree(position, geometryProperties);
     }
 
     //void load_advancedNormalTree_particleTest_lowVertices(int age, float radius_x, float radius_y, float radius_z) {

@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(MeshFilter))]
@@ -43,22 +42,5 @@ public class PointCloudRenderer : MonoBehaviour {
         } else {
             mesh.vertices = null;
         }
-
-        //if (attractionPoints != null) {
-        //    vertices = new Vector3[attractionPoints.GetBackup().Count]; //TODO: THIS IS NOT THREADSAFE
-        //    indizes = new int[attractionPoints.GetBackup().Count];
-        //                                                    //attractionPoints.CopyTo(vertices);
-        //    for (int i = 0; i < vertices.Length; i++) {
-        //        vertices[i] = attractionPoints.GetBackup()[i];
-        //        indizes[i] = i;
-        //    }
-
-        //    mesh.Clear();
-
-        //    if (Enabled) {
-        //        mesh.vertices = vertices;
-        //        mesh.SetIndices(indizes, MeshTopology.Points, 0);
-        //    }
-        //}
     }
 }

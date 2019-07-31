@@ -18,7 +18,7 @@ public sealed class PseudoEllipsoid : AttractionPoints {
     }
 
     //density says: how many points per 1x1x1 voxel
-    public PseudoEllipsoid(Vector3 position, float radius_x, float radius_y, float radius_z, float density, float cutoffRatio_bottom, float cutoffRatio_top, AttractionPointsListener attractionPointsListener) {
+    public PseudoEllipsoid(Vector3 position, float radius_x, float radius_y, float radius_z, float density, float cutoffRatio_bottom, float cutoffRatio_top) {
         //seed = (int)(new System.Random()).NextDouble() * 65335;
         seed = 0;// (int)Util.RandomInRange(0, 65335);
         random = new System.Random(seed);
@@ -30,8 +30,6 @@ public sealed class PseudoEllipsoid : AttractionPoints {
         this.density = density;
         this.cutoffRatio_bottom = cutoffRatio_bottom;
         this.cutoffRatio_top = cutoffRatio_top;
-
-        this.attractionPointsListener = attractionPointsListener;
 
         Generate();
     }
@@ -122,24 +120,18 @@ public sealed class PseudoEllipsoid : AttractionPoints {
         this.radius_x = radius_x;
         base.random = new System.Random(base.seed);
         Generate();
-
-		attractionPointsListener.OnAttractionPointsChanged();
 	}
 
     public void UpdateRadius_y(float radius_y) {
         this.radius_y = radius_y;
         base.random = new System.Random(base.seed);
         Generate();
-
-		attractionPointsListener.OnAttractionPointsChanged();
 	}
 
     public void UpdateRadius_z(float radius_z) {
         this.radius_z = radius_z;
         base.random = new System.Random(base.seed);
         Generate();
-
-		attractionPointsListener.OnAttractionPointsChanged();
 	}
 }
 

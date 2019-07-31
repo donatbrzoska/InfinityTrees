@@ -13,8 +13,6 @@ public abstract class AttractionPoints : List<Vector3> {
     protected int seed;
     protected System.Random random;
 
-    protected AttractionPointsListener attractionPointsListener;
-
 
     protected abstract void Generate();
 
@@ -24,7 +22,6 @@ public abstract class AttractionPoints : List<Vector3> {
         random = new System.Random(seed);
 
         Generate();
-        attractionPointsListener.OnAttractionPointsChanged();
     }
 
     //"copies" all points in backup to the base
