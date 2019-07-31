@@ -3007,7 +3007,7 @@ GameObject:
   - component: {fileID: 805977583}
   - component: {fileID: 805977582}
   m_Layer: 5
-  m_Name: Crown Shape Text
+  m_Name: Crown Shape Bounds Text
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3034,7 +3034,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 53.08, y: -40}
+  m_AnchoredPosition: {x: 53.079956, y: -40}
   m_SizeDelta: {x: 87.64, y: 15.699}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &805977582
@@ -3070,7 +3070,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Crown Shape
+  m_Text: Crown Shape Bounds
 --- !u!222 &805977583
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -3881,7 +3881,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -47.80011, y: -33.23999}
+  m_AnchoredPosition: {x: -47.80005, y: -33.23999}
   m_SizeDelta: {x: 160, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1204108074
@@ -4720,7 +4720,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 49.2, y: 39.6}
+  m_AnchoredPosition: {x: 49.19995, y: 39.600006}
   m_SizeDelta: {x: 160, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1411327178
@@ -6007,7 +6007,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -47.100037, y: -51.73999}
+  m_AnchoredPosition: {x: -47.100098, y: -51.73999}
   m_SizeDelta: {x: 160, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1627679278
@@ -8042,7 +8042,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -48.200134, y: -13.940002}
+  m_AnchoredPosition: {x: -48.200195, y: -13.940002}
   m_SizeDelta: {x: 160, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2083495331

@@ -3,6 +3,46 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public sealed class PseudoEllipsoid : AttractionPoints {
+
+    private Vector3 center;
+    public Vector3 GetCenter() {
+        return center;
+    }
+
+    float height;
+    public float GetHeight() {
+        return height;
+    }
+
+    //backup points, so the tree can be regrown with any amount of iterations
+    public List<Vector3> Backup { get; private set; }
+
+    private int seed;
+    private System.Random random;
+    private float RandomInRange(float from, float to) {
+        float difference = to - from;
+        if (difference < 0) {
+            throw new Exception("Random: from needs to be smaller or equal than to");
+        }
+        return (float)random.NextDouble() * difference + from;
+    }
+
+    //generates a new set of points
+    public void NewSeed() {
+        seed = (int)Util.RandomInRange(0, 65335);// (int)(new System.Random()).NextDouble() * 65335;
+        random = new System.Random(seed);
+
+        Generate();
+    }
+
+    //"copies" all points in backup to the base
+    public void Reset() {
+        base.Clear();
+        foreach (Vector3 p in Backup) {
+            base.Add(p);
+        }
+    }
+
     float radius_x;
     float radius_y;
     float radius_z;
@@ -12,10 +52,6 @@ public sealed class PseudoEllipsoid : AttractionPoints {
     float density;
     //float densityRatio; //TODO, what did I want to do here?
 
-    float height;
-    public float GetHeight() {
-        return height;
-    }
 
     //density says: how many points per 1x1x1 voxel
     public PseudoEllipsoid(/*Vector3 position, */float radius_x, float radius_y, float radius_z, float density, float cutoffRatio_bottom, float cutoffRatio_top) {
@@ -34,10 +70,12 @@ public sealed class PseudoEllipsoid : AttractionPoints {
         Generate();
     }
 
-    override protected void Generate() {
+    private void Generate() {
         base.Clear();
-        base.backup = new List<Vector3>();//.Clear();
+        Backup = new List<Vector3>();//.Clear();
         height = 0;
+        center = new Vector3(0, 0, 0);
+        //Center = new Vector3(0, 0, 0);
 
         //1. Calculate volume of sphere with radius 1
         float radius = 1f;
@@ -70,9 +108,6 @@ public sealed class PseudoEllipsoid : AttractionPoints {
             if ((y < 0 - radius + cutoffThreshhold_bottom) | y > 0 + radius - cutoffThreshhold_top) {
                 continue;
             }
-            if (y > height) {
-                height = y;
-            }
 
             float x = RandomInRange(-1, 1);
 
@@ -89,10 +124,17 @@ public sealed class PseudoEllipsoid : AttractionPoints {
                 float real_cutoffThreshhold_bottom = 2f * radius_y * cutoffRatio_bottom;
                 //Vector3 targetCenter = new Vector3(position.x, position.y + radius_y - real_cutoffThreshhold_bottom, position.z);// Vector3.up*radius + position;
                 Vector3 targetCenter = new Vector3(0, radius_y - real_cutoffThreshhold_bottom, 0);// Vector3.up*radius + position;
-                base.center = targetCenter;
 
                 base.Add(point + targetCenter);
-                backup.Add(point + targetCenter);
+                Backup.Add(point + targetCenter);
+
+                // for Core -> CameraMovement
+                if (height < base[base.Count - 1].y) {
+                    height = base[base.Count - 1].y;
+                }
+                if (center.y < base[base.Count - 1].y / 2) {
+                    center.y = base[base.Count - 1].y / 2;
+                }
             }
         }
     }
@@ -112,7 +154,7 @@ public sealed class PseudoEllipsoid : AttractionPoints {
 
     public void UpdateCutoffRatio_bottom(float value) {
         this.cutoffRatio_bottom = value;
-        base.random = new System.Random(base.seed);
+        random = new System.Random(seed);
         Generate();
     }
 
@@ -123,7 +165,7 @@ public sealed class PseudoEllipsoid : AttractionPoints {
 
     public void UpdateCutoffRatio_top(float value) {
         this.cutoffRatio_top = value;
-        base.random = new System.Random(base.seed);
+        random = new System.Random(seed);
         Generate();
     }
 
@@ -134,19 +176,19 @@ public sealed class PseudoEllipsoid : AttractionPoints {
 
     public void UpdateRadius_x(float radius_x) {
         this.radius_x = radius_x;
-        base.random = new System.Random(base.seed);
+        random = new System.Random(seed);
         Generate();
 	}
 
     public void UpdateRadius_y(float radius_y) {
         this.radius_y = radius_y;
-        base.random = new System.Random(base.seed);
+        random = new System.Random(seed);
         Generate();
 	}
 
     public void UpdateRadius_z(float radius_z) {
         this.radius_z = radius_z;
-        base.random = new System.Random(base.seed);
+        random = new System.Random(seed);
         Generate();
 	}
 }

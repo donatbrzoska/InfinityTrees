@@ -28,30 +28,30 @@ public class CameraMovement : MonoBehaviour {
 
     // Update is called once per frame
     void Update() {
-        if (Enabled) {
-            // find out where to look at
-            Vector3 treeCenter = GameObject.Find("Core").GetComponent<Core>().GetTreeCenter();
 
-            if (Input.GetKey(KeyCode.Space)) {
-                y_position += speed;
+        // find out where to look at
+        Vector3 center = GameObject.Find("Core").GetComponent<Core>().GetLookAt();
 
-                if (y_position > ((PseudoEllipsoid)GameObject.Find("Core").GetComponent<Core>().GetAttractionPoints()).GetHeight()) {
-                    y_position -= speed;
-                }
-            }
-            if (Input.GetKey(KeyCode.LeftShift)) {
+        if (Input.GetKey(KeyCode.Space)) {
+            y_position += speed;
+
+            if (y_position > GameObject.Find("Core").GetComponent<Core>().GetLookAtTop()) {
                 y_position -= speed;
-
-                if (y_position + treeCenter.y < 0) {
-                    y_position += speed;
-                }
             }
+        }
+        if (Input.GetKey(KeyCode.LeftShift)) {
+            y_position -= speed;
+
+            if (y_position + center.y < 0) {
+                y_position += speed;
+            }
+        }
+
+        Vector3 lookAt = new Vector3(center.x, center.y + y_position, center.z);
 
 
-            Vector3 lookAt = new Vector3(treeCenter.x, treeCenter.y + y_position, treeCenter.z);
 
-
-
+        if (Enabled) {
             // 1. determine mouse difference
             if (!eventSystem.IsPointerOverGameObject()) {
                 // detect mouse click
@@ -82,25 +82,31 @@ public class CameraMovement : MonoBehaviour {
                 // detect mouse scroll
                 distanceToTreeCenter += Input.mouseScrollDelta.y;
             }
-
-
-            // 2. update camera
-            //// find out where to look at
-            //Vector3 treeCenter = GameObject.Find("TreeMesh").GetComponent<TreeCreator>().GetAttractionPoints().GetCenter();
-            //http://mathworld.wolfram.com/SphericalCoordinates.html -> y und z tauschen
-            // calculate position based on rotations and distance to the center of the tree
-            float x = distanceToTreeCenter * Mathf.Cos(Util.DegreesToRadians(horizontalRotation)) * Mathf.Sin(Util.DegreesToRadians(verticalRotation));
-            float y = distanceToTreeCenter * Mathf.Cos(Util.DegreesToRadians(verticalRotation));
-            float z = distanceToTreeCenter * Mathf.Sin(Util.DegreesToRadians(horizontalRotation)) * Mathf.Sin(Util.DegreesToRadians(verticalRotation));
-            //Vector3 position = new Vector3(x, y, z) * distanceToTreeCenter + treeCenter;
-            Vector3 position = new Vector3(x, y, z) * distanceToTreeCenter + lookAt;
-
-            // update position and lookAt
-            GetComponent<Transform>().position = position;
-            //GetComponent<Transform>().LookAt(treeCenter);
-            GetComponent<Transform>().LookAt(lookAt);
-
-
         }
+
+        // 2. update camera
+        //// find out where to look at
+        //Vector3 treeCenter = GameObject.Find("TreeMesh").GetComponent<TreeCreator>().GetAttractionPoints().GetCenter();
+        //http://mathworld.wolfram.com/SphericalCoordinates.html -> y und z tauschen
+        // calculate position based on rotations and distance to the center of the tree
+        float x = distanceToTreeCenter * Mathf.Cos(Util.DegreesToRadians(horizontalRotation)) * Mathf.Sin(Util.DegreesToRadians(verticalRotation));
+        float y = distanceToTreeCenter * Mathf.Cos(Util.DegreesToRadians(verticalRotation));
+        float z = distanceToTreeCenter * Mathf.Sin(Util.DegreesToRadians(horizontalRotation)) * Mathf.Sin(Util.DegreesToRadians(verticalRotation));
+        //Vector3 position = new Vector3(x, y, z) * distanceToTreeCenter + treeCenter;
+
+        Vector3 position;
+
+        float distanceToAttractionPoints = GameObject.Find("Core").GetComponent<Core>().GetDistanceToAttractionPoints();
+        if (distanceToAttractionPoints < 0) { //normal case
+            position = new Vector3(x, y, z) * distanceToTreeCenter + lookAt;
+        } else { //case when attraction points are beeing modified
+            position = new Vector3(x, y, z) * distanceToAttractionPoints + lookAt;
+        }
+
+        // update position and lookAt
+        GetComponent<Transform>().position = position;
+        //GetComponent<Transform>().LookAt(treeCenter);
+        GetComponent<Transform>().LookAt(lookAt);
+
     }
 }

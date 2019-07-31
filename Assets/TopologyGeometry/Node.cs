@@ -224,29 +224,6 @@ public class Node : IEquatable<Node> {
         return radius;
     }
 
-
-    //public List<Node> GetNodeList() {
-    //    List<Node> nodeList = new List<Node> { this };
-    //    ExtractNodes(this, nodeList);
-    //    return nodeList;
-    //}
-
-    ////PUSHES A LOT TO THE STACK
-    //private void ExtractNodes(Node current, List<Node> extracted) {
-    //    foreach (Node n in current.GetSubnodes()) {
-    //        extracted.Add(n);
-    //        ExtractNodes(n, extracted);
-    //    }
-    //}
-
-
-    //public Vector3[] GetCircleVertices(bool doubled) {
-    //    lock (this) {
-    //        return TreeUtil.CalculateCircleVertices(position, normal, radius, geometryProperties.GetCircleResolution(), doubled);
-    //    }
-    //}
-
-
     public void GetCircleVertices(List<Vector3> verticesResult) {
         lock (this) {
             TreeUtil.CalculateAndStoreCircleVertices(verticesResult, position, normal, radius, geometryProperties.GetCircleResolution());
@@ -268,6 +245,12 @@ public class Node : IEquatable<Node> {
                 //debug("adding " + integerPart + " leaves");
 
                 for (int i=0; i<integerPart; i++) {
+
+                    //TODO: this is a hotfix, 2 leaves should have been calculated, 2 leaves should be displayed at max - at the time
+                    if (i > leaves.Count - 1) {
+                        break;
+                    }
+
                     leaves[i].CalculateAndStoreGeometry(verticesResult, uvsResult, trianglesResult);
                 }
             }

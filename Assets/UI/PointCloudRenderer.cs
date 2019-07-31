@@ -21,9 +21,10 @@ public class PointCloudRenderer : MonoBehaviour {
 
         triangleSize = 0.15f;
 
-        Texture2D texture = Resources.Load("point_cloud_color_red") as Texture2D;
-        //Texture2D texture = new Texture2D(10, 10);
-        //texture.SetPixels(0, 0, 10, 10, new Color[] { Color.magenta });
+        //Texture2D texture = Resources.Load("point_cloud_color_red") as Texture2D;
+        Texture2D texture = new Texture2D(1, 1);
+        texture.SetPixel(0, 0, Color.red);
+        texture.Apply();
         GetComponent<MeshRenderer>().material.SetTexture("_MainTex", texture);
     }
 

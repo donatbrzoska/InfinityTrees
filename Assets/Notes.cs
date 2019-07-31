@@ -1,4 +1,11 @@
-﻿/* NEXT STEPS
+﻿/* BUGS
+ *
+ * manche kleinen Äste flippen immer noch over
+ *
+ */
+
+
+/* NEXT STEPS
  *
  * Distanzberechnungen optimieren
  *
@@ -9,14 +16,14 @@
 
 /* RENDERING
  * 
- * CameraMovement
- * -> PointCloud CameraView
- * -> TreeGrowth CameraView
- * 
- * Punktwolke sichtbarer darstellen
  *
  * Sehr große Meshes aufsplitten
  * 
+ * DONE CameraMovement
+ * DONE -> PointCloud CameraView
+ * DONE -> TreeGrowth CameraView
+ * 
+ * DONE Punktwolke sichtbarer darstellen
  */
 
 /* UI
@@ -25,7 +32,6 @@
  * 
  * Sigmoid Clear Distance parametrisieren -> evtl. gar nicht notwendig mit Shadowgrid Grower
  *
- * Kugelschnitt anpassbar machen
  *
  * LeafType:Triangle -> Anzahl der Blätter einstellbar machen
  * Ansonsten:
@@ -33,8 +39,12 @@
  * - Particle: Anzahl Blätter, Lappengröße, Blattgröße
  * 
  * Elemente mit Icons
+ *
+ * Color Picker: Texture2D.SetPixel auf Basis von Template
  * 
  * //- Smooth-Slider Age
+ * 
+ * DONE Kugelschnitt anpassbar machen
  */
 
 
@@ -84,20 +94,20 @@
  * 
  */
 
- /* GEOMETRY
- * Verdrehung fixen
- * 
- * Curve-Resolution
- * 
- * Algorithmus für Dreiecke an Gabelungen überlegen, maximale Anzahl an Gabelungen zulassen? (auch in Anlehnung an Realität)
- *
- * //- Stammdicke interpolieren für flüssigere Übergänge bei kleinen Werten für nth_root
- * 
- * - Blätter als Tetraeder oder ein paar senkrecht zueinander stehende Bilder?
- * - Blätter auch zwischen zwei Nodes?
- * - Farbverläufe
- * 
- */
+/* GEOMETRY
+* Verdrehung fixen
+* 
+* Curve-Resolution
+* 
+* Algorithmus für Dreiecke an Gabelungen überlegen, maximale Anzahl an Gabelungen zulassen? (auch in Anlehnung an Realität)
+*
+* //- Stammdicke interpolieren für flüssigere Übergänge bei kleinen Werten für nth_root
+* 
+* - Blätter als Tetraeder oder ein paar senkrecht zueinander stehende Bilder?
+* - Blätter auch zwischen zwei Nodes?
+* - Farbverläufe
+* 
+*/
 
 
 /* DONE

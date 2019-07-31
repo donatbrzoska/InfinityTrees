@@ -12,6 +12,7 @@ public class NearestNodeAlgorithm {
         y.InsertSorted(node);
         z.InsertSorted(node);
     }
+
     public Node GetNearestWithinSquaredDistance(Vector3 position, float maxSquaredDistance, float nodePerceptionAngle) {
         SortedCandidateNodeList candidates = new SortedCandidateNodeList();
 

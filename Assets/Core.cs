@@ -13,10 +13,6 @@ public class Core : MonoBehaviour, GrowerListener {
 
     PseudoEllipsoid attractionPoints;
 
-    public AttractionPoints GetAttractionPoints() {
-        return attractionPoints;
-    }
-
     GrowthProperties growthProperties;
     Grower grower;
     GeometryProperties geometryProperties;
@@ -155,26 +151,50 @@ public class Core : MonoBehaviour, GrowerListener {
     // called by PointCloudRenderer
     public List<Vector3> GetPointCloud() {
         pointCloudReady = false;
-        return attractionPoints.GetBackup();
+        return attractionPoints.Backup;
     }
 
 
     //#######################################################################################
-    //##########                         UI ELEMENT LISTENER                       ##########
+    //##########                          CAMERA MOVEMENT                          ##########
     //#######################################################################################
 
-    public void OnAge(int value) {
-        grower.Stop();
-
-        growthProperties.SetIterations(value);
-        attractionPoints.Reset();
-
-        tree.Reset();
-
-        grower.Grow(tree.Root);
+    public enum CameraMode {
+        Tree,
+        AttractionPoints
     }
+
+    CameraMode cameraMode;
+
+    public Vector3 GetLookAt() {
+        if (cameraMode == CameraMode.AttractionPoints) {
+            return attractionPoints.GetCenter();
+        } else {
+            //if (cameraMode == CameraMode.Tree) {
+            return new Vector3(0, grower.GetTreeHeight() / 2, 0);
+        }
+    }
+
+    public float GetLookAtTop() {
+        return attractionPoints.GetHeight();
+    }
+
+    public float GetDistanceToAttractionPoints() {
+        if (cameraMode == CameraMode.Tree) { //normal case
+            return -1;
+        } else { //case when attraction points are beeing modified
+            //return GameObject.Find("Crown Height Slider").GetComponent<Slider>().maxValue * 2f / 3f;
+            return attractionPoints.GetHeight() / 3 + attractionPoints.GetRadius_x() / 3 + attractionPoints.GetRadius_z() / 3;
+        }
+    }
+
+    //#######################################################################################
+    //##########                             CROWN SHAPE                           ##########
+    //#######################################################################################
 
     public void OnCrownWidth(float value) {
+        cameraMode = CameraMode.AttractionPoints;
+
         grower.Stop();
 
         attractionPoints.UpdateRadius_x(value);
@@ -186,6 +206,8 @@ public class Core : MonoBehaviour, GrowerListener {
     }
 
     public void OnCrownHeight(float value) {
+        cameraMode = CameraMode.AttractionPoints;
+
         grower.Stop();
 
         attractionPoints.UpdateRadius_y(value);
@@ -197,6 +219,8 @@ public class Core : MonoBehaviour, GrowerListener {
     }
 
     public void OnCrownDepth(float value) {
+        cameraMode = CameraMode.AttractionPoints;
+
         grower.Stop();
 
         attractionPoints.UpdateRadius_z(value);
@@ -208,6 +232,8 @@ public class Core : MonoBehaviour, GrowerListener {
     }
 
     public void OnCrownTopCutoff(float value) {
+        cameraMode = CameraMode.AttractionPoints;
+
         grower.Stop();
 
         attractionPoints.UpdateCutoffRatio_top(value);
@@ -219,6 +245,8 @@ public class Core : MonoBehaviour, GrowerListener {
     }
 
     public void OnCrownBottomCutoff(float value) {
+        cameraMode = CameraMode.AttractionPoints;
+
         grower.Stop();
 
         attractionPoints.UpdateCutoffRatio_bottom(value);
@@ -227,6 +255,10 @@ public class Core : MonoBehaviour, GrowerListener {
         tree.Reset();
 
         grower.Grow(tree.Root);
+    }
+
+    public void OnCrownShapeDone() {
+        cameraMode = CameraMode.Tree;
     }
 
 
@@ -265,12 +297,20 @@ public class Core : MonoBehaviour, GrowerListener {
         recalculateMesh = true;
     }
 
+
     //#######################################################################################
     //##########                                  MISC                             ##########
     //#######################################################################################
 
-    public Vector3 GetTreeCenter() {
-        return attractionPoints.GetCenter();
+    public void OnAge(int value) {
+        grower.Stop();
+
+        growthProperties.SetIterations(value);
+        attractionPoints.Reset();
+
+        tree.Reset();
+
+        grower.Grow(tree.Root);
     }
 
     public void OnNewSeed() {

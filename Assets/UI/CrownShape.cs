@@ -55,6 +55,7 @@ public class CrownShape : MonoBehaviour {
         if (Input.GetMouseButtonUp(0)) {
             middleware.EnableCameraMovement();
             middleware.DisablePointCloudRenderer();
+            GameObject.Find("Core").GetComponent<Core>().OnCrownShapeDone();
         }
     }
 }

@@ -26,6 +26,11 @@ public class SpaceColonization : Grower {
     List<Node> nodeList;
     NearestNodeAlgorithm nearestNodeAlgorithm;
 
+    private float treeHeight;
+    public float GetTreeHeight() {
+        return treeHeight;
+    }
+
     GrowthProperties growthProperties;
     GrowerListener growerListener;
 
@@ -133,14 +138,21 @@ public class SpaceColonization : Grower {
                 if (!IsDuplicateNode(happyNodePosition, currentNode)) {
                     //add new node to currentNode
                     currentNode.Add(happyNodePosition).AddLeaves(growthProperties.GetLeavesPerNode());
+
                     //add to the nodeList
                     if (!advanced_algorithm) {
                         nodeList.Add(currentNode.GetSubnodes()[currentNode.GetSubnodes().Count - 1]);
                     } else {
                         nearestNodeAlgorithm.Add(currentNode.GetSubnodes()[currentNode.GetSubnodes().Count - 1]);
                     }
+
                     //and to the newPositions list
                     newPositions.Add(happyNodePosition);
+
+                    // used by Core -> CameraMovement
+                    if (treeHeight < happyNodePosition.y) {
+                        treeHeight = happyNodePosition.y;
+                    }
                 }
             }
 
