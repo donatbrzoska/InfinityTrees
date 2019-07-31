@@ -1,7 +1,8 @@
 ﻿using System;
+using UnityEngine;
 
 public static class Util {
-    private static Random random = new Random();
+    private static System.Random random = new System.Random();
 
     public static float RandomInRange(float from, float to) {
         float d = to - from;
@@ -9,7 +10,7 @@ public static class Util {
         return f + from;
     }
 
-    public static float RandomInRangeNormal(float mean, float stdDev) {
+    public static float RandomWithStdDev(float mean, float stdDev) {
         //https://stackoverflow.com/questions/218060/random-gaussian-variables
         double u1 = 1.0 - random.NextDouble(); //uniform(0,1] random doubles
         double u2 = 1.0 - random.NextDouble();
@@ -19,6 +20,13 @@ public static class Util {
                      mean + stdDev * randStdNormal; //random normal(mean,stdDev^2)
 
         return (float) randNormal;
+    }
+
+    public static Vector3 RandomVector3() {
+        float x = (float)(random.NextDouble() * 2) - 1;
+        float y = (float)(random.NextDouble() * 2) - 1;
+        float z = (float)(random.NextDouble() * 2) - 1;
+        return new Vector3(x, y, z);
     }
 
     public static float DegreesToRadians(float degrees) {

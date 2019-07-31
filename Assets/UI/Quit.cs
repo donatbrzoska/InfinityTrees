@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class QuitOnEscape : MonoBehaviour
+public class Quit : MonoBehaviour
 {
     // Start is called before the first frame update
     void Start()
@@ -14,8 +14,11 @@ public class QuitOnEscape : MonoBehaviour
     void Update()
     {
         if (Input.GetKey("escape")) {
-            //ThreadManager.Reset();
             Application.Quit();
         }
+    }
+
+    public void OnClick() {
+        Application.Quit();
     }
 }

@@ -24,16 +24,6 @@ public class Tree {
 
     public Node Root { get; private set; }
 
-    //private Vector3[] vertices;
-    //private Vector3[] normals;
-    //private Vector2[] uvs;
-    //private int[] triangles;
-
-    private int twigVertices;
-    private int twigTriangles;
-    private int leafVertices;
-    private int leafTriangles;
-
 
     public Tree(Vector3 position, GeometryProperties geometryProperties) {
         this.Root = new Node(position, geometryProperties);
@@ -42,9 +32,14 @@ public class Tree {
 
     public void Reset() {
         Root = new Node(Vector3.zero, geometryProperties);
-    }
+	}
 
-    public void GetMesh(ref Vector3[] vertices, ref Vector3[] normals, ref Vector2[] uvs, ref int[] triangles) {
+	private int twigVertices;
+	private int twigTriangles;
+	private int leafVertices;
+	private int leafTriangles;
+
+	public void GetMesh(ref Vector3[] vertices, ref Vector3[] normals, ref Vector2[] uvs, ref int[] triangles) {
         twigVertices = 0;
         twigTriangles = 0;
         leafVertices = 0;

@@ -81,9 +81,6 @@
     <Compile Include="Assets\TopologyGeometry\ObjExporter.cs" />
     <Compile Include="Assets\TopologyGeometry\Tree.cs" />
     <Compile Include="Assets\TopologyGeometry\TreeUtil.cs" />
-    <Compile Include="Assets\UI\_.cs" />
-    <Compile Include="Assets\UI\__.cs" />
-    <Compile Include="Assets\UI\___.cs" />
     <Compile Include="Assets\UI\Age.cs" />
     <Compile Include="Assets\UI\CameraMovement.cs" />
     <Compile Include="Assets\UI\CrownShape.cs" />
@@ -93,7 +90,7 @@
     <Compile Include="Assets\UI\Middleware.cs" />
     <Compile Include="Assets\UI\NewSeed.cs" />
     <Compile Include="Assets\UI\PointCloudRenderer.cs" />
-    <Compile Include="Assets\UI\QuitOnEscape.cs" />
+    <Compile Include="Assets\UI\Quit.cs" />
     <Compile Include="Assets\UI\Save.cs" />
     <Compile Include="Assets\UI\StemColor.cs" />
     <Compile Include="Assets\UI\TreeRenderer.cs" />

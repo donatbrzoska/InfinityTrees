@@ -3,28 +3,6 @@ using UnityEngine;
 
 public class GeometryProperties {
 
-    System.Random random = new System.Random();
-
-    //List<GeometryPropertiesObserver> geometryPropertiesObservers = new List<GeometryPropertiesObserver>();
-
-    //public void Subscribe(GeometryPropertiesObserver geometryPropertiesObserver) {
-    //    this.geometryPropertiesObservers.Add(geometryPropertiesObserver);
-    //    //Debug.Log(geometryPropertiesObservers.Count);
-    //}
-
-    //public void Unsubsribe(GeometryPropertiesObserver gpo) {
-    //    geometryPropertiesObservers.Remove(gpo);
-    //}
-
-    //public void UnsubscribeAll() {
-    //    geometryPropertiesObservers.Clear();
-    //}
-
-    //GeometryPropertiesListener geometryPropertiesListener;
-    //public void SetGeometryPropertiesListener(GeometryPropertiesListener geometryPropertiesListener) {
-    //    this.geometryPropertiesListener = geometryPropertiesListener;
-    //}
-
     //############################
     //########## TWIGS  ##########
     //############################
@@ -105,15 +83,8 @@ public class GeometryProperties {
         this.leafSizeStdDev = 0.2f * leafSize;
     }
 
-    //public void UpdateLeafSize(float leafSize) {
-    //    SetLeafSize(leafSize);
-    //    //foreach (GeometryPropertiesObserver gpo in geometryPropertiesObservers) {
-    //    //    gpo.OnLeafSizeChanged();
-    //    //}
-    //}
-
     public float GetLeafSize() {
-        return Util.RandomInRangeNormal(leafSize, leafSizeStdDev);
+        return Util.RandomWithStdDev(leafSize, leafSizeStdDev);
     }
 
 
@@ -132,14 +103,6 @@ public class GeometryProperties {
         this.displayedLeavesPerNode = displayedLeavesPerNode;
     }
 
-    //public void UpdateLeavesPerNode(float leavesPerNode) {
-    //    this.leavesPerNode = leavesPerNode;
-    //    //geometryPropertiesListener.OnLeavesPerNodeChanged();
-    //    for (int i=0; i<geometryPropertiesObservers.Count; i++) {
-    //        geometryPropertiesObservers[i].OnLeavesPerNodeChanged();
-    //    }
-    //}
-
     public float GetDisplayedLeavesPerNode() {
         return displayedLeavesPerNode;
     }
@@ -156,51 +119,11 @@ public class GeometryProperties {
     public void UpdateLeafType(int leafTypeStringsIndex) {
         this.CurrentLeafTypeStringsIndex = leafTypeStringsIndex;
         this.leafType = Leaf.LeafTypeStringToLeafType[LeafTypeStrings[leafTypeStringsIndex]];
-        //    //geometryPropertiesListener.OnLeafTypeChanged();
-        //    foreach (GeometryPropertiesObserver gpo in geometryPropertiesObservers) {
-        //        gpo.OnLeafTypeChanged();
-        //    }
     }
 
     public Leaf.LeafType GetLeafType() {
         return leafType;
     }
-
-
-
-    public Vector3 GetRandomLeafRotationAxis() {
-		//float x = UnityEngine.Random.Range(-1, 1);
-		//float y = UnityEngine.Random.Range(-1, 1);
-		//float z = UnityEngine.Random.Range(-1, 1);
-		float x = (float)(random.NextDouble() * 2) - 1;
-		float y = (float)(random.NextDouble() * 2) - 1;
-		float z = (float)(random.NextDouble() * 2) - 1;
-		return new Vector3(x, y, z);
-    }
-
-    public float GetRandomLeafRotationAngle() {
-		//return UnityEngine.Random.Range(0, 360);
-		return (float) random.NextDouble() * 360;
-	}
-
-
-
-	//public void SetLeavesEnabled(bool leavesEnabled) {
-	//	this.leavesEnabled = leavesEnabled;
-	//}
-
-    //public void UpdateLeavesEnabled(bool leavesEnabled) {
-    //    this.leavesEnabled = leavesEnabled;
-    //    //geometryPropertiesListener.OnLeavesEnabledChanged();
-    //    foreach (GeometryPropertiesObserver gpo in geometryPropertiesObservers) {
-    //        gpo.OnLeavesEnabledChanged();
-    //    }
-    //}
-
-	//public bool GetLeavesEnabled() {
- //       return leavesEnabled;
- //   }
-
 
 
     //##############################
@@ -212,25 +135,5 @@ public class GeometryProperties {
 
     public List<string> LeafColorStrings { get; set; }
     public int CurrentLeafColorStringsIndex { get; set; }
-
-    //public void SetStemColors(List<string> stemColors) {
-    //    this.stemColors = stemColors;
-    //}
-
-    //public void SetCurrentStemColor(int currentStemColor) {
-    //    this.currentStemColor = currentStemColor;
-    //}
-
-    //public void SetLeafColors(List<string> leafColors) {
-    //    this.leafColors = leafColors;
-    //}
-
-    //public void SetCurrentLeafColor(int currentLeafColor) {
-    //    this.currentLeafColor = currentLeafColor;
-    //}
-
-
-
-
 
 }

@@ -18,12 +18,12 @@ public sealed class PseudoEllipsoid : AttractionPoints {
     }
 
     //density says: how many points per 1x1x1 voxel
-    public PseudoEllipsoid(Vector3 position, float radius_x, float radius_y, float radius_z, float density, float cutoffRatio_bottom, float cutoffRatio_top) {
+    public PseudoEllipsoid(/*Vector3 position, */float radius_x, float radius_y, float radius_z, float density, float cutoffRatio_bottom, float cutoffRatio_top) {
         //seed = (int)(new System.Random()).NextDouble() * 65335;
         seed = 0;// (int)Util.RandomInRange(0, 65335);
         random = new System.Random(seed);
 
-        this.position = position;
+        //this.position = position;
         this.radius_x = radius_x;
         this.radius_y = radius_y;
         this.radius_z = radius_z;
@@ -37,6 +37,7 @@ public sealed class PseudoEllipsoid : AttractionPoints {
     override protected void Generate() {
         base.Clear();
         base.backup = new List<Vector3>();//.Clear();
+        height = 0;
 
         //1. Calculate volume of sphere with radius 1
         float radius = 1f;
@@ -86,7 +87,8 @@ public sealed class PseudoEllipsoid : AttractionPoints {
 
                 //4.3 Translate the points based on the real cutoff threshhold at the bottom (it is a different one than the one for the sphere with radius 1!)
                 float real_cutoffThreshhold_bottom = 2f * radius_y * cutoffRatio_bottom;
-                Vector3 targetCenter = new Vector3(position.x, position.y + radius_y - real_cutoffThreshhold_bottom, position.z);// Vector3.up*radius + position;
+                //Vector3 targetCenter = new Vector3(position.x, position.y + radius_y - real_cutoffThreshhold_bottom, position.z);// Vector3.up*radius + position;
+                Vector3 targetCenter = new Vector3(0, radius_y - real_cutoffThreshhold_bottom, 0);// Vector3.up*radius + position;
                 base.center = targetCenter;
 
                 base.Add(point + targetCenter);
@@ -107,8 +109,22 @@ public sealed class PseudoEllipsoid : AttractionPoints {
         return radius_z;
     }
 
+
+    public void UpdateCutoffRatio_bottom(float value) {
+        this.cutoffRatio_bottom = value;
+        base.random = new System.Random(base.seed);
+        Generate();
+    }
+
     public float GetCutoffRatio_bottom() {
         return cutoffRatio_bottom;
+    }
+
+
+    public void UpdateCutoffRatio_top(float value) {
+        this.cutoffRatio_top = value;
+        base.random = new System.Random(base.seed);
+        Generate();
     }
 
     public float GetCutoffRatio_top() {

@@ -1,86 +1,79 @@
 ﻿/* NEXT STEPS
  *
- * QUIT Button
- * 
- * UI Elemente größer machen
- * 
  * Distanzberechnungen optimieren
  *
  * Shadowgrid
- *
- * 
+ * -> behebt evtl. perfekte Rundungen
  *
  */
 
-/* TODO
+/* RENDERING
+ * 
+ * CameraMovement
+ * -> PointCloud CameraView
+ * -> TreeGrowth CameraView
+ * 
+ * Punktwolke sichtbarer darstellen
  *
- * perfekte Rundungen etwas verrauschen
+ * Sehr große Meshes aufsplitten
+ * 
+ */
+
+/* UI
  *
+ * Elemente die zusammengehören in Container packen und erst ausklappen wenn gewünscht?
  * 
- * 
- * UI Elemente mit Bildern
- * 
+ * Sigmoid Clear Distance parametrisieren -> evtl. gar nicht notwendig mit Shadowgrid Grower
+ *
+ * Kugelschnitt anpassbar machen
+ *
  * LeafType:Triangle -> Anzahl der Blätter einstellbar machen
  * Ansonsten:
  * - Triangle: Anzahl Blätter / Blattgröße
  * - Particle: Anzahl Blätter, Lappengröße, Blattgröße
  * 
+ * Elemente mit Icons
  * 
+ * //- Smooth-Slider Age
+ */
+
+
+/* UI & MODEL
+ *
  * Random Parameter Configurations
  *
- * investigate on .mtl -> mehrere Texturen sind so referenzierbar
  * 
- * Sigmoid Clear Distance parametrisieren
- * 
+ * abbrechen, wenn die neuen Nodes immer wieder entfernt werden
+ * + neuer Seed, wenn der Baum schon nach wenigen Iterationen aufhört zu wachsen?
  *
- * CameraMovement
- * -> PointCloud CameraView
- * -> TreeGrowth CameraView
- * 
+ */
+
+/* MODEL
  * 
  * Punktewolkengenerator
  * - DONE was überlegen für die Form der Basis-Baumkrone
  * - DONE in die Höhe ziehen
  * - DONE in die Breite ziehen
- * - Punkte überwiegend am Rand
- * - Punkte während des Wachstums hinzufügen
+ * // - Punkte überwiegend am Rand
+ * // - Punkte während des Wachstums hinzufügen
  * - density, influenceDistance und ClearDistance davon abhängig machen
  * 
  * - Verformung der Krone zur Laufzeit bei schon schöner Form
- * -> die alten Punkte sollten möglichst behalten werden, vermutlich nicht so einfach
+ * -> die alten Punkte sollten möglichst behalten werden
+ * --> jetzige Punkte zurücktransformieren und dann neue hinzufügen, bis es wieder genug sind (bzw. entfernen bis es wenig genug sind)
+ * -> genau so: Änderungen der cutoffRatio zur Laufzeit?
  *
- * - genau so: Änderungen der cutoffRatio zur Laufzeit?
- *
- * - Sinnhaftigkeit des density Parameters überdenken
- * 
- * - Kugelschnitt anpassbar machen
- * 
  * - Wenn die Breite/Tiefe der Krone größer als die Höhe ist, sollten die Tropismen nach oben entfernt werden?
  *
- * - Punktwolke sichtbarer darstellen
  * 
+ * Konifären mittels Apical Control?
  * 
- * Geometrie
- * - Verdrehung fixen
- * - Curve-Resolution
- * - Algorithmus für Dreiecke an Gabelungen überlegen, maximale Anzahl an Gabelungen zulassen? (auch in Anlehnung an Realität)
- *
- * //- Stammdicke interpolieren für flüssigere Übergänge bei kleinen Werten für nth_root
- * 
- * - Blätter als Tetraeder oder ein paar senkrecht zueinander stehende Bilder?
- * - Blätter besser verteilen an Nodes?
- * - mehrere Farben auswählbar machen für Blätter
- * - Farbenverläufe
- *
- * 
- * Model
- * - Konifären mittels Apical Control?
- * - hängende Äste
- * - - über Änderung des PerceptionVolumes -> Achse in Abhängigkeit der Noderichtung
- * - - bei Wachstum nach oben: Rotation um Winkel nach unten statt "Verschiebung der Wuchsrichtung" nach unten
- * - - über neue AttractionPoints, Persistenz durch Seed?
- * - >kleinere ClearDistance macht Tropismen hinfällig, viele AttractionPoints auch
- * - - vermutlich weil es einfach unten keine AttractionPoints mehr gibt
+ * hängende Äste
+ * - über Änderung des PerceptionVolumes -> Achse in Abhängigkeit der Noderichtung
+ * - bei Wachstum nach oben: Rotation um Winkel nach unten statt "Verschiebung der Wuchsrichtung" nach unten
+ * - über neue AttractionPoints, Persistenz durch Seed?
+ * >kleinere ClearDistance macht Tropismen hinfällig, viele AttractionPoints auch
+ * - vermutlich weil es einfach unten keine AttractionPoints mehr gibt
  * 
  *
  * Space Colonization
@@ -89,19 +82,26 @@
  * - - DONE Sortierung und dann Suchen
  * - - Octree
  * 
- * - abbrechen, wenn die neuen Nodes immer wieder entfernt werden
- * - neuer Seed, wenn der Baum schon nach wenigen Iterationen aufhört zu wachsen?
+ */
+
+ /* GEOMETRY
+ * Verdrehung fixen
+ * 
+ * Curve-Resolution
+ * 
+ * Algorithmus für Dreiecke an Gabelungen überlegen, maximale Anzahl an Gabelungen zulassen? (auch in Anlehnung an Realität)
  *
- *
- * - neuer Seed <-> Würfeln
- * //- Smooth-Slider Age
+ * //- Stammdicke interpolieren für flüssigere Übergänge bei kleinen Werten für nth_root
  * 
+ * - Blätter als Tetraeder oder ein paar senkrecht zueinander stehende Bilder?
+ * - Blätter auch zwischen zwei Nodes?
+ * - Farbverläufe
  * 
+ */
+
+
+/* DONE
  * 
- * UI
- * - Save Feedback
+ * investigate on .mtl -> mehrere Texturen sind so referenzierbar
  * 
- *
- * 
- *
  */

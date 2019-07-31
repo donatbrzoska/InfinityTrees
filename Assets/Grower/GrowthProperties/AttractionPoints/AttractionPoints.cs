@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public abstract class AttractionPoints : List<Vector3> {
-    protected Vector3 position;
+    //protected Vector3 position;
 
     protected Vector3 center;
 
@@ -12,7 +12,6 @@ public abstract class AttractionPoints : List<Vector3> {
 
     protected int seed;
     protected System.Random random;
-
 
     protected abstract void Generate();
 

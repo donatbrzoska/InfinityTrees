@@ -10,25 +10,41 @@ public class CrownShape : MonoBehaviour {
         middleware = new Middleware();
     }
 
-    public void OnValueChanged_x() {
+    public void OnValueChanged_Width() {
         float value = GetComponent<Slider>().value;
-        GameObject.Find("Core").GetComponent<Core>().OnCrownRadius_x(value);
+        GameObject.Find("Core").GetComponent<Core>().OnCrownWidth(value);
 
         middleware.DisableCameraMovement();
         middleware.EnablePointCloudRenderer();
     }
 
-    public void OnValueChanged_y() {
+    public void OnValueChanged_Height() {
         float value = GetComponent<Slider>().value;
-        GameObject.Find("Core").GetComponent<Core>().OnCrownRadius_y(value);
+        GameObject.Find("Core").GetComponent<Core>().OnCrownHeight(value);
 
         middleware.DisableCameraMovement();
         middleware.EnablePointCloudRenderer();
     }
 
-    public void OnValueChanged_z() {
+    public void OnValueChanged_Depth() {
         float value = GetComponent<Slider>().value;
-        GameObject.Find("Core").GetComponent<Core>().OnCrownRadius_z(value);
+        GameObject.Find("Core").GetComponent<Core>().OnCrownDepth(value);
+
+        middleware.DisableCameraMovement();
+        middleware.EnablePointCloudRenderer();
+    }
+
+    public void OnValueChanged_TopCutoff() {
+        float value = GetComponent<Slider>().value;
+        GameObject.Find("Core").GetComponent<Core>().OnCrownTopCutoff(value);
+
+        middleware.DisableCameraMovement();
+        middleware.EnablePointCloudRenderer();
+    }
+
+    public void OnValueChanged_BottomCutoff() {
+        float value = GetComponent<Slider>().value;
+        GameObject.Find("Core").GetComponent<Core>().OnCrownBottomCutoff(value);
 
         middleware.DisableCameraMovement();
         middleware.EnablePointCloudRenderer();

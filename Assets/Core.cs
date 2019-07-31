@@ -77,9 +77,13 @@ public class Core : MonoBehaviour, GrowerListener {
     void Update() {
         if (!initialized) {
             GameObject.Find("Age Slider").GetComponent<Slider>().SetValueWithoutNotify(growthProperties.GetIterations());
+
             GameObject.Find("Crown Width Slider").GetComponent<Slider>().SetValueWithoutNotify(attractionPoints.GetRadius_x());
             GameObject.Find("Crown Height Slider").GetComponent<Slider>().SetValueWithoutNotify(attractionPoints.GetRadius_y());
             GameObject.Find("Crown Depth Slider").GetComponent<Slider>().SetValueWithoutNotify(attractionPoints.GetRadius_z());
+            GameObject.Find("Crown Top Cutoff Slider").GetComponent<Slider>().SetValueWithoutNotify(attractionPoints.GetCutoffRatio_top());
+            GameObject.Find("Crown Bottom Cutoff Slider").GetComponent<Slider>().SetValueWithoutNotify(attractionPoints.GetCutoffRatio_bottom());
+
 
 
             GameObject.Find("Stem Color Dropdown").GetComponent<StemColor>().Initialize(geometryProperties.StemColorStrings);
@@ -170,7 +174,7 @@ public class Core : MonoBehaviour, GrowerListener {
         grower.Grow(tree.Root);
     }
 
-    public void OnCrownRadius_x(float value) {
+    public void OnCrownWidth(float value) {
         grower.Stop();
 
         attractionPoints.UpdateRadius_x(value);
@@ -181,7 +185,7 @@ public class Core : MonoBehaviour, GrowerListener {
         grower.Grow(tree.Root);
     }
 
-    public void OnCrownRadius_y(float value) {
+    public void OnCrownHeight(float value) {
         grower.Stop();
 
         attractionPoints.UpdateRadius_y(value);
@@ -192,10 +196,32 @@ public class Core : MonoBehaviour, GrowerListener {
         grower.Grow(tree.Root);
     }
 
-    public void OnCrownRadius_z(float value) {
+    public void OnCrownDepth(float value) {
         grower.Stop();
 
         attractionPoints.UpdateRadius_z(value);
+        pointCloudReady = true;
+
+        tree.Reset();
+
+        grower.Grow(tree.Root);
+    }
+
+    public void OnCrownTopCutoff(float value) {
+        grower.Stop();
+
+        attractionPoints.UpdateCutoffRatio_top(value);
+        pointCloudReady = true;
+
+        tree.Reset();
+
+        grower.Grow(tree.Root);
+    }
+
+    public void OnCrownBottomCutoff(float value) {
+        grower.Stop();
+
+        attractionPoints.UpdateCutoffRatio_bottom(value);
         pointCloudReady = true;
 
         tree.Reset();
@@ -242,6 +268,10 @@ public class Core : MonoBehaviour, GrowerListener {
     //#######################################################################################
     //##########                                  MISC                             ##########
     //#######################################################################################
+
+    public Vector3 GetTreeCenter() {
+        return attractionPoints.GetCenter();
+    }
 
     public void OnNewSeed() {
         grower.Stop();
@@ -456,7 +486,7 @@ public class Core : MonoBehaviour, GrowerListener {
     //}
 
     void load_advancedNormalTree_particleTest(int age, float radius_x, float radius_y, float radius_z) {
-        attractionPoints = new PseudoEllipsoid(new Vector3(0, 0, 0), radius_x, radius_y, radius_z, 15, 0.15f, 0.05f);
+        attractionPoints = new PseudoEllipsoid(/*new Vector3(0, 0, 0), */radius_x, radius_y, radius_z, 15, 0.15f, 0.05f);
 
 
         growthProperties = new GrowthProperties();

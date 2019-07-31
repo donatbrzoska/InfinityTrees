@@ -30,7 +30,7 @@ public class CameraMovement : MonoBehaviour {
     void Update() {
         if (Enabled) {
             // find out where to look at
-            Vector3 treeCenter = GameObject.Find("Core").GetComponent<Core>().GetAttractionPoints().GetCenter();
+            Vector3 treeCenter = GameObject.Find("Core").GetComponent<Core>().GetTreeCenter();
 
             if (Input.GetKey(KeyCode.Space)) {
                 y_position += speed;
