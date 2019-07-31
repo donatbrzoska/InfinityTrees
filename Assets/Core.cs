@@ -13,7 +13,7 @@ using System.IO;
 //Configure: File -> Build Settings -> Player Settings -> Other Settings -> API Compatibility := .NET 4.x
 
 
-public class Core : MonoBehaviour, MeshListener, AttractionPointsListener {
+public class Core : MonoBehaviour, MeshListener, AttractionPointsListener, GrowerListener {
     private static void debug(string message, [CallerMemberName]string callerName = "") {
         if (true) {
             UnityEngine.Debug.Log("DEBUG: TreeCreator: " + callerName + "(): " + message);
@@ -87,7 +87,7 @@ public class Core : MonoBehaviour, MeshListener, AttractionPointsListener {
         geometryProperties.CurrentLeafTypeStringsIndex = 0;
 
 
-        tree.Grow();
+        grower.Grow(tree.Root);
 	}
 
     bool initialized;
@@ -118,6 +118,14 @@ public class Core : MonoBehaviour, MeshListener, AttractionPointsListener {
 
             initialized = true;
         }
+    }
+
+    //#######################################################################################
+    //##########                           GROWER LISTENER                         ##########
+    //#######################################################################################
+
+    public void OnIterationFinished() {
+        tree.CalculateEverything();
     }
 
     //#######################################################################################
@@ -197,7 +205,9 @@ public class Core : MonoBehaviour, MeshListener, AttractionPointsListener {
         growthProperties.SetIterations(value);
         attractionPoints.Reset();
 
-        tree.Regrow();
+        tree.Reset();
+
+        grower.Grow(tree.Root);
     }
 
     public void OnCrownRadius_x(float value) {
@@ -205,7 +215,9 @@ public class Core : MonoBehaviour, MeshListener, AttractionPointsListener {
 
         ((PseudoEllipsoid)attractionPoints).UpdateRadius_x(value);
 
-        tree.Regrow();
+        tree.Reset();
+
+        grower.Grow(tree.Root);
     }
 
     public void OnCrownRadius_y(float value) {
@@ -213,7 +225,9 @@ public class Core : MonoBehaviour, MeshListener, AttractionPointsListener {
 
         ((PseudoEllipsoid)attractionPoints).UpdateRadius_y(value);
 
-        tree.Regrow();
+        tree.Reset();
+
+        grower.Grow(tree.Root);
     }
 
     public void OnCrownRadius_z(float value) {
@@ -221,7 +235,9 @@ public class Core : MonoBehaviour, MeshListener, AttractionPointsListener {
 
         ((PseudoEllipsoid)attractionPoints).UpdateRadius_z(value);
 
-        tree.Regrow();
+        tree.Reset();
+
+        grower.Grow(tree.Root);
     }
 
 
@@ -269,7 +285,9 @@ public class Core : MonoBehaviour, MeshListener, AttractionPointsListener {
 
         attractionPoints.NewSeed();
 
-        tree.Regrow();
+        tree.Reset();
+
+        grower.Grow(tree.Root);
     }
 
     //https://stackoverflow.com/questions/44733841/how-to-make-texture2d-readable-via-script?noredirect=1&lq=1
@@ -475,8 +493,7 @@ public class Core : MonoBehaviour, MeshListener, AttractionPointsListener {
     //}
 
     void load_advancedNormalTree_particleTest(int age, float radius_x, float radius_y, float radius_z) {
-        attractionPoints = new PseudoEllipsoid(new Vector3(0, 0, 0), radius_x, radius_y, radius_z, 15, 0.15f, 0.05f);
-        attractionPoints.SetAttractionPointsListener(this);
+        attractionPoints = new PseudoEllipsoid(new Vector3(0, 0, 0), radius_x, radius_y, radius_z, 15, 0.15f, 0.05f, this);
 
 
         growthProperties = new GrowthProperties();
@@ -492,7 +509,7 @@ public class Core : MonoBehaviour, MeshListener, AttractionPointsListener {
         growthProperties.SetIterations(age);
 
 
-        grower = new SpaceColonization(growthProperties);
+        grower = new SpaceColonization(growthProperties, this);
 
 
         Vector3 position = Vector3.zero;
@@ -510,8 +527,7 @@ public class Core : MonoBehaviour, MeshListener, AttractionPointsListener {
         geometryProperties.SetLeavesEnabled(true);
 
 
-        tree = new Tree(position, grower, geometryProperties, this);
-        grower.SetGrowerListener(tree);
+        tree = new Tree(position, geometryProperties, this);
     }
 
     //void load_advancedNormalTree_particleTest_lowVertices(int age, float radius_x, float radius_y, float radius_z) {

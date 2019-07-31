@@ -4,7 +4,7 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using UnityEngine;
 
-public class Tree : GrowerListener {
+public class Tree {
 
     private static bool debugEnabled = true;
     private static void debug(string message, [CallerMemberName]string callerName = "") {
@@ -20,84 +20,32 @@ public class Tree : GrowerListener {
     }
 
 
-
-
-
-    //private Vector3 position;
-    //private float stemRadius;
-    //private float steamRadiusRatio; //calculated when GetVertices() ... is called
-
-    private Grower grower;
-
     private GeometryProperties geometryProperties;
 
-    private Node root;
-
-    //private int age;
-
-
-    //private int ageAtPreviousCalculation = -1;
-    //private Vector3[][] vertices = new Vector3[2][];
-    //private Vector3[][] normals = new Vector3[2][];
-    //private Vector2[][] uvs = new Vector2[2][];
-    //private int[][] triangles = new int[2][];
-    //private FinishedPointer finishedPointer = new FinishedPointer();
+    public Node Root { get; private set; }
 
     private Vector3[] vertices;
     private Vector3[] normals;
     private Vector2[] uvs;
     private int[] triangles;
 
-    MeshListener meshListener;
-
-    public Tree(Vector3 position, Grower grower, GeometryProperties geometryProperties, MeshListener meshListener) {
-        this.grower = grower;
-
-        this.geometryProperties = geometryProperties;
-        this.meshListener = meshListener;
-        root = new Node(position, geometryProperties);
-    }
-
     private int twigVertices;
     private int twigTriangles;
     private int leafVertices;
     private int leafTriangles;
 
-    public void Grow() {
-        Thread t = new Thread(() => {
-            grower.Apply(root);
-            Thread.Sleep(100);
-            debug(new FormatString("{0} vertices, {1} triangles", vertices.Length, triangles.Length / 3));
-            debug(new FormatString("{0} twig vertices, {1} twig triangles", twigVertices, twigTriangles / 3));
-            debug(new FormatString("{0} leaf vertices, {1} leaf triangles", leafVertices, leafTriangles / 3));
-        });
-        ThreadManager.Add(t);
-        t.Start();
+
+    MeshListener meshListener;
+
+    public Tree(Vector3 position, GeometryProperties geometryProperties, MeshListener meshListener) {
+        this.Root = new Node(position, geometryProperties);
+        this.geometryProperties = geometryProperties;
+        this.meshListener = meshListener;
     }
 
-    public void Regrow() {
-        root = new Node(Vector3.zero, geometryProperties);
-        Grow();
+    public void Reset() {
+        Root = new Node(Vector3.zero, geometryProperties);
     }
-
-
-
-
-    //public void GetEverything(ref Vector3[] vertices, ref Vector3[] normals, ref Vector2[] uvs, ref int[] triangles) {
-    //    int index = finishedPointer.GetRead();
-
-    //    if (index == -1) { //return not null arrays, when there weren't any calculations yet
-    //        vertices = new Vector3[0];
-    //        normals = new Vector3[0];
-    //        uvs = new Vector2[0];
-    //        triangles = new int[0];
-    //    } else {
-    //        vertices = this.vertices[index];
-    //        normals = this.normals[index];
-    //        uvs = this.uvs[index];
-    //        triangles = this.triangles[index];
-    //    }
-    //}
 
     public void CalculateEverything() {
         twigVertices = 0;
@@ -112,7 +60,7 @@ public class Tree : GrowerListener {
         List<Vector2> uvsTmp = new List<Vector2>();// uvsTmp.Capacity = 5000;
         List<int> trianglesTmp = new List<int>();// trianglesTmp.Capacity = 5000;
 
-        CalculateEverythingHelper(root, nodeVerticesPositions, 0, verticesTmp, uvsTmp, trianglesTmp);
+        CalculateEverythingHelper(Root, nodeVerticesPositions, 0, verticesTmp, uvsTmp, trianglesTmp);
 
 
         this.vertices = new Vector3[verticesTmp.Count];
@@ -128,28 +76,37 @@ public class Tree : GrowerListener {
 
 
         meshListener.OnMeshReady(this.vertices, this.normals, this.uvs, this.triangles);
+
+
+        debug(new FormatString("{0} vertices, {1} triangles", vertices.Length, triangles.Length / 3));
+        debug(new FormatString("{0} twig vertices, {1} twig triangles", twigVertices, twigTriangles / 3));
+        debug(new FormatString("{0} leaf vertices, {1} leaf triangles", leafVertices, leafTriangles / 3));
     }
+
+    private float segmentLength;
 
     //looks at the current node, builds cylinders to it's subnodes and recursively calls the function for all subnodes
     private void CalculateEverythingHelper(Node node, Dictionary<Node, int> nodeVerticesPositions, float vOffset, List<Vector3> verticesResult, List<Vector2> uvsResult, List<int> trianglesResult) {
         if (node.IsRoot()) {
             CalculateAndStoreCircleVertices(node, nodeVerticesPositions, verticesResult);
             CalculateAndStoreCircleUVs(vOffset, uvsResult);
-            vOffset += grower.GetGrowthProperties().GetGrowthDistance(); //TODO: this is a little inaccurate
+            if (node.HasSubnodes()) {
+                segmentLength = Vector3.Distance(node.GetPosition(), node.GetSubnodes()[0].GetPosition());
+            }
+            vOffset += segmentLength; //TODO: this is a little inaccurate
         }
 
         int n_subnodes = node.GetSubnodes().Count;
         for (int i=0; i<n_subnodes; i++) {
             Node subnode = node.GetSubnodes()[i];
 
-            //TODO: 0.75 leads to an error
             if (subnode.GetRadius() > geometryProperties.GetMinRadiusRatioForNormalConnection() * node.GetRadius()) { //subnode radius has to be at least x*node.GetRadius() for a usual connection
                 //calculate and store vertices
                 CalculateAndStoreCircleVertices(subnode, nodeVerticesPositions, verticesResult);
 
                 //calculate and store uvs
                 CalculateAndStoreCircleUVs(vOffset, uvsResult);
-                vOffset += grower.GetGrowthProperties().GetGrowthDistance(); //TODO: this is a little inaccurate
+                vOffset += segmentLength; //TODO: this is a little inaccurate
 
                 //calculate triangles between the node's vertices and the subnode's vertices
                 CalculateAndStoreCylinderTriangles(nodeVerticesPositions[node], nodeVerticesPositions[subnode], trianglesResult);
@@ -159,20 +116,19 @@ public class Tree : GrowerListener {
                 // -> this is only a problem for the normal calculations, so it can also be solved there, which is probably easier than to figure out, whether all subnodes of the root are having too little of a radius
 
                 //calculate and store vertices of node oriented towards the subnode and with a smaller radius
-                //Node node_ = node.GetGeometryCopyWithNormalAndRadius(subnode.GetPosition() - node.GetPosition(), subnode.GetRadius());
                 Node node_ = node.GetGeometryCopyWithNormalAndRadius(subnode.GetDirection(), subnode.GetRadius());
                 //Node node_ = new Node(node.GetPosition(), subnode.GetDirection(), subnode.GetRadius(), geometryProperties);
                 CalculateAndStoreCircleVertices(node_, nodeVerticesPositions, verticesResult);
                 //calculate and store uvs
-                vOffset -= grower.GetGrowthProperties().GetGrowthDistance(); //TODO: this is a little inaccurate
+                vOffset -= segmentLength; //TODO: this is a little inaccurate
                 CalculateAndStoreCircleUVs(vOffset, uvsResult);
-                vOffset += grower.GetGrowthProperties().GetGrowthDistance(); //TODO: this is a little inaccurate
+                vOffset += segmentLength; //TODO: this is a little inaccurate
 
                 //calculate and store vertices
                 CalculateAndStoreCircleVertices(subnode, nodeVerticesPositions, verticesResult);
                 //calculate and store uvs
                 CalculateAndStoreCircleUVs(vOffset, uvsResult);
-                vOffset += grower.GetGrowthProperties().GetGrowthDistance(); //TODO: this is a little inaccurate
+                vOffset += segmentLength; //TODO: this is a little inaccurate
 
                 //calculate triangles between the node's vertices and the subnode's vertices
                 CalculateAndStoreCylinderTriangles(nodeVerticesPositions[node_], nodeVerticesPositions[subnode], trianglesResult);
@@ -205,14 +161,6 @@ public class Tree : GrowerListener {
         twigVertices += verticesResult.Count - nodeVerticesPostions[node];
     }
 
-    //private void CalculateAndStoreCylinderVertices(Node node, Dictionary<Node, int> nodeVerticesPostions, List<Vector3> verticesResult, float radius) {
-
-    //    //store the position of the node's vertices (the position in the 'global' vertices array)
-    //    nodeVerticesPostions[node] = verticesResult.Count;
-    //    //calculate vertices of the current node
-    //    node.GetCircleVertices(verticesResult, radius);
-    //}
-
     //TODO: u in Abhängigkeit von Radius?
     //TODO: v kontinuierlich und abhängig von der growthDistance -> uPointer oder sowas, Distancen zu vorherigen Nodes benötigt...
     private void CalculateAndStoreCircleUVs(float v, List<Vector2> uvsResult) {
@@ -236,14 +184,5 @@ public class Tree : GrowerListener {
 
         //statistics
         twigTriangles += trianglesResult.Count - triangles_;
-    }
-
-
-    //#######################################################################################
-    //##########                           GROWER LISTENER                         ##########
-    //#######################################################################################
-
-    public void OnIterationFinished() {
-        CalculateEverything();
     }
 }

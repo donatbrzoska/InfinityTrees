@@ -15,9 +15,6 @@ public abstract class AttractionPoints : List<Vector3> {
 
     protected AttractionPointsListener attractionPointsListener;
 
-    public void SetAttractionPointsListener(AttractionPointsListener attractionPointsListener) {
-        this.attractionPointsListener = attractionPointsListener;
-    }
 
     protected abstract void Generate();
 

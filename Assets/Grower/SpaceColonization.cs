@@ -29,12 +29,9 @@ public class SpaceColonization : Grower {
     GrowthProperties growthProperties;
     GrowerListener growerListener;
 
-    public void SetGrowerListener(GrowerListener growerListener) {
-        this.growerListener = growerListener;
-    }
-
-    public SpaceColonization(GrowthProperties growthProperties) {
+    public SpaceColonization(GrowthProperties growthProperties, GrowerListener growerListener) {
         this.growthProperties = growthProperties;
+        this.growerListener = growerListener;
     }
 
 
@@ -48,20 +45,31 @@ public class SpaceColonization : Grower {
         }
     }
 
-    public void Apply(Node root, bool regrow=true) {
-        running = true;
+    public void Grow(Node root) {
 
-        if (regrow) {
-            if (!advanced_algorithm) {
-                nodeList = new List<Node> { root };
-            } else {
-                nearestNodeAlgorithm = new NearestNodeAlgorithm();
-                nearestNodeAlgorithm.Add(root);
-            }
+        if (!advanced_algorithm) {
+            nodeList = new List<Node> { root };
+        } else {
+            nearestNodeAlgorithm = new NearestNodeAlgorithm();
+            nearestNodeAlgorithm.Add(root);
         }
 
-        Stopwatch growingStopwatch = new Stopwatch();
-        growingStopwatch.Start();
+
+        Thread t = new Thread(() => {
+            Stopwatch growingStopwatch = new Stopwatch();
+            growingStopwatch.Start();
+
+            GrowHelper();
+
+            growingStopwatch.Stop();
+            debug(new FormatString("grew {0} times in {1}", growthProperties.GetIterations(), growingStopwatch.Elapsed));
+        });
+        ThreadManager.Add(t);
+        t.Start();
+    }
+
+    private void GrowHelper() {
+        running = true;
 
         Stopwatch findClosePointStopwatch = new Stopwatch();
         Stopwatch removeClosePointsStopwatch = new Stopwatch();
@@ -149,11 +157,10 @@ public class SpaceColonization : Grower {
             }
         }
 
-        growingStopwatch.Stop();
-        debug(new FormatString("grew {0} times in {1}", growthProperties.GetIterations(), growingStopwatch.Elapsed));
         debug(new FormatString("finding close points took {0}", findClosePointStopwatch.Elapsed));
         debug(new FormatString("removing close points took {0}", removeClosePointsStopwatch.Elapsed));
 
+        running = false;
     }
 
     private bool IsDuplicateNode(Vector3 potentialPosition, Node node) {
