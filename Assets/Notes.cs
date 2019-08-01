@@ -8,13 +8,33 @@
 
 /* NEXT STEPS
  *
+ * fester Perception Angle von 90, hohe Density (50)
+ * ClearDistance wird angepasst
+ * -> muss maximalwert von ca. InfluenceDistance - 0.075 haben
+ * -> Anpassbarer Bereich ist der Abstand zur InfluenceDistance
+ * -> Astdichte am Anfang
+ * -> Astdichte am Ende
+ * -> IterationMapping Threshhold (Sigmoid Übergang) bestimmt Verhältnis zwischen Stammlänge / Krone
+ * Evtl. später Perception Angle bei diesem Threshhold auch wieder "freigeben" -> 160 (wird vermutlich wegen hoher Density nicht gut aussehen)
+ *
+ * Pruning
+ * 
+ * 
+ * 
  * Distanzberechnungen optimieren
  *
  * Shadowgrid
  * -> behebt evtl. perfekte Rundungen (Astdichte am Ende reduzieren könnte auch helfen)
  *
+ * Äste wachsen zum Schluss oft nach unten
+ * -> ShadowGrid
  *
- * ThreadManager lokal in SpaceColonization implementieren
+ * Exkurrente Bäume über Ordnung der Zweige?
+ * 
+ * Middleware in Core verschieben
+ * 
+ * Radiergummi
+ * Seitenwind
  */
 
 /* RENDERING

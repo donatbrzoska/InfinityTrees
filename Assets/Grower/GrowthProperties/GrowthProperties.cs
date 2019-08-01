@@ -64,6 +64,24 @@ public class GrowthProperties {
         this.clearDistance_begin = begin * begin;
         this.clearDistance_end = end * end;
     }
+
+    public void SetClearDistanceBegin(float begin) {
+        this.clearDistance_begin = begin * begin;
+    }
+
+    public float GetClearDistanceBegin() {
+        return (float)Math.Sqrt(clearDistance_begin);
+    }
+
+    public void SetClearDistanceEnd(float end) {
+        this.clearDistance_end = end * end;
+    }
+
+    public float GetClearDistanceEnd() {
+        return (float)Math.Sqrt(clearDistance_end);
+    }
+
+
     //enum ClearDistanceFunction {
     //    linear,
     //    exponential
@@ -100,7 +118,8 @@ public class GrowthProperties {
     private float SigmoidInterpolation(int iteration) {
         float d = clearDistance_begin - clearDistance_end;
 
-        return (float)(clearDistance_begin - Sigmoid(MapIteration(iteration, -15, 8)) * d);
+        return (float)(clearDistance_begin - Sigmoid(MapIteration(iteration, -2, 8)) * d);
+        //return (float)(clearDistance_begin - Sigmoid(MapIteration(iteration, -15, 8)) * d);
     }
 
     public float GetSquaredClearDistance(int iteration) {

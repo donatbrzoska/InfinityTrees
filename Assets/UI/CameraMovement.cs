@@ -32,20 +32,20 @@ public class CameraMovement : MonoBehaviour {
         // find out where to look at
         Vector3 center = GameObject.Find("Core").GetComponent<Core>().GetLookAt();
 
-        if (Input.GetKey(KeyCode.Space)) {
-            y_position += speed;
+        //if (Input.GetKey(KeyCode.Space)) {
+        //    y_position += speed;
 
-            if (y_position > GameObject.Find("Core").GetComponent<Core>().GetLookAtTop()) {
-                y_position -= speed;
-            }
-        }
-        if (Input.GetKey(KeyCode.LeftShift)) {
-            y_position -= speed;
+        //    if (y_position > GameObject.Find("Core").GetComponent<Core>().GetLookAtTop()) {
+        //        y_position -= speed;
+        //    }
+        //}
+        //if (Input.GetKey(KeyCode.LeftShift)) {
+        //    y_position -= speed;
 
-            if (y_position + center.y < 0) {
-                y_position += speed;
-            }
-        }
+        //    if (y_position + center.y < 0) {
+        //        y_position += speed;
+        //    }
+        //}
 
         Vector3 lookAt = new Vector3(center.x, center.y + y_position, center.z);
 

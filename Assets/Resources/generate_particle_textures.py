@@ -225,3 +225,6 @@ generate_for_parameters(texture_type_list,
                         leaf_color_list,
                         leaf_color_name_list,
                         leaf_size_list)
+
+
+Guten Morgen Papa, ich wünsche dir alles Gute zum Geburtstag und einen tollen Tag! Ein Geschenk habe ich nicht, aber vielleicht freust du dich ja über mein Arbeitszeugnis :D

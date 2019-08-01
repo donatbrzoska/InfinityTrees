@@ -51,6 +51,48 @@ public class CrownShape : MonoBehaviour {
         //middleware.EnablePointCloudRenderer();
     }
 
+    public void OnValueChanged_Density() {
+        float value = GetComponent<Slider>().value;
+        GameObject.Find("Core").GetComponent<Core>().OnDensity(value);
+        //GameObject.Find("Density Text").GetComponent<Text>().text = "Density " + value;
+        //GameObject.Find("Density Text").GetComponent<Text>().resizeTextForBestFit = true;
+    }
+
+    public void OnValueChanged_ClearDistanceBegin() {
+        float value = GetComponent<Slider>().value;
+        GameObject.Find("Core").GetComponent<Core>().OnClearDistanceBegin(value);
+        //GameObject.Find("Clear Distance Begin Text").GetComponent<Text>().text = "Begin " + value;
+        //GameObject.Find("Clear Distance Begin Text").GetComponent<Text>().resizeTextForBestFit = true;
+    }
+
+    public void OnValueChanged_ClearDistanceEnd() {
+        float value = GetComponent<Slider>().value;
+        GameObject.Find("Core").GetComponent<Core>().OnClearDistanceEnd(value);
+        //GameObject.Find("Clear Distance End Text").GetComponent<Text>().text = "End " + value;
+        //GameObject.Find("Clear Distance End Text").GetComponent<Text>().resizeTextForBestFit = true;
+    }
+
+    public void OnValueChanged_InfluenceDistance() {
+        float value = GetComponent<Slider>().value;
+        GameObject.Find("Core").GetComponent<Core>().OnInfluenceDistance(value);
+        //GameObject.Find("Influence Distance Text").GetComponent<Text>().text = "Influence Distance " + value;
+        //GameObject.Find("Influence Distance Text").GetComponent<Text>().resizeTextForBestFit = true;
+    }
+
+    public void OnValueChanged_GrowthDistance() {
+        float value = GetComponent<Slider>().value;
+        GameObject.Find("Core").GetComponent<Core>().OnGrowthDistance(value);
+        //GameObject.Find("Growth Distance Text").GetComponent<Text>().text = "GrowthDistance " + value;
+        //GameObject.Find("Growth Distance Text").GetComponent<Text>().resizeTextForBestFit = true;
+    }
+
+    public void OnValueChanged_PerceptionAngle() {
+        float value = GetComponent<Slider>().value;
+        GameObject.Find("Core").GetComponent<Core>().OnPerceptionAngle(value);
+        //GameObject.Find("Perception Angle Text").GetComponent<Text>().text = "PerceptionAngle " + value;
+        //GameObject.Find("Perception Angle Text").GetComponent<Text>().resizeTextForBestFit = true;
+    }
+
 
     void Update() {
         if (Input.GetMouseButtonDown(0) && GameObject.Find("EventSystem").GetComponent<EventSystem>().currentSelectedGameObject == gameObject) {

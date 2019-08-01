@@ -191,6 +191,16 @@ public sealed class PseudoEllipsoid : AttractionPoints {
         random = new System.Random(seed);
         Generate();
 	}
+
+    public float GetDensity() {
+        return density;
+    }
+
+    public void UpdateDensity(float density) {
+        this.density = density;
+        random = new System.Random(seed);
+        Generate();
+    }
 }
 
 

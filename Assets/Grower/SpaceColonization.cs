@@ -77,6 +77,7 @@ public class SpaceColonization : Grower {
     }
 
     private void GrowHelper() {
+        treeHeight = 0;
         running = true;
 
         Stopwatch findClosePointStopwatch = new Stopwatch();
