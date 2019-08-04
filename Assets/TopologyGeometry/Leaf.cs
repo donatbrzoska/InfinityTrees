@@ -5,7 +5,6 @@ using UnityEngine;
 //Entwurfsentscheidungen:
 // wichtig ist vor allem, dass geometryProperties geändert werden können
 // >> ohne, dass der ganze Baum neu berechnet werden muss
-// >> 
 public class Leaf {
 
     public enum LeafType {
@@ -32,6 +31,10 @@ public class Leaf {
     public static List<string> LeafTypeStrings = new List<string> { "Particle", "Triangle" };
 
 	Vector3 position;
+    public void UpdatePosition(Vector3 diff) {
+        position = position + diff;
+    }
+
     GeometryProperties geometryProperties;
 
     Quaternion rotation;
@@ -47,14 +50,15 @@ public class Leaf {
     }
 
     public void CalculateAndStoreGeometry(List<Vector3> verticesResult, List<Vector2> uvsResult, List<int> trianglesResult) {
-        float size = geometryProperties.GetLeafSize();
 
-        int verticesOffset = verticesResult.Count;
+		float size = geometryProperties.GetLeafSize();
+
+		int verticesOffset = verticesResult.Count;
 
         if (geometryProperties.GetLeafType() == LeafType.Square) {
 
-            //top side of leaf
-            verticesResult.Add(rotation * new Vector3(-0.5f, 0, 0) * size + position);
+			//top side of leaf
+			verticesResult.Add(rotation * new Vector3(-0.5f, 0, 0) * size + position);
             verticesResult.Add(rotation * new Vector3(-0.5f, 0, 1) * size + position);
             verticesResult.Add(rotation * new Vector3(0.5f, 0, 1) * size + position);
             verticesResult.Add(rotation * new Vector3(0.5f, 0, 0) * size + position);

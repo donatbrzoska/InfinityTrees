@@ -52,21 +52,21 @@ public class SpaceColonization : Grower {
         }
     }
 
-    Node root;
 
-    public void Grow(Node root) {
-        this.root = root;
+    public void Grow(Tree tree) {
+
+        //Vector3 rootPosition = root.GetPosition();
 
         //GrowStem();
 
-        Node initialNode = root.Add(new Vector3(0, ((PseudoEllipsoid)growthProperties.GetAttractionPoints()).Position.y, 0));
+        //Node initialNode = root.Add(new Vector3(0, ((PseudoEllipsoid)growthProperties.GetAttractionPoints()).Position.y, 0));
 
         if (!advanced_algorithm) {
-            nodeList = new List<Node> { root, initialNode};
+            nodeList = new List<Node> { tree.StemRoot };
         } else {
             nearestNodeAlgorithm = new NearestNodeAlgorithm();
-            nearestNodeAlgorithm.Add(root);
-            nearestNodeAlgorithm.Add(initialNode);
+            nearestNodeAlgorithm.Add(tree.StemRoot);
+            //nearestNodeAlgorithm.Add(initialNode);
         }
 
 
@@ -74,7 +74,9 @@ public class SpaceColonization : Grower {
             Stopwatch growingStopwatch = new Stopwatch();
             growingStopwatch.Start();
 
-            GrowHelper();
+            GrowStem(tree);
+            //((PseudoEllipsoid)growthProperties.GetAttractionPoints()).UpdatePosition(tree.CrownRoot.GetPosition());
+            GrowCrown(tree);
 
             growingStopwatch.Stop();
             debug(new FormatString("grew {0} times in {1}", growthProperties.GetIterations(), growingStopwatch.Elapsed));
@@ -83,7 +85,87 @@ public class SpaceColonization : Grower {
         growerThread.Start();
     }
 
-    private void GrowHelper() {
+    private AdvancedRandom stemRandom;
+
+    public void RegrowStem(Tree tree) {
+        //save the current crown structure
+        Node CurrentCrownRoot = tree.CrownRoot;
+
+        //delete everything from the tree
+        tree.Reset();
+
+        //grow a new stem
+        GrowStem(tree);
+
+        //put the current crown structure to the new stem
+        Vector3 pos_diff = tree.CrownRoot.GetPosition() - CurrentCrownRoot.GetPosition();
+        CurrentCrownRoot.UpdatePosition(pos_diff);
+        foreach (Node n in CurrentCrownRoot.GetSubnodes()) {
+            tree.CrownRoot.Add(n);
+            //have a look at the Add method again, if you want the move the attraction points towards the stem too
+        }
+
+        //((PseudoEllipsoid)growthProperties.GetAttractionPoints()).UpdatePosition(tree.CrownRoot.GetPosition());
+        growerListener.OnUpdate();
+    }
+
+    private void GrowStem(Tree tree) {
+        if (Util.AlmostEqual(growthProperties.StemLength, 0)) {
+            tree.CrownRoot = tree.StemRoot;
+        } else {
+            stemRandom = new AdvancedRandom(((PseudoEllipsoid)growthProperties.GetAttractionPoints()).Seed);
+
+            float angleRange = 5;
+
+            int iterations = (int)(growthProperties.StemLength / growthProperties.GetGrowthDistance());
+            for (int i = 0; i < iterations; i++) {
+                float angle = stemRandom.RandomInRange(-angleRange, angleRange);
+                Vector3 axis = stemRandom.RandomVector3();
+                axis.y = 0;
+
+                if (tree.StemRoot.HasSubnodes()) {
+                    Vector3 direction = Quaternion.AngleAxis(angle, axis) * tree.CrownRoot.GetDirection(true);
+                    Node newNode = tree.CrownRoot.Add(tree.CrownRoot.GetPosition() + direction * growthProperties.GetGrowthDistance());
+                    //nearestNodeAlgorithm.Add(newNode);
+                    //nodeList.Add(newNode);
+                    tree.CrownRoot = newNode;
+                } else {
+                    Vector3 direction = Quaternion.AngleAxis(angle, axis) * tree.StemRoot.GetDirection(true);
+                    Node newNode = tree.StemRoot.Add(tree.StemRoot.GetPosition() + direction * growthProperties.GetGrowthDistance());
+                    //nearestNodeAlgorithm.Add(newNode);
+                    //nodeList.Add(newNode);
+                    tree.CrownRoot = newNode;
+                }
+            }
+
+            float rest = growthProperties.StemLength % growthProperties.GetGrowthDistance();
+            if (!Util.AlmostEqual(rest, 0)) {
+                float angle = stemRandom.RandomInRange(-angleRange, angleRange);
+                Vector3 axis = stemRandom.RandomVector3();
+                axis.y = 0;
+
+                if (tree.StemRoot.HasSubnodes()) {
+                    Vector3 direction = Quaternion.AngleAxis(angle, axis) * tree.CrownRoot.GetDirection(true);
+                    Node newNode = tree.CrownRoot.Add(tree.CrownRoot.GetPosition() + direction * rest);
+                    //nearestNodeAlgorithm.Add(newNode);
+                    //nodeList.Add(newNode);
+                    tree.CrownRoot = newNode;
+                } else {
+                    Vector3 direction = Quaternion.AngleAxis(angle, axis) * tree.StemRoot.GetDirection(true);
+                    Node newNode = tree.StemRoot.Add(tree.StemRoot.GetPosition() + direction * rest);
+                    //nearestNodeAlgorithm.Add(newNode);
+                    //nodeList.Add(newNode);
+                    tree.CrownRoot = newNode;
+                }
+            }
+        }
+
+        nearestNodeAlgorithm.Add(tree.CrownRoot);
+        //nodeList.Add(newNode);
+        ((PseudoEllipsoid)growthProperties.GetAttractionPoints()).UpdatePosition(tree.CrownRoot.GetPosition());
+    }
+
+    private void GrowCrown(Tree tree) {
         treeHeight = 0;
         running = true;
 
@@ -185,7 +267,7 @@ public class SpaceColonization : Grower {
             RemoveClosePoints(newPositions, i);
             removeClosePointsStopwatch.Stop();
 
-            growerListener.OnIterationFinished();
+            growerListener.OnUpdate();
 
 
             //debug("attraction points left: " + growthProperties.GetAttractionPoints().Count);

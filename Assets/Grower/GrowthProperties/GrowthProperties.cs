@@ -3,9 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class GrowthProperties {
-    //public float StemLength { get; set; }
-    public float StemThickness { get; set; }
-
+    public float StemLength { get; set; }
 
     private float influenceDistance; //FREE
     private float squaredInfluenceDistance; //FREE

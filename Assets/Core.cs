@@ -63,17 +63,23 @@ public class Core : MonoBehaviour, GrowerListener {
 
 
         geometryProperties = new GeometryProperties();
+
         geometryProperties.SetTipRadius(0.007f);
-        geometryProperties.SetNthRoot(1.9f);
+        geometryProperties.SetNthRoot(1.8f);
+        geometryProperties.nth_root_min = 1.4f;
+        geometryProperties.nth_root_max = 3;
         //geometryProperties.SetNthRoot(1.2f);
         geometryProperties.SetCircleResolution(3);
-        geometryProperties.SetCircleResolution(6);
+        //geometryProperties.SetCircleResolution(6);
         geometryProperties.SetMinRadiusRatioForNormalConnection(0.49f);
 
-        geometryProperties.SetMaxTwigRadiusForLeaves(0.02f);
-        geometryProperties.SetLeafSize(1f);
+        geometryProperties.SetMaxTwigRadiusForLeaves(0.0071f);
+        geometryProperties.SetLeafSize(Leaf.LeafType.Triangle, 0.4f);
+        geometryProperties.SetLeafSize(Leaf.LeafType.ParticleSquare, 1f);
+        geometryProperties.SetDisplayedLeavesPerNode(Leaf.LeafType.Triangle, 2f);
+        geometryProperties.SetDisplayedLeavesPerNode(Leaf.LeafType.ParticleSquare, 0.5f);
+        //geometryProperties.SetLeafSize(0.5f);
         geometryProperties.SetLeafType(Leaf.LeafType.ParticleSquare);
-        geometryProperties.SetDisplayedLeavesPerNode(0.5f);
         geometryProperties.SetLeavesEnabled(true);
 
         geometryProperties.StemColorStrings = new List<string> { "dark_brown", "brown", "light_brown", "grey_brown", "greyish" };
@@ -85,12 +91,11 @@ public class Core : MonoBehaviour, GrowerListener {
         geometryProperties.LeafTypeStrings = Leaf.LeafTypeStrings;
         geometryProperties.CurrentLeafTypeStringsIndex = 0;
 
-        Vector3 position = Vector3.zero;
-        tree = new Tree(position, geometryProperties);
 
+        tree = new Tree(geometryProperties);
 
-        grower.Grow(tree.Root);
-	}
+        grower.Grow(tree);
+    }
 
     //initialize UI at the beginning
     bool initialized;
@@ -98,6 +103,7 @@ public class Core : MonoBehaviour, GrowerListener {
         //debug("sqcd: " + growthProperties.GetSquaredClearDistance(1));
         if (!initialized) {
             GameObject.Find("Stem Length Slider").GetComponent<Slider>().SetValueWithoutNotify(attractionPoints.Position.y);
+            GameObject.Find("Stem Thickness Slider").GetComponent<Slider>().SetValueWithoutNotify(geometryProperties.StemThickness);
 
 
             GameObject.Find("Age Slider").GetComponent<Slider>().SetValueWithoutNotify(growthProperties.GetIterations());
@@ -174,7 +180,7 @@ public class Core : MonoBehaviour, GrowerListener {
     //##########                           GROWER LISTENER                         ##########
     //#######################################################################################
 
-    public void OnIterationFinished() {
+    public void OnUpdate() {
         recalculateMesh = true;
     }
 
@@ -233,17 +239,23 @@ public class Core : MonoBehaviour, GrowerListener {
     //#######################################################################################
 
     public void OnLength(float value) {
+        //cameraMode = CameraMode.AttractionPoints;
+
         grower.Stop();
 
-        attractionPoints.UpdatePosition(new Vector3(0, value, 0));
+        //tree.UpdateStemLength(value);
+        growthProperties.StemLength = value;
+        pointCloudReady = true; // this is note precise, but a new PointCloud will follow soon
 
-        tree.Reset();
-
-        grower.Grow(tree.Root);
+        grower.RegrowStem(tree);
     }
 
     public void OnThickness(float value) {
+        geometryProperties.StemThickness = value;
 
+        tree.StemRoot.RecalculateRadii();
+
+        recalculateMesh = true;
     }
 
 
@@ -254,7 +266,7 @@ public class Core : MonoBehaviour, GrowerListener {
             growthProperties.SetTropismsWeights(
                 new Vector3(1,
                             growthProperties.UpTropismsWhenDamped
-                                *(growthProperties.UpTropismsDampRatio * (attractionPoints.GetRadius_x() + attractionPoints.GetRadius_z() / attractionPoints.GetRadius_y())), //this is about 1 when the border is crossed, and decreases as the y radius gets smaller
+                                * (growthProperties.UpTropismsDampRatio * (attractionPoints.GetRadius_x() + attractionPoints.GetRadius_z() / attractionPoints.GetRadius_y())), //this is about 1 when the border is crossed, and decreases as the y radius gets smaller
                             1));
         } else {
             growthProperties.SetTropismsWeights(new Vector3(1, 1, 1));
@@ -272,7 +284,7 @@ public class Core : MonoBehaviour, GrowerListener {
 
         tree.Reset();
 
-        grower.Grow(tree.Root);
+        grower.Grow(tree);
     }
 
     public void OnCrownHeight(float value) {
@@ -286,7 +298,7 @@ public class Core : MonoBehaviour, GrowerListener {
 
         tree.Reset();
 
-        grower.Grow(tree.Root);
+        grower.Grow(tree);
     }
 
     public void OnCrownDepth(float value) {
@@ -300,7 +312,7 @@ public class Core : MonoBehaviour, GrowerListener {
 
         tree.Reset();
 
-        grower.Grow(tree.Root);
+        grower.Grow(tree);
     }
 
     public void OnCrownTopCutoff(float value) {
@@ -313,7 +325,7 @@ public class Core : MonoBehaviour, GrowerListener {
 
         tree.Reset();
 
-        grower.Grow(tree.Root);
+        grower.Grow(tree);
     }
 
     public void OnCrownBottomCutoff(float value) {
@@ -326,7 +338,7 @@ public class Core : MonoBehaviour, GrowerListener {
 
         tree.Reset();
 
-        grower.Grow(tree.Root);
+        grower.Grow(tree);
     }
 
     public void OnCrownShapeDone() {
@@ -344,7 +356,7 @@ public class Core : MonoBehaviour, GrowerListener {
 
         tree.Reset();
 
-        grower.Grow(tree.Root);
+        grower.Grow(tree);
     }
 
 
@@ -356,7 +368,7 @@ public class Core : MonoBehaviour, GrowerListener {
 
         tree.Reset();
 
-        grower.Grow(tree.Root);
+        grower.Grow(tree);
     }
 
     public void OnBranchDensityEnd(float value) {
@@ -367,7 +379,7 @@ public class Core : MonoBehaviour, GrowerListener {
 
         tree.Reset();
 
-        grower.Grow(tree.Root);
+        grower.Grow(tree);
     }
 
 
@@ -381,7 +393,7 @@ public class Core : MonoBehaviour, GrowerListener {
 
         tree.Reset();
 
-        grower.Grow(tree.Root);
+        grower.Grow(tree);
     }
 
 
@@ -398,7 +410,7 @@ public class Core : MonoBehaviour, GrowerListener {
 
         tree.Reset();
 
-        grower.Grow(tree.Root);
+        grower.Grow(tree);
     }
 
     public void OnClearDistanceBegin(float value) {
@@ -409,7 +421,7 @@ public class Core : MonoBehaviour, GrowerListener {
 
         tree.Reset();
 
-        grower.Grow(tree.Root);
+        grower.Grow(tree);
     }
 
     public void OnClearDistanceEnd(float value) {
@@ -420,7 +432,7 @@ public class Core : MonoBehaviour, GrowerListener {
 
         tree.Reset();
 
-        grower.Grow(tree.Root);
+        grower.Grow(tree);
     }
 
     public void OnInfluenceDistance(float value) {
@@ -431,7 +443,7 @@ public class Core : MonoBehaviour, GrowerListener {
 
         tree.Reset();
 
-        grower.Grow(tree.Root);
+        grower.Grow(tree);
     }
 
     public void OnGrowthDistance(float value) {
@@ -442,7 +454,7 @@ public class Core : MonoBehaviour, GrowerListener {
 
         tree.Reset();
 
-        grower.Grow(tree.Root);
+        grower.Grow(tree);
     }
 
     public void OnPerceptionAngle(float value) {
@@ -453,7 +465,7 @@ public class Core : MonoBehaviour, GrowerListener {
 
         tree.Reset();
 
-        grower.Grow(tree.Root);
+        grower.Grow(tree);
     }
 
     //#######################################################################################
@@ -461,13 +473,6 @@ public class Core : MonoBehaviour, GrowerListener {
     //#######################################################################################
 
     public void OnLeafType(int value) {
-        if (geometryProperties.LeafTypeStrings[value] .Equals (Leaf.LeafTypeToString[Leaf.LeafType.Triangle])) {
-            geometryProperties.SetLeafSize(0.5f);
-            geometryProperties.SetDisplayedLeavesPerNode(2f);
-        } else if (geometryProperties.LeafTypeStrings[value] .Equals (Leaf.LeafTypeToString[Leaf.LeafType.ParticleSquare])) {
-            geometryProperties.SetLeafSize(1.6f);
-            geometryProperties.SetDisplayedLeavesPerNode(0.5f);
-        }
         geometryProperties.UpdateLeafType(value);
 
         recalculateMesh = true;
@@ -504,7 +509,7 @@ public class Core : MonoBehaviour, GrowerListener {
 
         tree.Reset();
 
-        grower.Grow(tree.Root);
+        grower.Grow(tree);
     }
 
     public void OnNewSeed() {
@@ -514,7 +519,7 @@ public class Core : MonoBehaviour, GrowerListener {
 
         tree.Reset();
 
-        grower.Grow(tree.Root);
+        grower.Grow(tree);
     }
 
     //https://stackoverflow.com/questions/44733841/how-to-make-texture2d-readable-via-script?noredirect=1&lq=1
@@ -786,6 +791,8 @@ public class Core : MonoBehaviour, GrowerListener {
         growthProperties.UpTropismsWhenDamped = 0.3f;
         growthProperties.SetHangingBranchesIntensity(0);
 
+        growthProperties.StemLength = 2;
+
         growthProperties.SetGrowthDistance(0.25f);
         growthProperties.SetLeavesPerNode(2);
         growthProperties.SetAttractionPoints(attractionPoints);
@@ -894,22 +901,6 @@ public class Core : MonoBehaviour, GrowerListener {
 
 
         grower = new SpaceColonization(growthProperties, this);
-
-
-        geometryProperties = new GeometryProperties();
-        geometryProperties.SetTipRadius(0.007f);
-        geometryProperties.SetNthRoot(1.7f);
-        geometryProperties.SetCircleResolution(3);
-        geometryProperties.SetMinRadiusRatioForNormalConnection(0.49f);
-
-        geometryProperties.SetMaxTwigRadiusForLeaves(0.02f);
-        geometryProperties.SetLeafSize(1.6f);
-        geometryProperties.SetLeafType(Leaf.LeafType.ParticleSquare);
-        geometryProperties.SetDisplayedLeavesPerNode(0.5f);
-        geometryProperties.SetLeavesEnabled(true);
-
-        Vector3 position = Vector3.zero;
-        tree = new Tree(position, geometryProperties);
     }
 
     //void load_advancedNormalTree_particleTest_lowVertices(int age, float radius_x, float radius_y, float radius_z) {

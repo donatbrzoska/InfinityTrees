@@ -9,6 +9,15 @@
  *
  */
 
+/* CODE
+ *
+ * CrownShape Script aufteilen, dann werden auch nicht immer die AttractionPoints angezeigt
+ * 
+ * Seed für Stamm, auch erneuerbar
+ * Festen AttractionPoints Seed rausnehmen
+ * Getter und Setter konsistenter machen
+ *
+ */
 
 /* Perception Angle: 90°, Density: 30 -> braucht hohe Density damit initial ein Stamm machbar ist
  *
@@ -57,16 +66,25 @@
  * Wichtigkeit des Lichts
  *
  * Seitenwind
- * 
- * Random Stamm mit Länge
  *
  *
  *
- * Hängende Äste mittels extra GrowthPhase mit extra AttractionPoints???
+ *
+ * Exkurrente Bäume:
+ * - Langer initialer Stamm (~ bis AttractionPoints Height)
+ * - an diesem können dann auch Nodes wachsen
+ * -> aufpassen bei Anpassung der Stammhöhe, weil immer alle Nodes unter der CrownRoot "verloren gehen"
+ * -> aber wahrscheinlich wird es dann hier eh keinen initialen Stamm geben?
+ * - oder die CrownRoot wird auch schon vorgegrowt (mit starken UpTropismen)
+ *
+ * Hängende Äste:
+ * - starke up Tropism weights und anschließend down Tropisms
+ * // - extra GrowthPhase mit extra AttractionPoints???
  * 
  *
  * bei höherem Alter bleiben die Astdichte-Parameter auf der Strecke
  * -> das liegt daran, dass der Baum den verfügbaren Platz "zu schnell" eingenommen hat
+ * -> User darauf aufmerksam machen?
  *
  *
  *
@@ -127,6 +145,7 @@
  * :: Bei sehr hohen Bäumen fangen die Äste in späteren Iterationen an, nach unten zu wachsen -> vermeiden (und dabei hanging branches offen lassen!)
  * 
  */
+
 
 /* RENDERING
  * 

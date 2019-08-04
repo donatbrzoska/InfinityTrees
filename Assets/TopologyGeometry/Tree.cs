@@ -1,12 +1,10 @@
 ﻿using System.Collections.Generic;
-using System.Diagnostics;
 using System.Runtime.CompilerServices;
-using System.Threading;
 using UnityEngine;
 
 public class Tree {
 
-    private static bool debugEnabled = false;
+    private static bool debugEnabled = true;
     private static void debug(string message, [CallerMemberName]string callerName = "") {
         if (debugEnabled) {
             UnityEngine.Debug.Log("DEBUG: Tree: " + callerName + "(): " + message);
@@ -20,19 +18,78 @@ public class Tree {
     }
 
 
+    // Stammlänge ändern:
+    // - Stamm muss auf Basis der neuen Stammlänge neu generiert werden (möglichst gleicher Seed)
+    // - alle Nodes müssen verschoben werden
+    //
+    // alte CrownRoot muss letzter Node des Stammes sein
+    //public float StemLength { get; private set; }
+    //public void UpdateStemLength(float value) {
+    //    StemLength = value;
+    //    GrowStem();
+    //}
+    //private float stemStepSize;
     private GeometryProperties geometryProperties;
 
-    public Node Root { get; private set; }
+    public Node CrownRoot { get; set; }
+    public Node StemRoot { get; set; }
 
-
-    public Tree(Vector3 position, GeometryProperties geometryProperties) {
-        this.Root = new Node(position, geometryProperties);
+    public Tree(/*float stemLength, float stemStepSize, */GeometryProperties geometryProperties) {
+        //this.StemLength = stemLength;
+        //this.stemStepSize = stemStepSize;
         this.geometryProperties = geometryProperties;
+        Initialize();
     }
+    private void Initialize() {
+        StemRoot = new Node(Vector3.zero, geometryProperties);
+        //GrowStem();
+	}
 
     public void Reset() {
-        Root = new Node(Vector3.zero, geometryProperties);
-	}
+        Initialize();
+    }
+
+
+    //// wo die AttractionPoints positioniert sind, hängt vom Endpunkt des Stammes ab
+    //private void GrowStem() {
+    //    float angleRange = 10;
+
+    //    int iterations = (int) (StemLength / stemStepSize);
+    //    for (int i=0; i<iterations; i++) {
+    //        float angle = Util.RandomInRange(-angleRange, angleRange);
+    //        Vector3 axis = Util.RandomVector3();
+    //        axis.y = 0;
+
+    //        if (StemRoot.HasSubnodes()) {
+    //            Vector3 direction = Quaternion.AngleAxis(angle, axis) * StemTip.GetDirection(true);
+    //            Node newNode = StemTip.Add(StemTip.GetPosition() + direction * stemStepSize);
+    //            StemTip = newNode;
+    //        } else {
+    //            Vector3 direction = Quaternion.AngleAxis(angle, axis) * StemRoot.GetDirection(true);
+    //            Node newNode = StemRoot.Add(StemRoot.GetPosition() + direction * stemStepSize);
+    //            StemTip = newNode;
+    //        }
+    //    }
+
+    //    float rest = StemLength % stemStepSize;
+    //    if (!Util.AlmostEqual(rest, 0)) {
+    //        float angle = Util.RandomInRange(-angleRange, angleRange);
+    //        Vector3 axis = Util.RandomVector3();
+    //        axis.y = 0;
+
+    //        if (StemRoot.HasSubnodes()) {
+    //            Vector3 direction = Quaternion.AngleAxis(angle, axis) * StemTip.GetDirection(true);
+    //            Node newNode = StemTip.Add(StemTip.GetPosition() + direction * rest);
+    //            StemTip = newNode;
+    //        } else {
+    //            Vector3 direction = Quaternion.AngleAxis(angle, axis) * StemRoot.GetDirection(true);
+    //            Node newNode = StemRoot.Add(StemRoot.GetPosition() + direction * rest);
+    //            StemTip = newNode;
+    //        }
+    //    }
+
+    //    CrownRoot = StemTip;
+    //}
 
 	private int twigVertices;
 	private int twigTriangles;
@@ -52,7 +109,8 @@ public class Tree {
         List<Vector2> uvsTmp = new List<Vector2>();// uvsTmp.Capacity = 5000;
         List<int> trianglesTmp = new List<int>();// trianglesTmp.Capacity = 5000;
 
-        CalculateEverything(Root, nodeVerticesPositions, 0, verticesTmp, uvsTmp, trianglesTmp);
+        CalculateEverything(StemRoot, nodeVerticesPositions, 0, verticesTmp, uvsTmp, trianglesTmp);
+        //CalculateEverything(CrownRoot, nodeVerticesPositions, 0, verticesTmp, uvsTmp, trianglesTmp);
 
 
         vertices = new Vector3[verticesTmp.Count];
@@ -157,7 +215,8 @@ public class Tree {
         //float circle_segment_size = 0.5f / geometryProperties.GetCircleResolution();
         //float circle_segment_size = 0.4f / geometryProperties.GetCircleResolution();
 
-        float u = 0.1f;
+        float u = 0.1f; //this way the color is picked from the mid of the stem texture and not from the leaf part
+        //float u = 0f;
         for (int i = 0; i < geometryProperties.GetCircleResolution() + 1; i++) {
             Vector2 uv = new Vector2(u, v);
             uvsResult.Add(uv);

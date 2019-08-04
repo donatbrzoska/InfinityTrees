@@ -32,10 +32,6 @@ public class Node : IEquatable<Node> {
     private List<Leaf> leaves = new List<Leaf>();
 
 
-    //THIS SHOULD ONLY BE USED BY THE NEAREST NODE ALGORITHM
-    public Node(Vector3 position) {
-        this.position = position;
-    }
 
     //public Node(Vector3 position, Vector3 normal, float radius, GeometryProperties geometryProperties) {
     //    this.position = new Vector3(position.x, position.y, position.z);
@@ -56,6 +52,30 @@ public class Node : IEquatable<Node> {
 
         CalculateNormal();
     }
+
+
+
+    //only used be nearest node algorithm
+    public Node(Vector3 position) {
+        this.position = position;
+    }
+
+
+
+    //only gets used by the method below
+    private Node(Vector3 position, Vector3 normal, float radius, GeometryProperties geometryProperties) {
+        this.position = position;
+        this.normal = normal;
+        this.radius = radius;
+        this.geometryProperties = geometryProperties;
+    }
+
+    public Node GetGeometryCopyWithNormalAndRadius(Vector3 normal, float radius) {
+        return new Node(this.position, normal, radius, geometryProperties);
+    }
+
+
+
 
     //private void UpdateLeaves() {
     //    if (leaves.Count < geometryProperties.GetLeavesPerNode()) {
@@ -95,17 +115,6 @@ public class Node : IEquatable<Node> {
     //    }
     //}
 
-    private Node(Vector3 position, Vector3 normal, float radius, GeometryProperties geometryProperties) {
-        this.position = position;
-        this.normal = normal;
-        this.radius = radius;
-        this.geometryProperties = geometryProperties;
-    }
-
-    public Node GetGeometryCopyWithNormalAndRadius(Vector3 normal, float radius) {
-        return new Node(this.position, normal, radius, geometryProperties);
-    }
-
     public Node Add(Vector3 position) {
         Node completeNode = new Node(position, this, geometryProperties);
 
@@ -118,9 +127,23 @@ public class Node : IEquatable<Node> {
             //recalculate the normal
             CalculateNormal();
         }
-        RecalculateRadii();
+        RecalculateRadius();
 
         return completeNode;
+    }
+
+    //only used for growing the stem
+    public void Add(Node node) {
+        //the following needs to be one atomic step, because as soon as there is a new subnode, the current normal is not valid anymore
+        // and when GetVertices() would get called in between, there would be an invalid result
+        lock (this) { //the corresponding lock is located at GetVertices()
+            //add the node
+            subnodes.Add(node);
+
+            //recalculate the normal
+            CalculateNormal();
+        }
+        RecalculateRadius();
     }
 
     public bool IsRoot() {
@@ -139,14 +162,28 @@ public class Node : IEquatable<Node> {
         return position;
     }
 
+    public void UpdatePosition(Vector3 diff) {
+        position = position + diff;
+        foreach (Node n in subnodes) {
+            n.UpdatePosition(diff);
+        }
+
+        foreach (Leaf l in leaves) {
+            l.UpdatePosition(diff);
+        }
+    }
+
     public Vector3 GetNormal() {
         return normal;
     }
 
-    public Vector3 GetDirection() {
+    public Vector3 GetDirection(bool normalized=false) {
         if (this.IsRoot()) {
             return Vector3.up;
         } else {
+            if (normalized) {
+                return (position - supernode.position).normalized;
+            }
             return position - supernode.position;
             //return supernode.position - position;
         }
@@ -211,6 +248,18 @@ public class Node : IEquatable<Node> {
     }
 
     public void RecalculateRadii() {
+        if (this.HasSubnodes()) { // signal upwards
+            foreach (Node sn in subnodes) {
+				sn.RecalculateRadii();
+			}
+		} else { //signal downwards begin
+            radius = geometryProperties.GetTipRadius();
+
+            supernode.RecalculateRadius();
+		}
+	}
+
+	public void RecalculateRadius() {
         float summedPottedSubnodeRadii = 0;
         foreach (Node subnode in subnodes) {
             summedPottedSubnodeRadii += (float) Math.Pow(subnode.GetRadius(), geometryProperties.GetNthRoot());
@@ -219,7 +268,7 @@ public class Node : IEquatable<Node> {
         radius = (float) Math.Pow(summedPottedSubnodeRadii, 1f/geometryProperties.GetNthRoot());
 
         if (!this.IsRoot()) {
-            supernode.RecalculateRadii();
+            supernode.RecalculateRadius();
         }
     }
 
@@ -236,18 +285,16 @@ public class Node : IEquatable<Node> {
     public void CalculateAndStoreLeafData(List<Vector3> verticesResult, List<Vector2> uvsResult, List<int> trianglesResult) {
         if (geometryProperties.GetLeavesEnabled()) {
             if (radius < geometryProperties.GetMaxTwigRadiusForLeaves()) {
-                float displayedLeavesPerNode = geometryProperties.GetDisplayedLeavesPerNode();
-                int integerPart = (int)displayedLeavesPerNode;
-                float floatingPart = displayedLeavesPerNode - integerPart;
+
+                int n_leaves = (int)geometryProperties.GetDisplayedLeavesPerNode();
+                float floatingRest = geometryProperties.GetDisplayedLeavesPerNode() - n_leaves;
 
                 float r = Util.RandomInRange(0, 1);
-                if (r <= floatingPart) {
-                    integerPart++;
+                if (r <= floatingRest) {
+                    n_leaves++;
                 }
 
-                //debug("adding " + integerPart + " leaves");
-
-                for (int i=0; i<integerPart; i++) {
+                for (int i=0; i < n_leaves; i++) {
 
                     //TODO: this is a hotfix, 2 leaves should have been calculated, 2 leaves should be displayed at max - at the time
                     if (i > leaves.Count - 1) {

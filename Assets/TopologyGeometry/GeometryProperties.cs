@@ -8,33 +8,48 @@ public class GeometryProperties {
     //############################
 
     private float tipRadius; //SET //0.007f
-    private float nth_root; //smaller values make bigger radii   //1.6f
 
-    private int circleResolution;
-    //private int curveResolution = -1;
+	public void SetTipRadius(float tipRadius)
+	{
+		this.tipRadius = tipRadius;
+	}
 
-    private float minRadiusRatioForNormalConnection;
-
-
-    public void SetTipRadius(float tipRadius) {
-        this.tipRadius = tipRadius;
-    }
-
-    public float GetTipRadius() {
-        return tipRadius;
-    }
+	public float GetTipRadius()
+	{
+		return tipRadius;
+	}
 
 
 
-    public void SetNthRoot(float nth_root) {
-        this.nth_root = nth_root;
-    }
+	private float nth_root; //smaller values make bigger radii   //1.6f
 
-    public float GetNthRoot() {
-        return nth_root;
-    }
+	public void SetNthRoot(float nth_root)
+	{
+		this.nth_root = nth_root;
+	}
+
+	public float GetNthRoot()
+	{
+		return nth_root;
+	}
+
+	public float nth_root_min { get; set; }
+	public float nth_root_max { get; set; }
+	public float StemThickness {
+		get{
+			//nth_root = nth_root_max - value * (nth_root_max - nth_root_min);
+			//nth_root + value * (nth_root_max - nth_root_min) = nth_root_max;
+			//value * (nth_root_max - nth_root_min) = nth_root_max - nth_root;
+			//value = (nth_root_max - nth_root) / (nth_root_max - nth_root_min);
+			return (nth_root_max - nth_root) / (nth_root_max - nth_root_min);
+		}
+		set {
+			nth_root = nth_root_max - value * (nth_root_max - nth_root_min);
+		}
+	}
 
 
+	private int circleResolution;
 
     public void SetCircleResolution(int circleResolution) {
         this.circleResolution = circleResolution;
@@ -45,8 +60,9 @@ public class GeometryProperties {
     }
 
 
+	private float minRadiusRatioForNormalConnection;
 
-    public void SetMinRadiusRatioForNormalConnection(float minRadiusRatioForNormalConnection) {
+	public void SetMinRadiusRatioForNormalConnection(float minRadiusRatioForNormalConnection) {
         this.minRadiusRatioForNormalConnection = minRadiusRatioForNormalConnection;
     }
 
@@ -59,10 +75,9 @@ public class GeometryProperties {
     //############################
 
     private float maxTwigRadiusForLeaves; //DEPENDS on tipRadius?
-    private float leafSize; //FREE
-    private float leafSizeStdDev;
+    private Dictionary<Leaf.LeafType, float> leafSizes = new Dictionary<Leaf.LeafType, float>();
     private Leaf.LeafType leafType;
-    private float displayedLeavesPerNode; //TODO: move to growthProperties
+    private Dictionary<Leaf.LeafType, float> displayedLeavesPerNode = new Dictionary<Leaf.LeafType, float>();
     private bool leavesEnabled;
 
 
@@ -78,13 +93,13 @@ public class GeometryProperties {
 
 
 
-    public void SetLeafSize(float leafSize) {
-        this.leafSize = leafSize;
-        this.leafSizeStdDev = 0.2f * leafSize;
+    public void SetLeafSize(Leaf.LeafType type, float leafSize) {
+        this.leafSizes[type] = leafSize;
     }
 
     public float GetLeafSize() {
-        return Util.RandomWithStdDev(leafSize, leafSizeStdDev);
+        float leafSizeStdDev = 0.2f * leafSizes[leafType];
+        return Util.RandomWithStdDev(leafSizes[leafType], leafSizeStdDev);
     }
 
 
@@ -99,12 +114,12 @@ public class GeometryProperties {
 
 
 
-    public void SetDisplayedLeavesPerNode(float displayedLeavesPerNode) {
-        this.displayedLeavesPerNode = displayedLeavesPerNode;
+    public void SetDisplayedLeavesPerNode(Leaf.LeafType type, float displayedLeavesPerNode) {
+        this.displayedLeavesPerNode[type] = displayedLeavesPerNode;
     }
 
     public float GetDisplayedLeavesPerNode() {
-        return displayedLeavesPerNode;
+        return displayedLeavesPerNode[leafType];
     }
 
 

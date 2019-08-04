@@ -37,7 +37,7 @@ public static class Util {
         return (float) (degrees * Math.PI / 180);
     }
 
-    public static bool AlmostEqual(float a, float b, float precision) {
+    public static bool AlmostEqual(float a, float b, float precision=0.00001f) {
         return Math.Abs(a - b) <= precision;
     }
 }
