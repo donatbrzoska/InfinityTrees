@@ -54,13 +54,6 @@ public class SpaceColonization : Grower {
 
 
     public void Grow(Tree tree) {
-
-        //Vector3 rootPosition = root.GetPosition();
-
-        //GrowStem();
-
-        //Node initialNode = root.Add(new Vector3(0, ((PseudoEllipsoid)growthProperties.GetAttractionPoints()).Position.y, 0));
-
         if (!advanced_algorithm) {
             nodeList = new List<Node> { tree.StemRoot };
         } else {
@@ -75,7 +68,6 @@ public class SpaceColonization : Grower {
             growingStopwatch.Start();
 
             GrowStem(tree);
-            //((PseudoEllipsoid)growthProperties.GetAttractionPoints()).UpdatePosition(tree.CrownRoot.GetPosition());
             GrowCrown(tree);
 
             growingStopwatch.Stop();
@@ -105,7 +97,6 @@ public class SpaceColonization : Grower {
             //have a look at the Add method again, if you want the move the attraction points towards the stem too
         }
 
-        //((PseudoEllipsoid)growthProperties.GetAttractionPoints()).UpdatePosition(tree.CrownRoot.GetPosition());
         growerListener.OnUpdate();
     }
 
@@ -271,7 +262,7 @@ public class SpaceColonization : Grower {
 
 
             //debug("attraction points left: " + growthProperties.GetAttractionPoints().Count);
-            //Prune();
+            Prune(tree);
 
 
             //if (growthProperties.GetHangingBranchesEnabled() && i > growthProperties.GetIterations() * growthProperties.GetHangingBranchesFromAgeRatio()) {
@@ -286,10 +277,10 @@ public class SpaceColonization : Grower {
         running = false;
     }
 
-    //private int maxConsecutiveNonBranchingNodes = 2;
+    //private int maxConsecutiveNonBranchingNodes = 8;
 
-    //private void Prune() {
-    //    PruneHelper(root, 0);
+    //private void Prune(Tree tree) {
+    //    PruneHelper(tree.CrownRoot, 0);
     //}
 
     //private void PruneHelper(Node currentNode, int consecutiveNonBranchingNodes) {
@@ -299,21 +290,40 @@ public class SpaceColonization : Grower {
 
     //        if (currentNode.HasSubnodes()) {
     //            if (currentNode.GetSubnodes().Count == 1) {
-    //                PruneHelper(currentNode.GetSubnodes()[0], consecutiveNonBranchingNodes++);
+    //                PruneHelper(currentNode.GetSubnodes()[0], consecutiveNonBranchingNodes+1);
     //            } else { //(currentNode.GetSubnodes().Count > 1)
-    //                PruneHelper(currentNode.GetSubnodes()[0], 0);
+    //                foreach (Node sn in currentNode.GetSubnodes()) {
+    //                    PruneHelper(sn, 0);
+    //                }
     //            }
     //        }
     //    }
     //}
 
-    private bool IsDuplicateNode(Vector3 potentialPosition, Node node) {
-        foreach (Node subnode in node.GetSubnodes()) {
-            if (subnode.GetPosition().Equals(potentialPosition)) {
-                return true;
+
+    private int minBranching = 2; //how often in
+    private int perNodes = 8;
+
+    private void Prune(Tree tree) {
+        PruneHelper(tree.CrownRoot, 0, perNodes);
+    }
+
+    private void PruneHelper(Node currentNode, int branches, int nodesLeft) {
+        if (nodesLeft == 0) {
+            if (branches < minBranching) {
+                currentNode.Active = false;
+            } else {
+                foreach (Node sn in currentNode.GetSubnodes()) {
+                    PruneHelper(sn, 0, perNodes);
+                }
+            }
+        } else {
+            if (currentNode.HasSubnodes()) {
+                foreach (Node sn in currentNode.GetSubnodes()) {
+                    PruneHelper(sn, branches, nodesLeft - 1);
+                }
             }
         }
-        return false;
     }
 
     //returns null if there is no closest node

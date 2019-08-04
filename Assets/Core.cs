@@ -27,6 +27,11 @@ public class Core : MonoBehaviour, GrowerListener {
         float initialRadius_y = 5;
         float initialRadius_z = 3.5f;
 
+        //int initialAge = 60;
+        //float initialRadius_x = 2;
+        //float initialRadius_y = 9;
+        //float initialRadius_z = 2;
+
         //int initialAge = 30;
         //float initialRadius_x = 5;
         //float initialRadius_y = 5;
@@ -66,11 +71,11 @@ public class Core : MonoBehaviour, GrowerListener {
 
         geometryProperties.SetTipRadius(0.007f);
         geometryProperties.SetNthRoot(1.8f);
-        geometryProperties.nth_root_min = 1.4f;
+        geometryProperties.nth_root_min = 1.2f;
         geometryProperties.nth_root_max = 3;
-        //geometryProperties.SetNthRoot(1.2f);
+
         geometryProperties.SetCircleResolution(3);
-        //geometryProperties.SetCircleResolution(6);
+        geometryProperties.SetCircleResolution(6);
         geometryProperties.SetMinRadiusRatioForNormalConnection(0.49f);
 
         geometryProperties.SetMaxTwigRadiusForLeaves(0.0071f);
@@ -782,6 +787,7 @@ public class Core : MonoBehaviour, GrowerListener {
         //growthProperties.SetClearDistance(0.925f, 0.7f);
         growthProperties.SetMinClearDistanceRatio(0.3f);
         growthProperties.SetMaxClearDistanceRatio(0.925f);
+        //growthProperties.SetMaxClearDistanceRatio(0.9f);
         growthProperties.SetBranchDensityBegin(0f);
         growthProperties.SetBranchDensityEnd(1f);
         growthProperties.SetClearDistanceBegin_clearDistanceEnd_Ratio(0.5f);
