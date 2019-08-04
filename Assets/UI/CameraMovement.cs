@@ -32,20 +32,20 @@ public class CameraMovement : MonoBehaviour {
         // find out where to look at
         Vector3 center = GameObject.Find("Core").GetComponent<Core>().GetLookAt();
 
-        //if (Input.GetKey(KeyCode.Space)) {
-        //    y_position += speed;
+        if (Input.GetKey(KeyCode.Space)) {
+            y_position += speed;
 
-        //    if (y_position > GameObject.Find("Core").GetComponent<Core>().GetLookAtTop()) {
-        //        y_position -= speed;
-        //    }
-        //}
-        //if (Input.GetKey(KeyCode.LeftShift)) {
-        //    y_position -= speed;
+            if (y_position > GameObject.Find("Core").GetComponent<Core>().GetLookAtTop()) {
+                y_position -= speed;
+            }
+        }
+        if (Input.GetKey(KeyCode.LeftShift)) {
+            y_position -= speed;
 
-        //    if (y_position + center.y < 0) {
-        //        y_position += speed;
-        //    }
-        //}
+            if (y_position + center.y < 0) {
+                y_position += speed;
+            }
+        }
 
         Vector3 lookAt = new Vector3(center.x, center.y + y_position, center.z);
 
@@ -99,8 +99,8 @@ public class CameraMovement : MonoBehaviour {
         float distanceToAttractionPoints = GameObject.Find("Core").GetComponent<Core>().GetDistanceToAttractionPoints();
         if (distanceToAttractionPoints < 0) { //normal case
             position = new Vector3(x, y, z) * distanceToTreeCenter + lookAt;
-        } else { //case when attraction points are beeing modified
-            position = new Vector3(x, y, z) * distanceToAttractionPoints + lookAt;
+        } else { //case when attraction points currently are beeing modified
+            position = new Vector3(x, y, z) * distanceToAttractionPoints + lookAt - new Vector3(0, y_position, 0);
         }
 
         // update position and lookAt

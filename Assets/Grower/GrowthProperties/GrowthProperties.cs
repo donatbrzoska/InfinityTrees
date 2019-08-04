@@ -3,16 +3,26 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class GrowthProperties {
+    //public float StemLength { get; set; }
+    public float StemThickness { get; set; }
+
+
     private float influenceDistance; //FREE
+    private float squaredInfluenceDistance; //FREE
     private float perceptionAngle; //SET
 
+    private float clearDistance;
+    private float squaredClearDistance;
     private float clearDistance_begin; //DEPENDS
+    private float squaredClearDistance_begin; //DEPENDS
     private float clearDistance_end; //DEPENDS
+    private float squaredClearDistance_end; //DEPENDS
 
     private Vector3 tropismsBackup;
     private Vector3 tropisms;
-    private bool hangingBranchesEnabled;
-    private float hangingBranchesFromAgeRatio;
+    private Vector3 tropismsWeights;
+    //private bool hangingBranchesEnabled;
+    private float hangingBranchesIntensity;
 
     private float growthDistance; //SET
 
@@ -31,16 +41,25 @@ public class GrowthProperties {
 
     //THIS OR clearDistance
     public void SetInfluenceDistance(float influenceDistance) {
-        this.influenceDistance = influenceDistance*influenceDistance;
+        this.influenceDistance = influenceDistance;
+        this.squaredInfluenceDistance = influenceDistance * influenceDistance;
+
+        minClearDistance = influenceDistance * minClearDistanceRatio;
+        maxClearDistance = influenceDistance * maxClearDistanceRatio;
+
     }
 
-    //public float GetInfluenceDistance() {
-    //    return influenceDistance;
-    //}
-
-    public float GetSquaredInfluenceDistance() {
+    public float GetInfluenceDistance() {
         return influenceDistance;
     }
+
+    public float GetSquaredInfluenceDistance() {
+        return squaredInfluenceDistance;
+    }
+
+
+
+
 
 
 
@@ -54,31 +73,44 @@ public class GrowthProperties {
 
 
 
-    //THIS OR influenceDistance
-    //public void SetClearDistance(float clearDistance) {
-    //    this.clearDistance_begin = clearDistance * clearDistance;
-    //    this.clearDistance_end = clearDistance_begin;
-    //}
+    public void SetClearDistance(float clearDistance) {
+        this.clearDistance = clearDistance;
+        this.squaredClearDistance = clearDistance* clearDistance;
+    }
 
     public void SetClearDistance(float begin, float end) {
+        if (begin < minClearDistance | end < minClearDistance) {
+            throw new Exception("Keep the minClearDistance in mind!");
+        }
+
         this.clearDistance_begin = begin * begin;
         this.clearDistance_end = end * end;
     }
 
     public void SetClearDistanceBegin(float begin) {
-        this.clearDistance_begin = begin * begin;
+        //Debug.Log("clear distance begin: " + begin);
+        if (begin < minClearDistance) {
+            throw new Exception("Keep the minClearDistance in mind!");
+        }
+        this.clearDistance_begin = begin;
+        this.squaredClearDistance_begin = begin * begin;
     }
 
     public float GetClearDistanceBegin() {
-        return (float)Math.Sqrt(clearDistance_begin);
+        return clearDistance_begin;
     }
 
     public void SetClearDistanceEnd(float end) {
-        this.clearDistance_end = end * end;
+        //Debug.Log("clear distance end: " + end);
+        if (end < minClearDistance) {
+            throw new Exception("Keep the minClearDistance in mind!");
+        }
+        this.clearDistance_end = end;
+        this.squaredClearDistance_end = end * end;
     }
 
     public float GetClearDistanceEnd() {
-        return (float)Math.Sqrt(clearDistance_end);
+        return clearDistance_end;
     }
 
 
@@ -97,6 +129,74 @@ public class GrowthProperties {
     //    return clearDistance;
     //}
 
+    // represents how much of the tree is begin
+    // 1-stemCrownRatio is the end part
+    private float clearDistanceBegin_clearDistanceEnd_Ratio;
+
+    public void SetClearDistanceBegin_clearDistanceEnd_Ratio(float value) {
+        this.clearDistanceBegin_clearDistanceEnd_Ratio = value;
+    }
+
+    public float GetClearDistanceBegin_clearDistanceEnd_Ratio() {
+        return clearDistanceBegin_clearDistanceEnd_Ratio;
+    }
+
+    //this is based on a sigmoid funcion and basically returns the lower bound of the looked at part of the sigmoid function within a given range
+    private float GetSigmoidStartValue(float range) {
+        //return -4 - clearDistanceBegin_clearDistanceEnd_Ratio * range; 
+        return -8 - clearDistanceBegin_clearDistanceEnd_Ratio * range; // earlier version
+    }
+
+    //this is based on a sigmoid funcion and basically returns the lower bound of the looked at part of the sigmoid function within a given range
+    private float GetSigmoidEndValue(float range) {
+        //return 4 + (1 - clearDistanceBegin_clearDistanceEnd_Ratio) * range;
+        return 8 + (1 - clearDistanceBegin_clearDistanceEnd_Ratio) * range; // earlier version
+    }
+
+
+
+
+    private float minClearDistanceRatio;
+    private float minClearDistance;
+    public void SetMinClearDistanceRatio(float value) {
+        minClearDistanceRatio = value;
+        minClearDistance = influenceDistance * minClearDistanceRatio;
+    }
+
+    //private float minDelta_ClearDistance_to_InfluenceDistance = 0.1f;
+    private float maxClearDistanceRatio;
+    private float maxClearDistance;// = 0.075f;
+    public void SetMaxClearDistanceRatio(float value) {
+        maxClearDistanceRatio = value;
+        maxClearDistance = influenceDistance * maxClearDistanceRatio;
+    }
+
+    private float branchDensityBegin;
+    public void SetBranchDensityBegin(float value) {
+        //Debug.Log("branch density begin: " + value);
+        this.branchDensityBegin = value;
+
+        float range = maxClearDistance - minClearDistance;
+        SetClearDistanceBegin(minClearDistance + (1-value) * range);
+    }
+
+    public float GetBranchDensityBegin() {
+        return branchDensityBegin;
+    }
+
+    private float branchDensityEnd;
+    public void SetBranchDensityEnd(float value) {
+        //Debug.Log("branch density end: " + value);
+        this.branchDensityEnd = value;
+
+        float range = maxClearDistance - minClearDistance;
+        SetClearDistanceEnd(minClearDistance + (1-value) * range);
+    }
+
+    public float GetBranchDensityEnd() {
+        return branchDensityEnd;
+    }
+
 
     private float MapIteration(int iteration, float begin, float end) {
         float d = end - begin;
@@ -106,31 +206,45 @@ public class GrowthProperties {
     }
 
     private float ExponentialInterpolation(int iteration) {
-        float d = clearDistance_begin - clearDistance_end;
+        float d = squaredClearDistance_begin - squaredClearDistance_end;
 
-        return (float)(clearDistance_begin - Math.Exp(MapIteration(iteration, -4, 0)) * d);
+        return (float)(squaredClearDistance_begin - Math.Exp(MapIteration(iteration, -4, 0)) * d);
     }
 
     private float Sigmoid(float x) {
         return (float) (Math.Exp(x) / (1 + Math.Exp(x)));
     }
 
+    // TODO: make independant from class attributes
     private float SigmoidInterpolation(int iteration) {
-        float d = clearDistance_begin - clearDistance_end;
+        float d = squaredClearDistance_begin - squaredClearDistance_end;
+        //float d = squaredClearDistance_end - squaredClearDistance_begin;
 
-        return (float)(clearDistance_begin - Sigmoid(MapIteration(iteration, -2, 8)) * d);
-        //return (float)(clearDistance_begin - Sigmoid(MapIteration(iteration, -15, 8)) * d);
+        float range = 0;
+        return (float)(squaredClearDistance_begin - Sigmoid(MapIteration(iteration, GetSigmoidStartValue(range), GetSigmoidEndValue(range))) * d);
+        //return (float)(squaredClearDistance_begin - Sigmoid(MapIteration(iteration, -4, 4)) * d);
+    }
+
+    private float LinearInterpolation(int iteration) {
+        float d = squaredClearDistance_end - squaredClearDistance_begin;
+        float step = d / iterations;
+        return squaredClearDistance_begin + step * (iteration+1);
     }
 
     public float GetSquaredClearDistance(int iteration) {
 
         return SigmoidInterpolation(iteration);
 
-        //float step = d / iterations;
-        //return clearDistance_begin + step * iteration;
+        //return LinearInterpolation(iteration);
+    }
+
+    public float GetSquaredClearDistance() {
+        return squaredClearDistance;
     }
 
 
+    public float UpTropismsDampRatio { get; set; }
+    public float UpTropismsWhenDamped { get; set; }
 
     public void SetTropisms(Vector3 tropisms, bool temporary=false) {
         this.tropisms = tropisms.normalized;
@@ -139,29 +253,48 @@ public class GrowthProperties {
         }
     }
 
-    public Vector3 GetTropisms() {
-        return tropisms;
+    public Vector3 GetTropisms(int iteration) {
+        bool hanging = iteration > (1-hangingBranchesIntensity) * iterations;
+
+        if (hanging) {
+            return Util.Hadamard(tropisms, new Vector3(1, -1, 1));
+        } else {
+            return tropisms;
+        }
+    }
+
+
+    public void SetTropismsWeights(Vector3 value) {
+        this.tropismsWeights = value;
+    }
+
+    public Vector3 GetTropismsWeights() {
+        return tropismsWeights;
     }
 
 
 
-    public void SetHangingBranchesEnabled(bool hangingBranchesEnabled) {
-        this.hangingBranchesEnabled = hangingBranchesEnabled;
+
+    //public void SetHangingBranchesEnabled(bool hangingBranchesEnabled) {
+    //    this.hangingBranchesEnabled = hangingBranchesEnabled;
+    //}
+
+    //public bool GetHangingBranchesEnabled() {
+    //    return hangingBranchesEnabled;
+    //}
+
+
+
+    public void SetHangingBranchesIntensity(float value) {
+        this.hangingBranchesIntensity = value;
     }
 
-    public bool GetHangingBranchesEnabled() {
-        return hangingBranchesEnabled;
+    public float GetHangingBranchesIntensity() {
+        return hangingBranchesIntensity;
     }
 
 
 
-    public void SetHangingBranchesFromAgeRatio(float hangingBranchesFromAgeRatio) {
-        this.hangingBranchesFromAgeRatio = hangingBranchesFromAgeRatio;
-    }
-
-    public float GetHangingBranchesFromAgeRatio() {
-        return hangingBranchesFromAgeRatio;
-    }
 
 
 

@@ -52,14 +52,21 @@ public class SpaceColonization : Grower {
         }
     }
 
+    Node root;
 
     public void Grow(Node root) {
+        this.root = root;
+
+        //GrowStem();
+
+        Node initialNode = root.Add(new Vector3(0, ((PseudoEllipsoid)growthProperties.GetAttractionPoints()).Position.y, 0));
 
         if (!advanced_algorithm) {
-            nodeList = new List<Node> { root };
+            nodeList = new List<Node> { root, initialNode};
         } else {
             nearestNodeAlgorithm = new NearestNodeAlgorithm();
             nearestNodeAlgorithm.Add(root);
+            nearestNodeAlgorithm.Add(initialNode);
         }
 
 
@@ -109,6 +116,7 @@ public class SpaceColonization : Grower {
                     closest = nearestNodeAlgorithm.GetNearestWithinSquaredDistance(attractionPoint, growthProperties.GetSquaredInfluenceDistance(), growthProperties.GetPerceptionAngle());
                 }
 
+
                 //if there is a close Node
                 if (closest != null) {
                     //add it to the nodesAttractionPoints
@@ -134,8 +142,21 @@ public class SpaceColonization : Grower {
                 Vector3 sum = new Vector3(0, 0, 0);
                 foreach (Vector3 associatedAttractionPoint in associatedAttractionPoints) {
                     sum += (associatedAttractionPoint - currentNode.GetPosition()).normalized;
+                    //sum += (associatedAttractionPoint - currentNode.GetPosition()) * (associatedAttractionPoint - currentNode.GetPosition()).magnitude;
+                    //sum += (associatedAttractionPoint - currentNode.GetPosition()) * (1/((associatedAttractionPoint - currentNode.GetPosition()).magnitude* (associatedAttractionPoint - currentNode.GetPosition()).magnitude));
                 }
-                Vector3 direction = (sum + growthProperties.GetTropisms()).normalized * growthProperties.GetGrowthDistance();
+                Vector3 direction = (sum + Util.Hadamard(growthProperties.GetTropisms(i), growthProperties.GetTropismsWeights())).normalized * growthProperties.GetGrowthDistance();
+                //Vector3 direction = (sum + growthProperties.GetTropisms()).normalized * growthProperties.GetGrowthDistance();
+                //debug("direction is " + direction);
+                ////hanging branches:
+                //// the smaller the angle(newNode_direction, Vec3.down)
+                //// the more the gravitation gets applied (with lower bound of the branch pointing downwards!)
+                //// .. rotation by axis Cross(Vec3.down, newNode_direction)
+                //// ..        and f(angle) = k*(180-angle)
+                //float angleToDown = Vector3.Angle(direction, Vector3.down);
+                //Vector3 rotationAxis = Vector3.Cross(direction, Vector3.down);
+                //direction = Quaternion.AngleAxis(1f * (180 - angleToDown), rotationAxis) * direction;
+
                 //and new nodes position
                 Vector3 happyNodePosition = currentNode.GetPosition() + direction;
 
@@ -167,10 +188,14 @@ public class SpaceColonization : Grower {
             growerListener.OnIterationFinished();
 
 
-            if (growthProperties.GetHangingBranchesEnabled() && i > growthProperties.GetIterations() * growthProperties.GetHangingBranchesFromAgeRatio()) {
-                growthProperties.SetTropisms(new Vector3(0, -1f, 0), true);
-                debug("updated tropisms");
-            }
+            //debug("attraction points left: " + growthProperties.GetAttractionPoints().Count);
+            //Prune();
+
+
+            //if (growthProperties.GetHangingBranchesEnabled() && i > growthProperties.GetIterations() * growthProperties.GetHangingBranchesFromAgeRatio()) {
+            //    growthProperties.SetTropisms(new Vector3(0, -1f, 0), true);
+            //    debug("updated tropisms");
+            //}
         }
 
         debug(new FormatString("finding close points took {0}", findClosePointStopwatch.Elapsed));
@@ -178,6 +203,27 @@ public class SpaceColonization : Grower {
 
         running = false;
     }
+
+    //private int maxConsecutiveNonBranchingNodes = 2;
+
+    //private void Prune() {
+    //    PruneHelper(root, 0);
+    //}
+
+    //private void PruneHelper(Node currentNode, int consecutiveNonBranchingNodes) {
+    //    if (consecutiveNonBranchingNodes == maxConsecutiveNonBranchingNodes) {
+    //        currentNode.Active = false;
+    //    } else {
+
+    //        if (currentNode.HasSubnodes()) {
+    //            if (currentNode.GetSubnodes().Count == 1) {
+    //                PruneHelper(currentNode.GetSubnodes()[0], consecutiveNonBranchingNodes++);
+    //            } else { //(currentNode.GetSubnodes().Count > 1)
+    //                PruneHelper(currentNode.GetSubnodes()[0], 0);
+    //            }
+    //        }
+    //    }
+    //}
 
     private bool IsDuplicateNode(Vector3 potentialPosition, Node node) {
         foreach (Node subnode in node.GetSubnodes()) {
@@ -197,6 +243,7 @@ public class SpaceColonization : Grower {
         foreach (Node current in nodeList) {
 
             float quadraticDistanceToCurrent = GetQuadraticDistanceWithMaxValue(current.GetPosition(), attractionPoint, currentSmallestDistance);
+
 
             if (!Util.AlmostEqual(quadraticDistanceToCurrent, -1, 0.0001f)) {
                 if (AttractionPointInPerceptionAngle(current, attractionPoint)) { //angle calculation is a lot slower than one distance calculation
@@ -218,7 +265,11 @@ public class SpaceColonization : Grower {
     private void RemoveClosePoints(List<Vector3> newPositions, int iteration) {
         foreach (Vector3 newPosition in newPositions) {
             List<Vector3> closePoints;
+
+            //debug("squared cleardistance is " + growthProperties.GetSquaredClearDistance(iteration));
             closePoints = DetermineAttractionPointsWithinQuadraticDistance(newPosition, growthProperties.GetSquaredClearDistance(iteration));
+            //closePoints = DetermineAttractionPointsWithinQuadraticDistance(newPosition, growthProperties.GetSquaredClearDistance()); //near the envelope test
+            //debug("removing " + closePoints.Count + " close points");
             foreach (Vector3 closePoint in closePoints) {
                 growthProperties.GetAttractionPoints().Remove(closePoint);
             }

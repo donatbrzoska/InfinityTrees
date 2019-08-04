@@ -24,6 +24,7 @@ public class Node : IEquatable<Node> {
     private Vector3 position;
     private Vector3 normal;
     private float radius;
+    public bool Active { get; set; }
     
 
     private Node supernode;
@@ -50,6 +51,8 @@ public class Node : IEquatable<Node> {
         this.supernode = supernode;
         this.radius = geometryProperties.GetTipRadius();
         this.geometryProperties = geometryProperties;
+
+        Active = true;
 
         CalculateNormal();
     }

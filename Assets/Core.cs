@@ -51,12 +51,30 @@ public class Core : MonoBehaviour, GrowerListener {
         //load_normalTree(initialAge, initialRadius_x, initialRadius_y, initialRadius_z);
         //load_advancedNormalTree(initialAge, initialRadius_x, initialRadius_y, initialRadius_z);
         //load_advancedNormalTree_particleTest(initialAge, initialRadius_x, initialRadius_y, initialRadius_z);
-        load_testTree(initialAge, initialRadius_x, initialRadius_y, initialRadius_z);
+        //load_testTree(initialAge, initialRadius_x, initialRadius_y, initialRadius_z);
+        load_stemTestTree160_15(initialAge, initialRadius_x, initialRadius_y, initialRadius_z);
+        //load_stemTestTree90_30(initialAge, initialRadius_x, initialRadius_y, initialRadius_z);
+        //load_excurrentTree(initialAge, initialRadius_x, initialRadius_y, initialRadius_z);
+        //load_nearTheEnvelopeTree(initialAge, initialRadius_x, initialRadius_y, initialRadius_z);
         //load_advancedNormalTree_attractionPointTest(initialAge, initialRadius_x, initialRadius_y, initialRadius_z);
         //load_advancedNormalTree_particleTest_lowVertices(initialAge, initialRadius_x, initialRadius_y, initialRadius_z);
         //load_excurrentTree(initialAge, initialRadius_x, initialRadius_y, initialRadius_z);
         //load_testTree(initialAge, initialRadius_x, initialRadius_y, initialRadius_z);
 
+
+        geometryProperties = new GeometryProperties();
+        geometryProperties.SetTipRadius(0.007f);
+        geometryProperties.SetNthRoot(1.9f);
+        //geometryProperties.SetNthRoot(1.2f);
+        geometryProperties.SetCircleResolution(3);
+        geometryProperties.SetCircleResolution(6);
+        geometryProperties.SetMinRadiusRatioForNormalConnection(0.49f);
+
+        geometryProperties.SetMaxTwigRadiusForLeaves(0.02f);
+        geometryProperties.SetLeafSize(1f);
+        geometryProperties.SetLeafType(Leaf.LeafType.ParticleSquare);
+        geometryProperties.SetDisplayedLeavesPerNode(0.5f);
+        geometryProperties.SetLeavesEnabled(true);
 
         geometryProperties.StemColorStrings = new List<string> { "dark_brown", "brown", "light_brown", "grey_brown", "greyish" };
         geometryProperties.CurrentStemColorStringsIndex = 0;
@@ -67,6 +85,9 @@ public class Core : MonoBehaviour, GrowerListener {
         geometryProperties.LeafTypeStrings = Leaf.LeafTypeStrings;
         geometryProperties.CurrentLeafTypeStringsIndex = 0;
 
+        Vector3 position = Vector3.zero;
+        tree = new Tree(position, geometryProperties);
+
 
         grower.Grow(tree.Root);
 	}
@@ -74,7 +95,11 @@ public class Core : MonoBehaviour, GrowerListener {
     //initialize UI at the beginning
     bool initialized;
     void Update() {
+        //debug("sqcd: " + growthProperties.GetSquaredClearDistance(1));
         if (!initialized) {
+            GameObject.Find("Stem Length Slider").GetComponent<Slider>().SetValueWithoutNotify(attractionPoints.Position.y);
+
+
             GameObject.Find("Age Slider").GetComponent<Slider>().SetValueWithoutNotify(growthProperties.GetIterations());
 
             GameObject.Find("Crown Width Slider").GetComponent<Slider>().SetValueWithoutNotify(attractionPoints.GetRadius_x());
@@ -83,12 +108,11 @@ public class Core : MonoBehaviour, GrowerListener {
             GameObject.Find("Crown Top Cutoff Slider").GetComponent<Slider>().SetValueWithoutNotify(attractionPoints.GetCutoffRatio_top());
             GameObject.Find("Crown Bottom Cutoff Slider").GetComponent<Slider>().SetValueWithoutNotify(attractionPoints.GetCutoffRatio_bottom());
 
-            GameObject.Find("Density Slider").GetComponent<Slider>().SetValueWithoutNotify(attractionPoints.GetDensity());
-            GameObject.Find("Clear Distance Begin Slider").GetComponent<Slider>().SetValueWithoutNotify(growthProperties.GetClearDistanceBegin());
-            GameObject.Find("Clear Distance End Slider").GetComponent<Slider>().SetValueWithoutNotify(growthProperties.GetClearDistanceEnd());
-            GameObject.Find("Influence Distance Slider").GetComponent<Slider>().SetValueWithoutNotify((float)Math.Sqrt(growthProperties.GetSquaredInfluenceDistance()));
-            GameObject.Find("Growth Distance Slider").GetComponent<Slider>().SetValueWithoutNotify(growthProperties.GetGrowthDistance());
-            GameObject.Find("Perception Angle Slider").GetComponent<Slider>().SetValueWithoutNotify(growthProperties.GetPerceptionAngle());
+            GameObject.Find("Stem / Crown Ratio Slider").GetComponent<Slider>().SetValueWithoutNotify(growthProperties.GetClearDistanceBegin_clearDistanceEnd_Ratio());
+            GameObject.Find("Branch Density Begin Slider").GetComponent<Slider>().SetValueWithoutNotify(growthProperties.GetBranchDensityBegin());
+            GameObject.Find("Branch Density End Slider").GetComponent<Slider>().SetValueWithoutNotify(growthProperties.GetBranchDensityEnd());
+
+            GameObject.Find("Hanging Branches Slider").GetComponent<Slider>().SetValueWithoutNotify(growthProperties.GetHangingBranchesIntensity());
 
 
             GameObject.Find("Stem Color Dropdown").GetComponent<StemColor>().Initialize(geometryProperties.StemColorStrings);
@@ -104,6 +128,15 @@ public class Core : MonoBehaviour, GrowerListener {
             GameObject.Find("Leaf Type Dropdown").GetComponent<Dropdown>().RefreshShownValue();
 
             GameObject.Find("Leaves Enabled Toggle").GetComponent<Toggle>().SetIsOnWithoutNotify(geometryProperties.GetLeavesEnabled());
+
+
+            // SPACE COLONIZATION PARAMETERS
+            GameObject.Find("Density Slider").GetComponent<Slider>().SetValueWithoutNotify(attractionPoints.GetDensity());
+            GameObject.Find("Clear Distance Begin Slider").GetComponent<Slider>().SetValueWithoutNotify(growthProperties.GetClearDistanceBegin());
+            GameObject.Find("Clear Distance End Slider").GetComponent<Slider>().SetValueWithoutNotify(growthProperties.GetClearDistanceEnd());
+            GameObject.Find("Influence Distance Slider").GetComponent<Slider>().SetValueWithoutNotify(growthProperties.GetInfluenceDistance());
+            GameObject.Find("Growth Distance Slider").GetComponent<Slider>().SetValueWithoutNotify(growthProperties.GetGrowthDistance());
+            GameObject.Find("Perception Angle Slider").GetComponent<Slider>().SetValueWithoutNotify(growthProperties.GetPerceptionAngle());
 
             initialized = true;
         }
@@ -176,12 +209,11 @@ public class Core : MonoBehaviour, GrowerListener {
     CameraMode cameraMode;
 
     public Vector3 GetLookAt() {
-        if (cameraMode == CameraMode.AttractionPoints) {
-            return attractionPoints.GetCenter();
-        } else {
-            //if (cameraMode == CameraMode.Tree) {
-            return new Vector3(0, grower.GetTreeHeight() / 2, 0);
-        }
+        //if (cameraMode == CameraMode.Tree) {
+        //return new Vector3(0, grower.GetTreeHeight() / 2, 0);
+        //} else {
+        return attractionPoints.GetCenter();
+        //}
     }
 
     public float GetLookAtTop() {
@@ -192,7 +224,6 @@ public class Core : MonoBehaviour, GrowerListener {
         if (cameraMode == CameraMode.Tree) { //normal case
             return -1;
         } else { //case when attraction points are beeing modified
-            //return GameObject.Find("Crown Height Slider").GetComponent<Slider>().maxValue * 2f / 3f;
             return attractionPoints.GetHeight() / 3 + attractionPoints.GetRadius_x() / 3 + attractionPoints.GetRadius_z() / 3;
         }
     }
@@ -201,12 +232,42 @@ public class Core : MonoBehaviour, GrowerListener {
     //##########                             CROWN SHAPE                           ##########
     //#######################################################################################
 
+    public void OnLength(float value) {
+        grower.Stop();
+
+        attractionPoints.UpdatePosition(new Vector3(0, value, 0));
+
+        tree.Reset();
+
+        grower.Grow(tree.Root);
+    }
+
+    public void OnThickness(float value) {
+
+    }
+
+
+    private void updateTropisms() {
+        // the smaller growthProperties.UpTropismRemovalRatio, the later the condition hits
+        if (attractionPoints.GetRadius_y() < growthProperties.UpTropismsDampRatio * (attractionPoints.GetRadius_x() + attractionPoints.GetRadius_z())) {
+            //growthProperties.SetTropismsWeights(new Vector3(growthProperties.GetTropismsWeights().x, 0, growthProperties.GetTropismsWeights().z));
+            growthProperties.SetTropismsWeights(
+                new Vector3(1,
+                            growthProperties.UpTropismsWhenDamped
+                                *(growthProperties.UpTropismsDampRatio * (attractionPoints.GetRadius_x() + attractionPoints.GetRadius_z() / attractionPoints.GetRadius_y())), //this is about 1 when the border is crossed, and decreases as the y radius gets smaller
+                            1));
+        } else {
+            growthProperties.SetTropismsWeights(new Vector3(1, 1, 1));
+        }
+    }
+    
     public void OnCrownWidth(float value) {
         cameraMode = CameraMode.AttractionPoints;
 
         grower.Stop();
 
         attractionPoints.UpdateRadius_x(value);
+        updateTropisms();
         pointCloudReady = true;
 
         tree.Reset();
@@ -220,6 +281,7 @@ public class Core : MonoBehaviour, GrowerListener {
         grower.Stop();
 
         attractionPoints.UpdateRadius_y(value);
+        updateTropisms();
         pointCloudReady = true;
 
         tree.Reset();
@@ -233,6 +295,7 @@ public class Core : MonoBehaviour, GrowerListener {
         grower.Stop();
 
         attractionPoints.UpdateRadius_z(value);
+        updateTropisms();
         pointCloudReady = true;
 
         tree.Reset();
@@ -271,6 +334,59 @@ public class Core : MonoBehaviour, GrowerListener {
     }
 
 
+
+
+    public void OnClearDistanceBegin_clearDistanceEnd_Ratio(float value) {
+        grower.Stop();
+
+        growthProperties.SetClearDistanceBegin_clearDistanceEnd_Ratio(value);
+        attractionPoints.Reset();
+
+        tree.Reset();
+
+        grower.Grow(tree.Root);
+    }
+
+
+    public void OnBranchDensityBegin(float value) {
+        grower.Stop();
+
+        growthProperties.SetBranchDensityBegin(value);
+        attractionPoints.Reset();
+
+        tree.Reset();
+
+        grower.Grow(tree.Root);
+    }
+
+    public void OnBranchDensityEnd(float value) {
+        grower.Stop();
+
+        growthProperties.SetBranchDensityEnd(value);
+        attractionPoints.Reset();
+
+        tree.Reset();
+
+        grower.Grow(tree.Root);
+    }
+
+
+
+    // TODO WHAT IF Y DAMPED
+    public void OnHangingBranches(float value) {
+        grower.Stop();
+
+        growthProperties.SetHangingBranchesIntensity(value);
+        attractionPoints.Reset();
+
+        tree.Reset();
+
+        grower.Grow(tree.Root);
+    }
+
+
+
+    // SPACE COLONIZATION
 
     public void OnDensity(float value) {
         cameraMode = CameraMode.AttractionPoints;
@@ -619,34 +735,29 @@ public class Core : MonoBehaviour, GrowerListener {
 
 
         grower = new SpaceColonization(growthProperties, this);
-
-
-
-        geometryProperties = new GeometryProperties();
-        geometryProperties.SetTipRadius(0.007f);
-        geometryProperties.SetNthRoot(1.7f);
-        geometryProperties.SetCircleResolution(3);
-        geometryProperties.SetMinRadiusRatioForNormalConnection(0.49f);
-
-        geometryProperties.SetMaxTwigRadiusForLeaves(0.02f);
-        geometryProperties.SetLeafSize(1.6f);
-        geometryProperties.SetLeafType(Leaf.LeafType.ParticleSquare);
-        geometryProperties.SetDisplayedLeavesPerNode(0.5f);
-        geometryProperties.SetLeavesEnabled(true);
-
-        Vector3 position = Vector3.zero;
-        tree = new Tree(position, geometryProperties);
     }
 
     void load_testTree(int age, float radius_x, float radius_y, float radius_z) {
-        attractionPoints = new PseudoEllipsoid(/*new Vector3(0, 0, 0), */radius_x, radius_y, radius_z, 50, 0.15f, 0.05f);
+        attractionPoints = new PseudoEllipsoid(/*new Vector3(0, 0, 0), */radius_x, radius_y, radius_z, 30, 0.15f, 0.05f);
 
 
         growthProperties = new GrowthProperties();
         growthProperties.SetInfluenceDistance(1);
-        growthProperties.SetPerceptionAngle(90f);
-        growthProperties.SetClearDistance(0.925f, 0.7f);
+        growthProperties.SetPerceptionAngle(90);
+
+        //growthProperties.SetClearDistance(0.925f, 0.7f);
+        growthProperties.SetMinClearDistanceRatio(0.4f);
+        growthProperties.SetMaxClearDistanceRatio(0.925f);
+        growthProperties.SetBranchDensityBegin(0.2f);
+        growthProperties.SetBranchDensityEnd(0.8f);
+        growthProperties.SetClearDistanceBegin_clearDistanceEnd_Ratio(0.5f);
+
         growthProperties.SetTropisms(new Vector3(0, 1f, 0));
+        growthProperties.SetTropismsWeights(new Vector3(1, 1f, 1));
+        growthProperties.UpTropismsDampRatio = 0.4f;
+        growthProperties.UpTropismsWhenDamped = 0.3f;
+        growthProperties.SetHangingBranchesIntensity(0);
+
         growthProperties.SetGrowthDistance(0.25f);
         growthProperties.SetLeavesPerNode(2);
         growthProperties.SetAttractionPoints(attractionPoints);
@@ -654,23 +765,114 @@ public class Core : MonoBehaviour, GrowerListener {
 
 
         grower = new SpaceColonization(growthProperties, this);
+    }
+
+    void load_stemTestTree160_15(int age, float radius_x, float radius_y, float radius_z) {
+        attractionPoints = new PseudoEllipsoid(new Vector3(0, 0f, 0), radius_x, radius_y, radius_z, 15, 0.15f, 0.05f);
 
 
+        growthProperties = new GrowthProperties();
+        growthProperties.SetInfluenceDistance(1f);
+        growthProperties.SetPerceptionAngle(160);
+        //growthProperties.SetClearDistance(0.925f, 0.7f);
+        growthProperties.SetMinClearDistanceRatio(0.3f);
+        growthProperties.SetMaxClearDistanceRatio(0.925f);
+        growthProperties.SetBranchDensityBegin(0f);
+        growthProperties.SetBranchDensityEnd(1f);
+        growthProperties.SetClearDistanceBegin_clearDistanceEnd_Ratio(0.5f);
+        growthProperties.SetTropisms(new Vector3(0, 1f, 0));
+        growthProperties.SetTropismsWeights(new Vector3(1, 1f, 1));
+        growthProperties.UpTropismsDampRatio = 0.4f;
+        growthProperties.UpTropismsWhenDamped = 0.3f;
+        growthProperties.SetHangingBranchesIntensity(0);
 
-        geometryProperties = new GeometryProperties();
-        geometryProperties.SetTipRadius(0.007f);
-        geometryProperties.SetNthRoot(1.7f);
-        geometryProperties.SetCircleResolution(3);
-        geometryProperties.SetMinRadiusRatioForNormalConnection(0.49f);
+        growthProperties.SetGrowthDistance(0.25f);
+        growthProperties.SetLeavesPerNode(2);
+        growthProperties.SetAttractionPoints(attractionPoints);
+        growthProperties.SetIterations(age);
 
-        geometryProperties.SetMaxTwigRadiusForLeaves(0.02f);
-        geometryProperties.SetLeafSize(1.6f);
-        geometryProperties.SetLeafType(Leaf.LeafType.ParticleSquare);
-        geometryProperties.SetDisplayedLeavesPerNode(0.5f);
-        geometryProperties.SetLeavesEnabled(true);
 
-        Vector3 position = Vector3.zero;
-        tree = new Tree(position, geometryProperties);
+        grower = new SpaceColonization(growthProperties, this);
+    }
+
+    void load_stemTestTree90_30(int age, float radius_x, float radius_y, float radius_z) {
+        attractionPoints = new PseudoEllipsoid(new Vector3(0, 2, 0), radius_x, radius_y, radius_z, 30, 0.15f, 0.05f);
+
+
+        growthProperties = new GrowthProperties();
+        growthProperties.SetInfluenceDistance(1.2f);
+        growthProperties.SetPerceptionAngle(90);
+        //growthProperties.SetClearDistance(0.925f, 0.7f);
+        growthProperties.SetMinClearDistanceRatio(0.4f);
+        growthProperties.SetMaxClearDistanceRatio(0.95f);
+        growthProperties.SetBranchDensityBegin(0.08f);
+        growthProperties.SetBranchDensityEnd(0.7f);
+        growthProperties.SetClearDistanceBegin_clearDistanceEnd_Ratio(0.5f);
+        growthProperties.SetTropisms(new Vector3(0, 1f, 0));
+        growthProperties.SetTropismsWeights(new Vector3(1, 1f, 1));
+        growthProperties.UpTropismsDampRatio = 0.4f;
+        growthProperties.UpTropismsWhenDamped = 0.3f;
+        growthProperties.SetHangingBranchesIntensity(0);
+
+        growthProperties.SetGrowthDistance(0.25f);
+        growthProperties.SetLeavesPerNode(2);
+        growthProperties.SetAttractionPoints(attractionPoints);
+        growthProperties.SetIterations(age);
+
+
+        grower = new SpaceColonization(growthProperties, this);
+    }
+
+    void load_excurrentTree(int age, float radius_x, float radius_y, float radius_z) {
+        attractionPoints = new PseudoEllipsoid(/*new Vector3(0, 0, 0), */radius_x, radius_y, radius_z, 30, 0.15f, 0.05f);
+
+
+        growthProperties = new GrowthProperties();
+        growthProperties.SetInfluenceDistance(10);
+        growthProperties.SetPerceptionAngle(130);
+        //growthProperties.SetClearDistance(0.925f, 0.7f);
+        growthProperties.SetMinClearDistanceRatio(0.04f);
+        growthProperties.SetMaxClearDistanceRatio(0.9f);
+        growthProperties.SetBranchDensityBegin(1f);
+        growthProperties.SetBranchDensityEnd(1f);
+        growthProperties.SetClearDistanceBegin_clearDistanceEnd_Ratio(0.5f);
+        growthProperties.SetTropisms(new Vector3(0, 1, 0));
+        growthProperties.SetTropismsWeights(new Vector3(1, 0, 1));
+        growthProperties.UpTropismsDampRatio = 0.4f;
+        growthProperties.UpTropismsWhenDamped = 0.3f;
+        growthProperties.SetHangingBranchesIntensity(0);
+
+        growthProperties.SetGrowthDistance(0.25f);
+        growthProperties.SetLeavesPerNode(2);
+        growthProperties.SetAttractionPoints(attractionPoints);
+        growthProperties.SetIterations(age);
+
+
+        grower = new SpaceColonization(growthProperties, this);
+    }
+
+    void load_nearTheEnvelopeTree(int age, float radius_x, float radius_y, float radius_z) {
+        //growthProperties.StemLength = 2;
+        attractionPoints = new PseudoEllipsoid(new Vector3(0, 2, 0), radius_x, radius_y, radius_z, 25, 0.35f, 0f);
+
+
+        growthProperties = new GrowthProperties();
+        growthProperties.SetInfluenceDistance(1000);
+        growthProperties.SetPerceptionAngle(180);
+        growthProperties.SetClearDistance(0.7f);
+        growthProperties.SetTropisms(new Vector3(0, 1f, 0));
+        growthProperties.SetTropismsWeights(new Vector3(1, 0.2f, 1));
+        growthProperties.UpTropismsDampRatio = 0.4f;
+        growthProperties.UpTropismsWhenDamped = 0.3f;
+        growthProperties.SetHangingBranchesIntensity(0);
+
+        growthProperties.SetGrowthDistance(0.25f);
+        growthProperties.SetLeavesPerNode(2);
+        growthProperties.SetAttractionPoints(attractionPoints);
+        growthProperties.SetIterations(age);
+
+
+        grower = new SpaceColonization(growthProperties, this);
     }
 
     void load_advancedNormalTree_attractionPointTest(int age, float radius_x, float radius_y, float radius_z) {
@@ -684,6 +886,7 @@ public class Core : MonoBehaviour, GrowerListener {
         //growthProperties.SetClearDistance(0.925f, 0.7f);
         growthProperties.SetClearDistance(0.5f, 0.5f);
         growthProperties.SetTropisms(new Vector3(0, 1f, 0));
+        growthProperties.SetTropismsWeights(new Vector3(1, 1, 1));
         growthProperties.SetGrowthDistance(0.25f);
         growthProperties.SetLeavesPerNode(2);
         growthProperties.SetAttractionPoints(attractionPoints);

@@ -18,93 +18,105 @@ public class NearestNodeAlgorithm {
 
         int nearest_x = x.GetNearestIndex(new Node(position));
         for (int i = nearest_x; i >= 0; i--) {
-            Vector3 currentPosition = x[i].GetPosition();
-            Vector3 d = currentPosition - position;
+            if (x[i].Active) {
+                Vector3 currentPosition = x[i].GetPosition();
+                Vector3 d = currentPosition - position;
 
-            float dx = d.x * d.x;
-            if (dx <= maxSquaredDistance) { //find out whether we are still in the x range
-                float distance = dx + d.y * d.y + d.z * d.z;
-                if (distance <= maxSquaredDistance) {
-                    candidates.InsertSorted(new CandidateNode(x[i], distance));
+                float dx = d.x * d.x;
+                if (dx <= maxSquaredDistance) { //find out whether we are still in the x range
+                    float distance = dx + d.y * d.y + d.z * d.z;
+                    if (distance <= maxSquaredDistance) {
+                        candidates.InsertSorted(new CandidateNode(x[i], distance));
+                    }
+                } else {
+                    break;
                 }
-            } else {
-                break;
             }
         }
         for (int i = nearest_x + 1; i < x.Count; i++) {
-            Vector3 currentPosition = x[i].GetPosition();
-            Vector3 d = currentPosition - position;
+            if (x[i].Active) {
+                Vector3 currentPosition = x[i].GetPosition();
+                Vector3 d = currentPosition - position;
 
-            float dx = d.x * d.x;
-            if (dx <= maxSquaredDistance) { //find out whether we are still in the x range
-                float distance = dx + d.y * d.y + d.z * d.z;
-                if (distance <= maxSquaredDistance) {
-                    candidates.InsertSorted(new CandidateNode(x[i], distance));
+                float dx = d.x * d.x;
+                if (dx <= maxSquaredDistance) { //find out whether we are still in the x range
+                    float distance = dx + d.y * d.y + d.z * d.z;
+                    if (distance <= maxSquaredDistance) {
+                        candidates.InsertSorted(new CandidateNode(x[i], distance));
+                    }
+                } else {
+                    break;
                 }
-            } else {
-                break;
             }
         }
 
 
         int nearest_y = y.GetNearestIndex(new Node(position));
         for (int i = nearest_y; i >= 0; i--) {
-            Vector3 currentPosition = y[i].GetPosition();
-            Vector3 d = currentPosition - position;
+            if (y[i].Active) {
+                Vector3 currentPosition = y[i].GetPosition();
+                Vector3 d = currentPosition - position;
 
-            float dy = d.y * d.y;
-            if (dy <= maxSquaredDistance) { //find out whether we are still in the y range
-                float distance = d.x * d.x + dy + d.z * d.z;
-                if (distance <= maxSquaredDistance) {
-                    candidates.InsertSorted(new CandidateNode(y[i], distance));
+                float dy = d.y * d.y;
+                if (dy <= maxSquaredDistance) { //find out whether we are still in the y range
+                    float distance = d.x * d.x + dy + d.z * d.z;
+                    if (distance <= maxSquaredDistance) {
+                        candidates.InsertSorted(new CandidateNode(y[i], distance));
+                    }
+                } else {
+                    break;
                 }
-            } else {
-                break;
             }
         }
         for (int i = nearest_y + 1; i < y.Count; i++) {
-            Vector3 currentPosition = y[i].GetPosition();
-            Vector3 d = currentPosition - position;
+            if (y[i].Active) {
+                Vector3 currentPosition = y[i].GetPosition();
+                Vector3 d = currentPosition - position;
 
-            float dy = d.y * d.y;
-            if (dy <= maxSquaredDistance) { //find out whether we are still in the y range
-                float distance = d.x * d.x + dy + d.z * d.z;
-                if (distance <= maxSquaredDistance) {
-                    candidates.InsertSorted(new CandidateNode(y[i], distance));
+                float dy = d.y * d.y;
+                if (dy <= maxSquaredDistance) { //find out whether we are still in the y range
+                    float distance = d.x * d.x + dy + d.z * d.z;
+                    if (distance <= maxSquaredDistance) {
+                        candidates.InsertSorted(new CandidateNode(y[i], distance));
+                    }
+                } else {
+                    break;
                 }
-            } else {
-                break;
             }
         }
 
 
         int nearest_z = z.GetNearestIndex(new Node(position));
         for (int i = nearest_z; i >= 0; i--) {
-            Vector3 currentPosition = z[i].GetPosition();
-            Vector3 d = currentPosition - position;
+            if (z[i].Active) {
+                Vector3 currentPosition = z[i].GetPosition();
+                Vector3 d = currentPosition - position;
 
-            float dz = d.z * d.z;
-            if (dz <= maxSquaredDistance) { //find out whether we are still in the z range
-                float distance = d.x * d.x + d.y * d.y + dz;
-                if (distance <= maxSquaredDistance) {
-                    candidates.InsertSorted(new CandidateNode(z[i], distance));
+                float dz = d.z * d.z;
+                if (dz <= maxSquaredDistance) { //find out whether we are still in the z range
+                    float distance = d.x * d.x + d.y * d.y + dz;
+                    if (distance <= maxSquaredDistance) {
+                        candidates.InsertSorted(new CandidateNode(z[i], distance));
+                    }
+                } else {
+                    break;
                 }
-            } else {
-                break;
             }
         }
         for (int i = nearest_z + 1; i < z.Count; i++) {
-            Vector3 currentPosition = z[i].GetPosition();
-            Vector3 d = currentPosition - position;
+            if (z[i].Active) {
+                Vector3 currentPosition = z[i].GetPosition();
+                Vector3 d = currentPosition - position;
 
-            float dz = d.z * d.z;
-            if (dz <= maxSquaredDistance) { //find out whether we are still in the z range
-                float distance = d.x * d.x + d.y * d.y + dz;
-                if (distance <= maxSquaredDistance) {
-                    candidates.InsertSorted(new CandidateNode(z[i], distance));
+                float dz = d.z * d.z;
+                if (dz <= maxSquaredDistance) { //find out whether we are still in the z range
+                    float distance = d.x * d.x + d.y * d.y + dz;
+                    if (distance <= maxSquaredDistance) {
+                        candidates.InsertSorted(new CandidateNode(z[i], distance));
+                    }
+                } else {
+                    break;
                 }
-            } else {
-                break;
             }
         }
 

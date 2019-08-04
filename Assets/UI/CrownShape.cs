@@ -11,6 +11,19 @@ public class CrownShape : MonoBehaviour {
         middleware = new Middleware();
     }
 
+
+    public void OnValueChanged_Thickness() {
+        float value = GetComponent<Slider>().value;
+        GameObject.Find("Core").GetComponent<Core>().OnThickness(value);
+    }
+
+    public void OnValueChanged_Length() {
+        float value = GetComponent<Slider>().value;
+        GameObject.Find("Core").GetComponent<Core>().OnLength(value);
+    }
+
+
+
     public void OnValueChanged_Width() {
         float value = GetComponent<Slider>().value;
         GameObject.Find("Core").GetComponent<Core>().OnCrownWidth(value);
@@ -50,6 +63,35 @@ public class CrownShape : MonoBehaviour {
         //middleware.DisableCameraMovement();
         //middleware.EnablePointCloudRenderer();
     }
+
+
+
+
+    public void OnValueChanged_ClearDistanceBegin_clearDistanceEnd_Ratio() {
+        float value = GetComponent<Slider>().value;
+        GameObject.Find("Core").GetComponent<Core>().OnClearDistanceBegin_clearDistanceEnd_Ratio(value);
+    }
+
+    public void OnValueChanged_BranchDensityBegin() {
+        float value = GetComponent<Slider>().value;
+        GameObject.Find("Core").GetComponent<Core>().OnBranchDensityBegin(value);
+    }
+
+    public void OnValueChanged_BranchDensityEnd() {
+        float value = GetComponent<Slider>().value;
+        GameObject.Find("Core").GetComponent<Core>().OnBranchDensityEnd(value);
+    }
+
+
+
+
+    public void OnValueChanged_HangingBranches() {
+        float value = GetComponent<Slider>().value;
+        GameObject.Find("Core").GetComponent<Core>().OnHangingBranches(value);
+    }
+
+
+
 
     public void OnValueChanged_Density() {
         float value = GetComponent<Slider>().value;

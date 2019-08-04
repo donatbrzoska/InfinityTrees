@@ -29,6 +29,10 @@ public static class Util {
         return new Vector3(x, y, z);
     }
 
+    public static Vector3 Hadamard(Vector3 a, Vector3 b) {
+        return new Vector3(a.x * b.x, a.y * b.y, a.z * b.z);
+    }
+
     public static float DegreesToRadians(float degrees) {
         return (float) (degrees * Math.PI / 180);
     }
