@@ -5,4 +5,5 @@ public interface Grower {
     void RegrowStem(Tree tree);
     void Stop();
     float GetTreeHeight();
+    GrowthProperties GetGrowthProperties();
 }

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public sealed class PseudoEllipsoid : AttractionPoints {
+public sealed class PseudoEllipsoid : List<Vector3> {
 
     private Vector3 center;
     public Vector3 GetCenter() {

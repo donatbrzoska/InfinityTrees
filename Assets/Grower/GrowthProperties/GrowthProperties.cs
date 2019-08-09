@@ -27,7 +27,7 @@ public class GrowthProperties {
     private int leavesPerNode;
 
     //private List<Vector3> attractionPointsBackup;
-    private AttractionPoints attractionPoints;
+    private PseudoEllipsoid attractionPoints;
 
     private int iterations;
 
@@ -340,11 +340,11 @@ public class GrowthProperties {
 
 
 
-    public void SetAttractionPoints(AttractionPoints attractionPoints) {
+    public void SetAttractionPoints(PseudoEllipsoid attractionPoints) {
         this.attractionPoints = attractionPoints;
     }
 
-    public AttractionPoints GetAttractionPoints() {
+    public PseudoEllipsoid GetAttractionPoints() {
         return attractionPoints;
     }
 

@@ -39,7 +39,6 @@ public class SpaceColonization : Grower {
         this.growerListener = growerListener;
     }
 
-
     Thread growerThread;
 
     //interrupt thread nicely when growthProperties change

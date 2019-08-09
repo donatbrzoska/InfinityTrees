@@ -31,6 +31,10 @@ public class Tree {
     //private float stemStepSize;
     private GeometryProperties geometryProperties;
 
+    public GeometryProperties GetGeometryProperties() {
+        return geometryProperties;
+    }
+
     public Node CrownRoot { get; set; }
     public Node StemRoot { get; set; }
     //public Node StemTip { get; set; }
