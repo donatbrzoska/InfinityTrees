@@ -42,9 +42,11 @@ public class GrowthProperties {
         this.influenceDistance = influenceDistance;
         this.squaredInfluenceDistance = influenceDistance * influenceDistance;
 
-        minClearDistance = influenceDistance * minClearDistanceRatio;
-        maxClearDistance = influenceDistance * maxClearDistanceRatio;
+        minClearDistance = influenceDistance * minClearDistanceRatio; //refresh
+        maxClearDistance = influenceDistance * maxClearDistanceRatio; 
 
+        SetBranchDensityBegin(branchDensityBegin); //refresh
+        SetBranchDensityEnd(branchDensityEnd);
     }
 
     public float GetInfluenceDistance() {
@@ -77,9 +79,9 @@ public class GrowthProperties {
     }
 
     public void SetClearDistance(float begin, float end) {
-        if (begin < minClearDistance | end < minClearDistance) {
-            throw new Exception("Keep the minClearDistance in mind!");
-        }
+        //if (begin < minClearDistance | end < minClearDistance) {
+        //    throw new Exception("Keep the minClearDistance in mind!");
+        //}
 
         this.clearDistance_begin = begin * begin;
         this.clearDistance_end = end * end;
@@ -87,9 +89,9 @@ public class GrowthProperties {
 
     public void SetClearDistanceBegin(float begin) {
         //Debug.Log("clear distance begin: " + begin);
-        if (begin < minClearDistance) {
-            throw new Exception("Keep the minClearDistance in mind!");
-        }
+        //if (begin < minClearDistance) {
+        //    throw new Exception("Keep the minClearDistance in mind!");
+        //}
         this.clearDistance_begin = begin;
         this.squaredClearDistance_begin = begin * begin;
     }
@@ -100,9 +102,9 @@ public class GrowthProperties {
 
     public void SetClearDistanceEnd(float end) {
         //Debug.Log("clear distance end: " + end);
-        if (end < minClearDistance) {
-            throw new Exception("Keep the minClearDistance in mind!");
-        }
+        //if (end < minClearDistance) {
+        //    throw new Exception("Keep the minClearDistance in mind!");
+        //}
         this.clearDistance_end = end;
         this.squaredClearDistance_end = end * end;
     }
@@ -142,7 +144,7 @@ public class GrowthProperties {
     //this is based on a sigmoid funcion and basically returns the lower bound of the looked at part of the sigmoid function within a given range
     private float GetSigmoidStartValue(float range) {
         //return -4 - clearDistanceBegin_clearDistanceEnd_Ratio * range; 
-        return -8 - clearDistanceBegin_clearDistanceEnd_Ratio * range; // earlier version
+        return - 8 - clearDistanceBegin_clearDistanceEnd_Ratio * range; // earlier version
     }
 
     //this is based on a sigmoid funcion and basically returns the lower bound of the looked at part of the sigmoid function within a given range
@@ -152,21 +154,28 @@ public class GrowthProperties {
     }
 
 
+    //InfluenceDistance -> max/minClearDistance -> branchDensityBegin/End
 
 
-    private float minClearDistanceRatio;
+    private float minClearDistanceRatio; //0..1
     private float minClearDistance;
     public void SetMinClearDistanceRatio(float value) {
         minClearDistanceRatio = value;
         minClearDistance = influenceDistance * minClearDistanceRatio;
+
+        SetBranchDensityBegin(branchDensityBegin); //refresh
+        SetBranchDensityBegin(branchDensityEnd);
     }
 
     //private float minDelta_ClearDistance_to_InfluenceDistance = 0.1f;
-    private float maxClearDistanceRatio;
+    private float maxClearDistanceRatio; //0..1
     private float maxClearDistance;// = 0.075f;
     public void SetMaxClearDistanceRatio(float value) {
         maxClearDistanceRatio = value;
         maxClearDistance = influenceDistance * maxClearDistanceRatio;
+
+        SetBranchDensityBegin(branchDensityBegin); //refresh
+        SetBranchDensityBegin(branchDensityEnd);
     }
 
     private float branchDensityBegin;
@@ -241,7 +250,7 @@ public class GrowthProperties {
     }
 
 
-    public float UpTropismsDampRatio { get; set; }
+    public float UpTropismsDampRatio { get; set; } //0..1
     public float UpTropismsWhenDamped { get; set; }
 
     public void SetTropisms(Vector3 tropisms, bool temporary=false) {
@@ -261,6 +270,20 @@ public class GrowthProperties {
         }
     }
 
+
+
+    public float UpTropismWeight_min { private get; set; }
+    public float UpTropismWeight_max { private get; set; }
+    public float UpTropismWeightRatio { //0..1
+        set {
+            this.tropismsWeights.y = value * (UpTropismWeight_max - UpTropismWeight_min);
+        }
+        get {
+            //this.tropismsWeights.y = value * (UpTropismWeight_max - UpTropismWeight_min);
+            //this.tropismsWeights.y / (UpTropismWeight_max - UpTropismWeight_min) = value;
+            return this.tropismsWeights.y / (UpTropismWeight_max - UpTropismWeight_min);
+        }
+    }
 
     public void SetTropismsWeights(Vector3 value) {
         this.tropismsWeights = value;

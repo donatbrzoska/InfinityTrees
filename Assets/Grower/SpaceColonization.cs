@@ -103,6 +103,7 @@ public class SpaceColonization : Grower {
     private void GrowStem(Tree tree) {
         if (Util.AlmostEqual(growthProperties.StemLength, 0)) {
             tree.CrownRoot = tree.StemRoot;
+            //tree.StemTip = tree.StemRoot;
         } else {
             stemRandom = new AdvancedRandom(((PseudoEllipsoid)growthProperties.GetAttractionPoints()).Seed);
 
@@ -120,12 +121,14 @@ public class SpaceColonization : Grower {
                     //nearestNodeAlgorithm.Add(newNode);
                     //nodeList.Add(newNode);
                     tree.CrownRoot = newNode;
+                    //tree.StemTip = newNode;
                 } else {
                     Vector3 direction = Quaternion.AngleAxis(angle, axis) * tree.StemRoot.GetDirection(true);
                     Node newNode = tree.StemRoot.Add(tree.StemRoot.GetPosition() + direction * growthProperties.GetGrowthDistance());
                     //nearestNodeAlgorithm.Add(newNode);
                     //nodeList.Add(newNode);
                     tree.CrownRoot = newNode;
+                    //tree.StemTip = newNode;
                 }
             }
 
@@ -141,12 +144,14 @@ public class SpaceColonization : Grower {
                     //nearestNodeAlgorithm.Add(newNode);
                     //nodeList.Add(newNode);
                     tree.CrownRoot = newNode;
+                    //tree.StemTip = newNode;
                 } else {
                     Vector3 direction = Quaternion.AngleAxis(angle, axis) * tree.StemRoot.GetDirection(true);
                     Node newNode = tree.StemRoot.Add(tree.StemRoot.GetPosition() + direction * rest);
                     //nearestNodeAlgorithm.Add(newNode);
                     //nodeList.Add(newNode);
                     tree.CrownRoot = newNode;
+                    //tree.StemTip = newNode;
                 }
             }
         }
@@ -175,11 +180,9 @@ public class SpaceColonization : Grower {
 
             findClosePointStopwatch.Start();
             //iterate through all attractionPoints
-            foreach (Vector3 attractionPoint in growthProperties.GetAttractionPoints()) {
-
-                if (!running) {
-                    break;
-                }
+            //foreach (Vector3 attractionPoint in growthProperties.GetAttractionPoints()) { //there is some threading problem with the enumeration foreach loop, usual for should fix it
+            for (int j = 0; j < growthProperties.GetAttractionPoints().Count; j++) {
+                Vector3 attractionPoint = growthProperties.GetAttractionPoints()[j];
 
                 //and find the closest Node respectively
                 Node closest;
@@ -198,6 +201,10 @@ public class SpaceColonization : Grower {
                     } else {
                         nodesAttractionPoints[closest] = new List<Vector3> { attractionPoint };
                     }
+                }
+
+                if (!running) {
+                    break;
                 }
             }
             findClosePointStopwatch.Stop();
@@ -218,7 +225,27 @@ public class SpaceColonization : Grower {
                     //sum += (associatedAttractionPoint - currentNode.GetPosition()) * (associatedAttractionPoint - currentNode.GetPosition()).magnitude;
                     //sum += (associatedAttractionPoint - currentNode.GetPosition()) * (1/((associatedAttractionPoint - currentNode.GetPosition()).magnitude* (associatedAttractionPoint - currentNode.GetPosition()).magnitude));
                 }
+
                 Vector3 direction = (sum + Util.Hadamard(growthProperties.GetTropisms(i), growthProperties.GetTropismsWeights())).normalized * growthProperties.GetGrowthDistance();
+
+                //Vector3 direction;
+                //if (i < 0.3 * growthProperties.GetIterations()) {
+                //    direction = (sum + Util.Hadamard(growthProperties.GetTropisms(i), new Vector3(0, 10, 0))).normalized * growthProperties.GetGrowthDistance();
+                //} else if (i < 0.5 * growthProperties.GetIterations()) {
+                //    direction = (sum + Util.Hadamard(growthProperties.GetTropisms(i), new Vector3(0, 0, 0))).normalized * growthProperties.GetGrowthDistance();
+                //} else if (i < 0.8 * growthProperties.GetIterations()) {
+                //    direction = (sum + Util.Hadamard(growthProperties.GetTropisms(i), new Vector3(0, -5, 0))).normalized * growthProperties.GetGrowthDistance();
+                //} else {
+                //    direction = (sum + Util.Hadamard(growthProperties.GetTropisms(i), new Vector3(0, -5, 0))).normalized * growthProperties.GetGrowthDistance();
+                //}
+
+                //Vector3 direction;
+                //if (i < 0.5 * growthProperties.GetIterations()) {
+                //    direction = (sum + Util.Hadamard(growthProperties.GetTropisms(i), new Vector3(0, 10, 0))).normalized * growthProperties.GetGrowthDistance();
+                //} else {
+                //    direction = (sum + Util.Hadamard(growthProperties.GetTropisms(i), new Vector3(0, -1, 0))).normalized * growthProperties.GetGrowthDistance();
+                //}
+
                 //Vector3 direction = (sum + growthProperties.GetTropisms()).normalized * growthProperties.GetGrowthDistance();
                 //debug("direction is " + direction);
                 ////hanging branches:
@@ -261,14 +288,7 @@ public class SpaceColonization : Grower {
             growerListener.OnUpdate();
 
 
-            //debug("attraction points left: " + growthProperties.GetAttractionPoints().Count);
             Prune(tree);
-
-
-            //if (growthProperties.GetHangingBranchesEnabled() && i > growthProperties.GetIterations() * growthProperties.GetHangingBranchesFromAgeRatio()) {
-            //    growthProperties.SetTropisms(new Vector3(0, -1f, 0), true);
-            //    debug("updated tropisms");
-            //}
         }
 
         debug(new FormatString("finding close points took {0}", findClosePointStopwatch.Elapsed));
@@ -277,57 +297,76 @@ public class SpaceColonization : Grower {
         running = false;
     }
 
-    //private int maxConsecutiveNonBranchingNodes = 8;
-
-    //private void Prune(Tree tree) {
-    //    PruneHelper(tree.CrownRoot, 0);
-    //}
-
-    //private void PruneHelper(Node currentNode, int consecutiveNonBranchingNodes) {
-    //    if (consecutiveNonBranchingNodes == maxConsecutiveNonBranchingNodes) {
-    //        currentNode.Active = false;
-    //    } else {
-
-    //        if (currentNode.HasSubnodes()) {
-    //            if (currentNode.GetSubnodes().Count == 1) {
-    //                PruneHelper(currentNode.GetSubnodes()[0], consecutiveNonBranchingNodes+1);
-    //            } else { //(currentNode.GetSubnodes().Count > 1)
-    //                foreach (Node sn in currentNode.GetSubnodes()) {
-    //                    PruneHelper(sn, 0);
-    //                }
-    //            }
-    //        }
-    //    }
-    //}
-
-
-    private int minBranching = 2; //how often in
-    private int perNodes = 8;
-
-    private void Prune(Tree tree) {
-        PruneHelper(tree.CrownRoot, 0, perNodes);
-    }
-
-    private void PruneHelper(Node currentNode, int branches, int nodesLeft) {
-        if (nodesLeft == 0) {
-            if (branches < minBranching) {
-                currentNode.Active = false;
-            } else {
-                foreach (Node sn in currentNode.GetSubnodes()) {
-                    PruneHelper(sn, 0, perNodes);
-                }
-            }
-        } else {
-            if (currentNode.HasSubnodes()) {
-                foreach (Node sn in currentNode.GetSubnodes()) {
-                    PruneHelper(sn, branches, nodesLeft - 1);
-                }
+    private bool IsDuplicateNode(Vector3 potentialPosition, Node node) {
+        foreach (Node subnode in node.GetSubnodes()) {
+            if (subnode.GetPosition().Equals(potentialPosition)) {
+                return true;
             }
         }
+        return false;
     }
 
-    //returns null if there is no closest node
-    private Node FindClosestNode(Vector3 attractionPoint) {
+	private int maxConsecutiveNonBranchingNodes = 8;
+
+	private void Prune(Tree tree)
+	{
+		PruneHelper(tree.CrownRoot, 0);
+	}
+
+	private void PruneHelper(Node currentNode, int consecutiveNonBranchingNodes)
+	{
+		if (consecutiveNonBranchingNodes == maxConsecutiveNonBranchingNodes)
+		{
+			currentNode.Active = false;
+		}
+		else
+		{
+
+			if (currentNode.HasSubnodes())
+			{
+				if (currentNode.GetSubnodes().Count == 1)
+				{
+					PruneHelper(currentNode.GetSubnodes()[0], consecutiveNonBranchingNodes + 1);
+				}
+				else
+				{ //(currentNode.GetSubnodes().Count > 1)
+					foreach (Node sn in currentNode.GetSubnodes())
+					{
+						PruneHelper(sn, 0);
+					}
+				}
+			}
+		}
+	}
+
+
+	//private int minBranching = 2; //how often in perNodes the tree as to branch
+	//private int perNodes = 8;
+
+	//private void Prune(Tree tree) {
+	//    PruneHelper(tree.CrownRoot, 0, perNodes);
+	//}
+
+	//private void PruneHelper(Node currentNode, int branches, int nodesLeft) {
+	//    if (nodesLeft == 0) {
+	//        if (branches < minBranching) {
+	//            currentNode.Active = false;
+	//        } else {
+	//            foreach (Node sn in currentNode.GetSubnodes()) {
+	//                PruneHelper(sn, 0, perNodes);
+	//            }
+	//        }
+	//    } else {
+	//        if (currentNode.HasSubnodes()) {
+	//            foreach (Node sn in currentNode.GetSubnodes()) {
+	//                PruneHelper(sn, branches+currentNode.GetSubnodes().Count, nodesLeft - 1);
+	//            }
+	//        }
+	//    }
+	//}
+
+	//returns null if there is no closest node
+	private Node FindClosestNode(Vector3 attractionPoint) {
         Node closest = null;
 
         float currentSmallestDistance = growthProperties.GetSquaredInfluenceDistance();

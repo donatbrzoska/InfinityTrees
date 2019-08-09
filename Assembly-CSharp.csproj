@@ -91,6 +91,7 @@
     <Compile Include="Assets\UI\NewSeed.cs" />
     <Compile Include="Assets\UI\PointCloudRenderer.cs" />
     <Compile Include="Assets\UI\Quit.cs" />
+    <Compile Include="Assets\UI\ResetToDefaults.cs" />
     <Compile Include="Assets\UI\Save.cs" />
     <Compile Include="Assets\UI\StemColor.cs" />
     <Compile Include="Assets\UI\TreeRenderer.cs" />

@@ -132,8 +132,10 @@ public class Node : IEquatable<Node> {
         return completeNode;
     }
 
-    //only used for growing the stem
+    //only used for transfering the old crownRoots subodes to the new stem
     public void Add(Node node) {
+        node.supernode = this; // when adding the nodes like this, their supernode reference has to be updated manually
+
         //the following needs to be one atomic step, because as soon as there is a new subnode, the current normal is not valid anymore
         // and when GetVertices() would get called in between, there would be an invalid result
         lock (this) { //the corresponding lock is located at GetVertices()
@@ -283,26 +285,25 @@ public class Node : IEquatable<Node> {
     }
 
     public void CalculateAndStoreLeafData(List<Vector3> verticesResult, List<Vector2> uvsResult, List<int> trianglesResult) {
-        if (geometryProperties.GetLeavesEnabled()) {
-            if (radius < geometryProperties.GetMaxTwigRadiusForLeaves()) {
+        if (geometryProperties.GetLeavesEnabled()
+            && radius < geometryProperties.GetMaxTwigRadiusForLeaves()
+            /*&& !this.HasSubnodes()*/) {
+            int n_leaves = (int)geometryProperties.GetDisplayedLeavesPerNode();
+            float floatingRest = geometryProperties.GetDisplayedLeavesPerNode() - n_leaves;
 
-                int n_leaves = (int)geometryProperties.GetDisplayedLeavesPerNode();
-                float floatingRest = geometryProperties.GetDisplayedLeavesPerNode() - n_leaves;
+            float r = Util.RandomInRange(0, 1);
+            if (r <= floatingRest) {
+                n_leaves++;
+            }
 
-                float r = Util.RandomInRange(0, 1);
-                if (r <= floatingRest) {
-                    n_leaves++;
+            for (int i = 0; i < n_leaves; i++) {
+
+                //TODO: this is a hotfix, 2 leaves should have been calculated, 2 leaves should be displayed at max - at the time
+                if (i > leaves.Count - 1) {
+                    break;
                 }
 
-                for (int i=0; i < n_leaves; i++) {
-
-                    //TODO: this is a hotfix, 2 leaves should have been calculated, 2 leaves should be displayed at max - at the time
-                    if (i > leaves.Count - 1) {
-                        break;
-                    }
-
-                    leaves[i].CalculateAndStoreGeometry(verticesResult, uvsResult, trianglesResult);
-                }
+                leaves[i].CalculateAndStoreGeometry(verticesResult, uvsResult, trianglesResult);
             }
         }
     }

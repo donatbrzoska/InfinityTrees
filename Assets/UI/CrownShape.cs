@@ -90,6 +90,11 @@ public class CrownShape : MonoBehaviour {
         GameObject.Find("Core").GetComponent<Core>().OnHangingBranches(value);
     }
 
+    public void OnValueChanged_GrowTowardsLight() {
+        float value = GetComponent<Slider>().value;
+        GameObject.Find("Core").GetComponent<Core>().OnGrowTowardsLight(value);
+    }
+
 
 
 

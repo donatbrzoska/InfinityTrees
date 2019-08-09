@@ -1,5 +1,6 @@
 ﻿/* BUGS
  *
+ * 
  * Twisting-Bug -> Frenet Frame?
  * Manche kleinen Äste flippen immer noch over
  *
@@ -7,16 +8,26 @@
  *
  * bei dickem Stamm und zu vielen Subnodes, kann es sein, dass der Übergang nicht mehr gut ist wegen minRadiusDifference
  *
+ * manchmal hört der Baum einfach auf zu wachsen, weil es einen ungünstigen Zufall gibt
+ *
+ * GrowCrown: erstes foreach enumeration changed bug...
  */
 
 /* CODE
  *
- * CrownShape Script aufteilen, dann werden auch nicht immer die AttractionPoints angezeigt
+ * UI Schicht soll sich default-Werte aus Core pollen
  * 
- * Seed für Stamm, auch erneuerbar
+ * CrownShape Script aufteilen, dann werden auch nicht immer die AttractionPoints angezeigt
+ * CrownShape -> SliderScript
+ * 
+ * Middleware in Core verschieben
+ * AttractionPoints aus GrowthProperties nehmen?
+ * 
  * Festen AttractionPoints Seed rausnehmen
  * Getter und Setter konsistenter machen
- *
+ * 
+ * Seed für Stamm, auch erneuerbar
+ * 
  */
 
 /* Perception Angle: 90°, Density: 30 -> braucht hohe Density damit initial ein Stamm machbar ist
@@ -50,40 +61,74 @@
 
 /* Hohe Influence Distance für exkurrente Bäume
  * -> macht Distanzeberechnungen unmöglich zu optimieren
- *
+ * 
  */
 
 /* NEXT STEPS
+ * Undo-Funktionalität
+ * 
+ * Bei Bäumen mit niedriger Höhe, wachsen die Äste oft zu erst sehr in die Höhe und dann sieht man von oben sehr viele Äste und von unten Blattwerk
+ * -> kleinere DampRatio hilft
+ * -> trotzdem noch mal durchdenken
+ * -> evtl. für größere Höhen auch eine automatische Anpassung vornehmen
  *
- * Reset to Defaults Button
+ * Blattgröße -> etwas überlegen
+ * 
+ * 
+ * UI Elemente kleiner
+ *
+ * 
+ * Stammtexturierung
+ * 
+ * 
+ * Verändern der Thickness rambled die Blätter ...
+ * 
+ * 
+ * Stärke des Lichteinfluss'
+ * - bei kleineren Höhen der AttractionPoints müssen die min und max Werte angepasst werden
+ * - generell muss das ganze in UpdateTropisms eingebaut werden
+ * 
+ * Seitenwind
+ * -> erfordert mehr Platz in bestimmte Richtung
+ * 
+ *
+ * 
+ * Tropismen können Nodes over flippen
+ * 
+ *
+ * Improved Age Slider
  * 
  *
  * Surprise Parameters:
  * - Perception Angle (90 - 160) -> verändert außerdem Density (30 - 10)
+ * - 
  * 
  * 
  * Influence Distance anpassbar machen? -> weniger wobble -> vielleicht auch nur von 0.9 - 1.3
  * ->> Density muss von Influence Distance abhängen, irgendwas anderes auch ... (d_i 0.8, hohe Density bringt nix)
  *
- * Wichtigkeit des Lichts
- *
- * Seitenwind
  *
  *
  *
  *
  * Exkurrente Bäume:
  * - Langer initialer Stamm (~ bis AttractionPoints Height)
- * - an diesem können dann auch Nodes wachsen
- * -> aufpassen bei Anpassung der Stammhöhe, weil immer alle Nodes unter der CrownRoot "verloren gehen"
- * -> aber wahrscheinlich wird es dann hier eh keinen initialen Stamm geben?
+ * -> an diesem können dann auch Nodes wachsen
+ * --> aufpassen bei Anpassung der Stammhöhe, weil immer alle Nodes unter der CrownRoot "verloren gehen"
+ * --> aber wahrscheinlich wird es dann hier eh keinen initialen Stamm geben?
  * - oder die CrownRoot wird auch schon vorgegrowt (mit starken UpTropismen)
- *
- * Hängende Äste:
- * - starke up Tropism weights und anschließend down Tropisms
- * // - extra GrowthPhase mit extra AttractionPoints???
+ * 
+ * - Tannen ausgehend von einem Prozeduralen Stamm + Apikalkontrolle über Zweigordnungen?
  * 
  *
+ * Hängende Äste:
+ * - starke up Tropism weights und anschließend down Tropisms (noch besser wäre eine zusätzliche Verschiebung des PerceptionVolumes)
+ * // - extra GrowthPhase mit extra AttractionPoints???
+ *
+ * - werden vermutlich nichts bringen, wenn die Branch Density um Zweige sehr hoch ist
+ *
+ *
+ * 
  * bei höherem Alter bleiben die Astdichte-Parameter auf der Strecke
  * -> das liegt daran, dass der Baum den verfügbaren Platz "zu schnell" eingenommen hat
  * -> User darauf aufmerksam machen?
@@ -94,13 +139,7 @@
  * -> x, y, z auf jeweils auf bestimmten Wertebereich bringen, sonst wird beispielsweise (0,0.2,0) am Ende doch wieder (0,1,0)
  * --> oder Realisierung mittels Weights?
  *
- * Hanging Branches werden vermutlich nichts bringen, wenn die Branch Density um Zweige sehr hoch ist
  *
- * Simply: Stammlänge als extra Parameter mit extra Wachstumsphase
- * ->> benötigt dann extra Punktwolke für den Stamm / Prozedurales Wachstum
- * -> Retry Pruning
- *
- * Tannen ausgehend von einem Prozeduralen Stamm + Apikalkontrolle über Zweigordnungen?
  *
  * kleinere Leaves / globale Leafdensity
  * 
@@ -109,23 +148,12 @@
  * - active
  * : NearestNode for AttractionPoint
  * : Grower
- * -> hat nicht funktioniert
+ * -> nur wirklich sinnvoll, bei exkurrenten Bäumen
  *
- * PerceptionAngle auch abhängig von BranchDensity machen
- * -> wird wahrscheinlich schwierig mit Density
  * 
  * Distanzberechnungen optimieren
- *
- * Leaves nur an Tipnodes und Supertipnode setzen?
  * 
- * Middleware in Core verschieben
- * AttractionPoints aus GrowthProperties nehmen?
- * CrownShape -> SliderScript
- * GrowthCamera smoother machen
  * 
- * Seitenwind
- *
- * Stammdicke
  *
  * TanH squishen (Sigmoid Ersatz)
  *
@@ -139,13 +167,12 @@
  * 
  * Exkurrente Bäume über Ordnung der Zweige?
  * Radiergummi
- * LIVE PARAMETER!!!
  *
  *
  * 
  * AttractionPoints nach Entfernung gewichten -> behebt eventuell (je weiter weg, desto wichtiger!(?))
  * :: Bei sehr hohen Bäumen fangen die Äste in späteren Iterationen an, nach unten zu wachsen -> vermeiden (und dabei hanging branches offen lassen!)
- * 
+ * :: -> nein, das behebt es nicht, macht es eher noch krasser
  */
 
 
@@ -164,8 +191,8 @@
 /* UI
  * 
  * Sigmoid Clear Distance parametrisieren -> evtl. gar nicht notwendig mit Shadowgrid Grower
- *
- *
+ * 
+ * 
  * LeafType:Triangle -> Anzahl der Blätter einstellbar machen
  * Ansonsten:
  * - Triangle: Anzahl Blätter / Blattgröße
@@ -175,7 +202,7 @@
  * Elemente die zusammengehören in Container packen und erst ausklappen wenn gewünscht?
  * 
  * Elemente mit Icons
- *
+ * 
  * Color Picker: Texture2D.SetPixel auf Basis von Template
  * 
  * //- Smooth-Slider Age

@@ -33,6 +33,7 @@ public class Tree {
 
     public Node CrownRoot { get; set; }
     public Node StemRoot { get; set; }
+    //public Node StemTip { get; set; }
 
     public Tree(/*float stemLength, float stemStepSize, */GeometryProperties geometryProperties) {
         //this.StemLength = stemLength;
@@ -48,7 +49,6 @@ public class Tree {
     public void Reset() {
         Initialize();
     }
-
 
     //// wo die AttractionPoints positioniert sind, hängt vom Endpunkt des Stammes ab
     //private void GrowStem() {

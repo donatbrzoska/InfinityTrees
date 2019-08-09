@@ -15,11 +15,13 @@ public class NearestNodeAlgorithm {
 
     public Node GetNearestWithinSquaredDistance(Vector3 position, float maxSquaredDistance, float nodePerceptionAngle) {
         SortedCandidateNodeList candidates = new SortedCandidateNodeList();
+        //HashSet<Node> alreadyCandidate = new HashSet<Node>();
 
         int nearest_x = x.GetNearestIndex(new Node(position));
         for (int i = nearest_x; i >= 0; i--) {
+            //if (!alreadyCandidate.Contains(x[i]) && x[i].Active) {
             if (x[i].Active) {
-                Vector3 currentPosition = x[i].GetPosition();
+                    Vector3 currentPosition = x[i].GetPosition();
                 Vector3 d = currentPosition - position;
 
                 float dx = d.x * d.x;
@@ -27,6 +29,7 @@ public class NearestNodeAlgorithm {
                     float distance = dx + d.y * d.y + d.z * d.z;
                     if (distance <= maxSquaredDistance) {
                         candidates.InsertSorted(new CandidateNode(x[i], distance));
+                        //alreadyCandidate.Add(x[i]);
                     }
                 } else {
                     break;
@@ -34,8 +37,9 @@ public class NearestNodeAlgorithm {
             }
         }
         for (int i = nearest_x + 1; i < x.Count; i++) {
+            //if (!alreadyCandidate.Contains(x[i]) && x[i].Active) {
             if (x[i].Active) {
-                Vector3 currentPosition = x[i].GetPosition();
+                    Vector3 currentPosition = x[i].GetPosition();
                 Vector3 d = currentPosition - position;
 
                 float dx = d.x * d.x;
@@ -43,6 +47,7 @@ public class NearestNodeAlgorithm {
                     float distance = dx + d.y * d.y + d.z * d.z;
                     if (distance <= maxSquaredDistance) {
                         candidates.InsertSorted(new CandidateNode(x[i], distance));
+                        //alreadyCandidate.Add(x[i]);
                     }
                 } else {
                     break;
@@ -53,8 +58,9 @@ public class NearestNodeAlgorithm {
 
         int nearest_y = y.GetNearestIndex(new Node(position));
         for (int i = nearest_y; i >= 0; i--) {
-            if (y[i].Active) {
-                Vector3 currentPosition = y[i].GetPosition();
+            //if (!alreadyCandidate.Contains(y[i]) && y[i].Active) {
+             if (y[i].Active) {
+                    Vector3 currentPosition = y[i].GetPosition();
                 Vector3 d = currentPosition - position;
 
                 float dy = d.y * d.y;
@@ -62,6 +68,7 @@ public class NearestNodeAlgorithm {
                     float distance = d.x * d.x + dy + d.z * d.z;
                     if (distance <= maxSquaredDistance) {
                         candidates.InsertSorted(new CandidateNode(y[i], distance));
+                        //alreadyCandidate.Add(y[i]);
                     }
                 } else {
                     break;
@@ -69,8 +76,9 @@ public class NearestNodeAlgorithm {
             }
         }
         for (int i = nearest_y + 1; i < y.Count; i++) {
+            //if (!alreadyCandidate.Contains(y[i]) && y[i].Active) {
             if (y[i].Active) {
-                Vector3 currentPosition = y[i].GetPosition();
+                    Vector3 currentPosition = y[i].GetPosition();
                 Vector3 d = currentPosition - position;
 
                 float dy = d.y * d.y;
@@ -78,6 +86,7 @@ public class NearestNodeAlgorithm {
                     float distance = d.x * d.x + dy + d.z * d.z;
                     if (distance <= maxSquaredDistance) {
                         candidates.InsertSorted(new CandidateNode(y[i], distance));
+                        //alreadyCandidate.Add(y[i]);
                     }
                 } else {
                     break;
@@ -89,6 +98,7 @@ public class NearestNodeAlgorithm {
         int nearest_z = z.GetNearestIndex(new Node(position));
         for (int i = nearest_z; i >= 0; i--) {
             if (z[i].Active) {
+                //if (!alreadyCandidate.Contains(z[i]) && z[i].Active) {
                 Vector3 currentPosition = z[i].GetPosition();
                 Vector3 d = currentPosition - position;
 
@@ -97,6 +107,7 @@ public class NearestNodeAlgorithm {
                     float distance = d.x * d.x + d.y * d.y + dz;
                     if (distance <= maxSquaredDistance) {
                         candidates.InsertSorted(new CandidateNode(z[i], distance));
+                        //alreadyCandidate.Add(z[i]);
                     }
                 } else {
                     break;
@@ -104,8 +115,9 @@ public class NearestNodeAlgorithm {
             }
         }
         for (int i = nearest_z + 1; i < z.Count; i++) {
+            //if (!alreadyCandidate.Contains(z[i]) && z[i].Active) {
             if (z[i].Active) {
-                Vector3 currentPosition = z[i].GetPosition();
+                    Vector3 currentPosition = z[i].GetPosition();
                 Vector3 d = currentPosition - position;
 
                 float dz = d.z * d.z;
@@ -113,6 +125,7 @@ public class NearestNodeAlgorithm {
                     float distance = d.x * d.x + d.y * d.y + dz;
                     if (distance <= maxSquaredDistance) {
                         candidates.InsertSorted(new CandidateNode(z[i], distance));
+                        //alreadyCandidate.Add(z[i]);
                     }
                 } else {
                     break;

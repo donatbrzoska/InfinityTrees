@@ -121,7 +121,7 @@ public sealed class PseudoEllipsoid : AttractionPoints {
             center = new Vector3(0, 0, 0);
             //Center = new Vector3(0, 0, 0);
 
-            //1. Calculate volume of sphere with radius 1
+            //1. Calculate volume of sphere cut with radius 1
             float radius = 1f;
 
             float cutoffThreshhold_top = 2f * radius * cutoffRatio_top;
@@ -136,7 +136,7 @@ public sealed class PseudoEllipsoid : AttractionPoints {
 
             float volume = (float)(Math.PI * h / 6f) * (3f * roh_squared_top + 3f * roh_squared_bottom + h * h);
 
-            //2. Calculate volume of sphere with given radii
+            //2. Calculate volume of sphere cut with given radii
             //generate transformation matrix
             Matrix4x4 transformation = Matrix4x4.Scale(new Vector3(radius_x, radius_y, radius_z));
             //determine the volume of the target ellipsoid
@@ -161,26 +161,30 @@ public sealed class PseudoEllipsoid : AttractionPoints {
 
                 float distance = (point - Vector3.zero).magnitude;
                 if (distance <= radius) {
-                    //if (distance <= radius && distance > 0.5f) { //near the envelope test
-                    //4.2 Scale the points with the transformation matrix
-                    point = transformation.MultiplyVector(point);
+                    //float ran = Util.RandomInRange(0, 1);
+                    //if (ran < distance*distance) {
 
-                    //4.3 Translate the points based on the real cutoff threshhold at the bottom (it is a different one than the one for the sphere with radius 1!)
-                    float real_cutoffThreshhold_bottom = 2f * radius_y * cutoffRatio_bottom;
-                    Vector3 targetCenter = new Vector3(Position.x, Position.y + radius_y - real_cutoffThreshhold_bottom, Position.z);// Vector3.up*radius + position;
-                                                                                                                                     //Vector3 targetCenter = new Vector3(0, radius_y - real_cutoffThreshhold_bottom, 0);// Vector3.up*radius + position;
+                        //if (distance <= radius && distance > 0.5f) { //near the envelope test
+                        //4.2 Scale the points with the transformation matrix
+                        point = transformation.MultiplyVector(point);
 
-                    base.Add(point + targetCenter);
-                    Backup.Add(point + targetCenter);
+                        //4.3 Translate the points based on the real cutoff threshhold at the bottom (it is a different one than the one for the sphere with radius 1!)
+                        float real_cutoffThreshhold_bottom = 2f * radius_y * cutoffRatio_bottom;
+                        Vector3 targetCenter = new Vector3(Position.x, Position.y + radius_y - real_cutoffThreshhold_bottom, Position.z);// Vector3.up*radius + position;
+                                                                                                                                         //Vector3 targetCenter = new Vector3(0, radius_y - real_cutoffThreshhold_bottom, 0);// Vector3.up*radius + position;
 
-                    // for Core -> CameraMovement
-                    if (height < base[base.Count - 1].y) {
-                        height = base[base.Count - 1].y;
+                        base.Add(point + targetCenter);
+                        Backup.Add(point + targetCenter);
+
+                        // for Core -> CameraMovement
+                        if (height < base[base.Count - 1].y) {
+                            height = base[base.Count - 1].y;
+                        }
+                        if (center.y < base[base.Count - 1].y / 2) {
+                            center.y = base[base.Count - 1].y / 2;
+                        }
                     }
-                    if (center.y < base[base.Count - 1].y / 2) {
-                        center.y = base[base.Count - 1].y / 2;
-                    }
-                }
+                //}
             }
         }
     }
