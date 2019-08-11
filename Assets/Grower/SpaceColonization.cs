@@ -8,7 +8,7 @@ using System.Diagnostics;
 
 public class SpaceColonization : Grower {
 
-    private static bool debugEnabled = true;
+    private static bool debugEnabled = false;
     private static void debug(string message, [CallerMemberName]string callerName = "") {
         if (debugEnabled) {
             UnityEngine.Debug.Log("DEBUG: SpaceColonization: " + callerName + "(): " + message);
@@ -287,7 +287,7 @@ public class SpaceColonization : Grower {
             growerListener.OnUpdate();
 
 
-            Prune(tree);
+            //Prune(tree);
         }
 
         debug(new FormatString("finding close points took {0}", findClosePointStopwatch.Elapsed));

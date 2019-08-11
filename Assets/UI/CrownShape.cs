@@ -24,6 +24,21 @@ public class CrownShape : MonoBehaviour {
 
 
 
+
+    public void OnValueChanged_FoliageDensity() {
+        float value = GetComponent<Slider>().value;
+        GameObject.Find("Core").GetComponent<Core>().OnFoliageDensity(value);
+    }
+
+    public void OnValueChanged_FoliageLobeSize() {
+        float value = GetComponent<Slider>().value;
+        GameObject.Find("Core").GetComponent<Core>().OnFoliageLobeSize(value);
+    }
+
+
+
+
+
     public void OnValueChanged_Width() {
         float value = GetComponent<Slider>().value;
         GameObject.Find("Core").GetComponent<Core>().OnCrownWidth(value);

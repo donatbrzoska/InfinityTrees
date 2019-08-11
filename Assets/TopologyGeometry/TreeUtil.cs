@@ -125,30 +125,32 @@ public static class TreeUtil
 		//store first vertex once more for texturing
 		verticesResult.Add(firstVertex);
 
-	}
+    }
 
-	public static void CalculateCylinderTriangles(List<int> trianglesResult, int fromVerticesOffset, int toVerticesOffset, int resolution) {
-		//initialize a VertexPointer for both circles
-		//the VertexPointers indicate, where the next vertex is going to be read from
-		int fromVertexPointer = fromVerticesOffset;
-		int toVertexPointer = toVerticesOffset;
+    public static void CalculateCylinderTriangles(List<int> trianglesResult, int fromVerticesOffset, int toVerticesOffset, int resolution, bool tipNode) {
+        //initialize a VertexPointer for both circles
+        //the VertexPointers indicate, where the next vertex is going to be read from
+        int fromVertexPointer = fromVerticesOffset;
+        int toVertexPointer = toVerticesOffset;
 
-		//for every resolution, two triangles are made
-		for (int i = 0; i < resolution; i++)
-		{
-			//first triangle
-			trianglesResult.Add(fromVertexPointer); fromVertexPointer++;
-			trianglesResult.Add(toVertexPointer);
-			trianglesResult.Add(fromVertexPointer);
+        //for every resolution, two triangles are made
+        for (int i = 0; i < resolution; i++) {
+            //first triangle
+            trianglesResult.Add(fromVertexPointer); fromVertexPointer++;
+            trianglesResult.Add(toVertexPointer);
+            trianglesResult.Add(fromVertexPointer);
 
-			//second triangle
-			trianglesResult.Add(fromVertexPointer);
-			trianglesResult.Add(toVertexPointer); toVertexPointer++;
-			trianglesResult.Add(toVertexPointer);
-		}
-	}
+            //second triangle
+            trianglesResult.Add(fromVertexPointer);
+            trianglesResult.Add(toVertexPointer); toVertexPointer++;
+            if (tipNode) {
+                toVertexPointer--;
+            }
+            trianglesResult.Add(toVertexPointer);
+        }
+    }
 
-	public static Vector3[] CalculateNormals(Vector3[] vertices, int[] triangles) {
+    public static Vector3[] CalculateNormals(Vector3[] vertices, int[] triangles) {
         debug("Calculating normals for " + vertices.Length + " vertices and " + triangles.Length + " triangles");
         if (triangles.Length == 0) {
 			debug("No triangles ...");

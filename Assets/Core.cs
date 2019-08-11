@@ -95,7 +95,7 @@ public class Core : MonoBehaviour, GrowerListener {
         growthProperties.SetClearDistanceBegin_clearDistanceEnd_Ratio(0.5f);
         growthProperties.SetTropisms(new Vector3(0f, 1f, 0));
         growthProperties.SetTropismsWeights(new Vector3(1, 1f, 1));
-        growthProperties.UpTropismsDampRatio = 0.2f;
+        growthProperties.UpTropismsDampRatio = 0.5f;
         growthProperties.UpTropismsWhenDamped = 0.3f;
         growthProperties.SetHangingBranchesIntensity(0);
 
@@ -106,7 +106,7 @@ public class Core : MonoBehaviour, GrowerListener {
         growthProperties.StemLength = 2;
 
         growthProperties.SetGrowthDistance(0.25f);
-        growthProperties.SetLeavesPerNode(2);
+        growthProperties.SetLeavesPerNode(10);
         growthProperties.SetAttractionPoints(attractionPoints);
         growthProperties.SetIterations(30);
 
@@ -228,10 +228,12 @@ public class Core : MonoBehaviour, GrowerListener {
         geometryProperties.SetMaxTwigRadiusForLeaves(0.0071f);
         geometryProperties.SetLeafSize(Leaf.LeafType.Triangle, 0.4f);
         geometryProperties.SetLeafSize(Leaf.LeafType.ParticleSquare, 1f);
+        geometryProperties.SetLeafSize(Leaf.LeafType.ParticleCrossFoil, 1f);
         geometryProperties.SetDisplayedLeavesPerNode(Leaf.LeafType.Triangle, 2f);
         geometryProperties.SetDisplayedLeavesPerNode(Leaf.LeafType.ParticleSquare, 0.5f);
+        geometryProperties.SetDisplayedLeavesPerNode(Leaf.LeafType.ParticleCrossFoil, 0.5f);
         //geometryProperties.SetLeafSize(0.5f);
-        geometryProperties.SetLeafType(Leaf.LeafType.ParticleSquare);
+        geometryProperties.SetLeafType(Leaf.LeafType.ParticleCrossFoil);
         geometryProperties.SetLeavesEnabled(true);
 
         geometryProperties.StemColorStrings = new List<string> { "dark_brown", "brown", "light_brown", "grey_brown", "greyish" };
@@ -241,7 +243,7 @@ public class Core : MonoBehaviour, GrowerListener {
         geometryProperties.CurrentLeafColorStringsIndex = 3;
 
         geometryProperties.LeafTypeStrings = Leaf.LeafTypeStrings;
-        geometryProperties.CurrentLeafTypeStringsIndex = 0;
+        geometryProperties.CurrentLeafTypeStringsIndex = 1;
 
 
         tree = new Tree(geometryProperties);
@@ -282,6 +284,8 @@ public class Core : MonoBehaviour, GrowerListener {
         GameObject.Find("Leaf Type Dropdown").GetComponent<Dropdown>().RefreshShownValue();
 
         GameObject.Find("Leaves Enabled Toggle").GetComponent<Toggle>().SetIsOnWithoutNotify(tree.GetGeometryProperties().GetLeavesEnabled());
+        GameObject.Find("Foliage Density Slider").GetComponent<Slider>().SetValueWithoutNotify(tree.GetGeometryProperties().GetDisplayedLeavesPerNode());
+        GameObject.Find("Foliage Lobe Size Slider").GetComponent<Slider>().SetValueWithoutNotify(tree.GetGeometryProperties().GetLeafSize());
 
 
         // SPACE COLONIZATION PARAMETERS
@@ -319,6 +323,9 @@ public class Core : MonoBehaviour, GrowerListener {
         triangles = this.triangles;
 
         recalculateMesh = false;
+
+        GameObject.Find("Vertices Text").GetComponent<Text>().text = vertices.Length + " vertices";
+        GameObject.Find("Triangles Text").GetComponent<Text>().text = triangles.Length / 3 + " triangles";
     }
 
     //#######################################################################################
@@ -368,7 +375,7 @@ public class Core : MonoBehaviour, GrowerListener {
     }
 
     public float GetLookAtTop() {
-        return grower.GetGrowthProperties().GetAttractionPoints().GetHeight();
+        return grower.GetGrowthProperties().GetAttractionPoints().GetHighestPoint();
     }
 
     public float GetDistanceToAttractionPoints() {
@@ -406,16 +413,19 @@ public class Core : MonoBehaviour, GrowerListener {
 
     private void UpdateTropisms() {
         // the smaller growthProperties.UpTropismRemovalRatio, the later the condition hits
-        if (grower.GetGrowthProperties().GetAttractionPoints().GetRadius_y() < grower.GetGrowthProperties().UpTropismsDampRatio * (grower.GetGrowthProperties().GetAttractionPoints().GetRadius_x() + grower.GetGrowthProperties().GetAttractionPoints().GetRadius_z())) {
+        if (grower.GetGrowthProperties().GetAttractionPoints().GetHeight() < grower.GetGrowthProperties().UpTropismsDampRatio * (grower.GetGrowthProperties().GetAttractionPoints().GetWidth() + grower.GetGrowthProperties().GetAttractionPoints().GetDepth())) {
             //growthProperties.SetTropismsWeights(new Vector3(growthProperties.GetTropismsWeights().x, 0, growthProperties.GetTropismsWeights().z));
             grower.GetGrowthProperties().SetTropismsWeights(
                 new Vector3(1,
-                            (float) (grower.GetGrowthProperties().UpTropismsWhenDamped
-                                * grower.GetGrowthProperties().UpTropismsDampRatio * (grower.GetGrowthProperties().GetAttractionPoints().GetRadius_x() + grower.GetGrowthProperties().GetAttractionPoints().GetRadius_z() / grower.GetGrowthProperties().GetAttractionPoints().GetRadius_y())), //this is about 1 when the border is crossed, and decreases as the y radius gets smaller
+                            //(float) (grower.GetGrowthProperties().UpTropismsWhenDamped
+                            //    * grower.GetGrowthProperties().UpTropismsDampRatio * (grower.GetGrowthProperties().GetAttractionPoints().GetRadius_x() + grower.GetGrowthProperties().GetAttractionPoints().GetRadius_z() / grower.GetGrowthProperties().GetAttractionPoints().GetRadius_y())), //this is about 1 when the border is crossed, and decreases as the y radius gets smaller
+                            0,
                             1)
                 );
+            debug("damped tropisms");
         } else {
             grower.GetGrowthProperties().SetTropismsWeights(new Vector3(1, 1, 1));
+            debug("undamped tropisms");
         }
     }
     
@@ -467,6 +477,7 @@ public class Core : MonoBehaviour, GrowerListener {
         grower.Stop();
 
         grower.GetGrowthProperties().GetAttractionPoints().UpdateCutoffRatio_top(value);
+        UpdateTropisms();
         pointCloudReady = true;
 
         tree.Reset();
@@ -480,6 +491,7 @@ public class Core : MonoBehaviour, GrowerListener {
         grower.Stop();
 
         grower.GetGrowthProperties().GetAttractionPoints().UpdateCutoffRatio_bottom(value);
+        UpdateTropisms();
         pointCloudReady = true;
 
         tree.Reset();
@@ -622,6 +634,8 @@ public class Core : MonoBehaviour, GrowerListener {
         tree.GetGeometryProperties().UpdateLeafType(value);
 
         recalculateMesh = true;
+
+        InitializeUI();
     }
 
     public void OnStemColor(int value) {
@@ -638,6 +652,18 @@ public class Core : MonoBehaviour, GrowerListener {
 
     public void OnLeavesEnabled(bool enabled) {
         tree.GetGeometryProperties().SetLeavesEnabled(enabled);
+
+        recalculateMesh = true;
+    }
+
+    public void OnFoliageDensity(float value) {
+        tree.GetGeometryProperties().SetDisplayedLeavesPerNode(tree.GetGeometryProperties().GetLeafType(), value);
+
+        recalculateMesh = true;
+    }
+
+    public void OnFoliageLobeSize(float value) {
+        tree.GetGeometryProperties().SetLeafSize(tree.GetGeometryProperties().GetLeafType(), value);
 
         recalculateMesh = true;
     }

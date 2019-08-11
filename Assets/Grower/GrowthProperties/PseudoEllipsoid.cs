@@ -9,9 +9,29 @@ public sealed class PseudoEllipsoid : List<Vector3> {
         return center;
     }
 
-    float height;
+
+    float smallest_x;
+    float biggest_x;
+    public float GetWidth() {
+        //Debug.Log("width: " + (biggest_x - smallest_x));
+        return biggest_x - smallest_x;
+    }
+    float smallest_y;
+    float biggest_y;
     public float GetHeight() {
-        return height;
+        //Debug.Log("height: " + (biggest_y - smallest_y));
+        return biggest_y - smallest_y;
+        //return height;
+    }
+    public float GetHighestPoint() {
+        return biggest_y;
+    }
+
+    float smallest_z;
+    float biggest_z;
+    public float GetDepth() {
+        //Debug.Log("depth: " + (biggest_z - smallest_z));
+        return biggest_z - smallest_z;
     }
 
     private object backupLock = new object();
@@ -117,7 +137,13 @@ public sealed class PseudoEllipsoid : List<Vector3> {
 
             base.Clear();
             Backup = new List<Vector3>();//.Clear();
-            height = 0;
+            smallest_x = float.MaxValue;
+            biggest_x = float.MinValue;
+            smallest_y = float.MaxValue;
+            biggest_y = float.MinValue;
+            smallest_z = float.MaxValue;
+            biggest_z = float.MinValue;
+
             center = new Vector3(0, 0, 0);
             //Center = new Vector3(0, 0, 0);
 
@@ -164,26 +190,42 @@ public sealed class PseudoEllipsoid : List<Vector3> {
                     //float ran = Util.RandomInRange(0, 1);
                     //if (ran < distance*distance) {
 
-                        //if (distance <= radius && distance > 0.5f) { //near the envelope test
-                        //4.2 Scale the points with the transformation matrix
-                        point = transformation.MultiplyVector(point);
+                    //if (distance <= radius && distance > 0.5f) { //near the envelope test
+                    //4.2 Scale the points with the transformation matrix
+                    point = transformation.MultiplyVector(point);
 
-                        //4.3 Translate the points based on the real cutoff threshhold at the bottom (it is a different one than the one for the sphere with radius 1!)
-                        float real_cutoffThreshhold_bottom = 2f * radius_y * cutoffRatio_bottom;
-                        Vector3 targetCenter = new Vector3(Position.x, Position.y + radius_y - real_cutoffThreshhold_bottom, Position.z);// Vector3.up*radius + position;
-                                                                                                                                         //Vector3 targetCenter = new Vector3(0, radius_y - real_cutoffThreshhold_bottom, 0);// Vector3.up*radius + position;
+                    //4.3 Translate the points based on the real cutoff threshhold at the bottom (it is a different one than the one for the sphere with radius 1!)
+                    float real_cutoffThreshhold_bottom = 2f * radius_y * cutoffRatio_bottom;
+                    Vector3 targetCenter = new Vector3(Position.x, Position.y + radius_y - real_cutoffThreshhold_bottom, Position.z);// Vector3.up*radius + position;
+                                                                                                                                     //Vector3 targetCenter = new Vector3(0, radius_y - real_cutoffThreshhold_bottom, 0);// Vector3.up*radius + position;
 
-                        base.Add(point + targetCenter);
-                        Backup.Add(point + targetCenter);
+                    base.Add(point + targetCenter);
+                    Backup.Add(point + targetCenter);
 
-                        // for Core -> CameraMovement
-                        if (height < base[base.Count - 1].y) {
-                            height = base[base.Count - 1].y;
-                        }
-                        if (center.y < base[base.Count - 1].y / 2) {
-                            center.y = base[base.Count - 1].y / 2;
-                        }
+                    // for Core -> CameraMovement and UpTropismDamping
+                    if (smallest_x > base[base.Count - 1].x) {
+                        smallest_x = base[base.Count - 1].x;
                     }
+                    if (biggest_x < base[base.Count - 1].x) {
+                        biggest_x = base[base.Count - 1].x;
+                    }
+                    if (smallest_y > base[base.Count - 1].y) {
+                        smallest_y = base[base.Count - 1].y;
+                    }
+                    if (biggest_y < base[base.Count - 1].y) {
+                        biggest_y = base[base.Count - 1].y;
+                    }
+                    if (smallest_z > base[base.Count - 1].z) {
+                        smallest_z = base[base.Count - 1].z;
+                    }
+                    if (biggest_z < base[base.Count - 1].z) {
+                        biggest_z = base[base.Count - 1].z;
+                    }
+                    // for Core -> CameraMovement
+                    if (center.y < base[base.Count - 1].y / 2) {
+                        center.y = base[base.Count - 1].y / 2;
+                    }
+                }
                 //}
             }
         }

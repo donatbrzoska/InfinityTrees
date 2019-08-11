@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Tree {
 
-    private static bool debugEnabled = true;
+    private static bool debugEnabled = true ;
     private static void debug(string message, [CallerMemberName]string callerName = "") {
         if (debugEnabled) {
             UnityEngine.Debug.Log("DEBUG: Tree: " + callerName + "(): " + message);
@@ -157,10 +157,14 @@ public class Tree {
                 CalculateAndStoreCircleVertices(subnode, nodeVerticesPositions, verticesResult);
 
                 //calculate and store uvs
+                //bool tipNode = !subnode.HasSubnodes(); //close tips
+                //CalculateAndStoreCircleUVs(vOffset, uvsResult, tipNode);
                 CalculateAndStoreCircleUVs(vOffset, uvsResult);
                 vOffset += segmentLength; //TODO: this is a little inaccurate
 
                 //calculate triangles between the node's vertices and the subnode's vertices
+                ////bool tipNode = !subnode.HasSubnodes(); //close tips
+                //CalculateAndStoreCylinderTriangles(nodeVerticesPositions[node], nodeVerticesPositions[subnode], trianglesResult, tipNode);
                 CalculateAndStoreCylinderTriangles(nodeVerticesPositions[node], nodeVerticesPositions[subnode], trianglesResult);
 
             } else {
@@ -171,19 +175,27 @@ public class Tree {
                 Node node_ = node.GetGeometryCopyWithNormalAndRadius(subnode.GetDirection(), subnode.GetRadius());
                 //Node node_ = new Node(node.GetPosition(), subnode.GetDirection(), subnode.GetRadius(), geometryProperties);
                 CalculateAndStoreCircleVertices(node_, nodeVerticesPositions, verticesResult);
+
                 //calculate and store uvs
                 vOffset -= segmentLength; //TODO: this is a little inaccurate
                 CalculateAndStoreCircleUVs(vOffset, uvsResult);
                 vOffset += segmentLength; //TODO: this is a little inaccurate
 
+
+
                 //calculate and store vertices
                 CalculateAndStoreCircleVertices(subnode, nodeVerticesPositions, verticesResult);
+
                 //calculate and store uvs
+                //bool tipNode = !subnode.HasSubnodes(); //close tips
+                //CalculateAndStoreCircleUVs(vOffset, uvsResult, tipNode);
                 CalculateAndStoreCircleUVs(vOffset, uvsResult);
                 vOffset += segmentLength; //TODO: this is a little inaccurate
 
                 //calculate triangles between the node's vertices and the subnode's vertices
-                CalculateAndStoreCylinderTriangles(nodeVerticesPositions[node_], nodeVerticesPositions[subnode], trianglesResult);
+                ////bool tipNode = !subnode.HasSubnodes(); //close tips
+                //CalculateAndStoreCylinderTriangles(nodeVerticesPositions[node], nodeVerticesPositions[subnode], trianglesResult, tipNode);
+                CalculateAndStoreCylinderTriangles(nodeVerticesPositions[node], nodeVerticesPositions[subnode], trianglesResult);
             }
 
 
@@ -213,27 +225,48 @@ public class Tree {
         twigVertices += verticesResult.Count - nodeVerticesPostions[node];
     }
 
+    ////TODO: u in Abhängigkeit von Radius?
+    ////TODO: v kontinuierlich und abhängig von der growthDistance -> uPointer oder sowas, Distancen zu vorherigen Nodes benötigt...
+    //private void CalculateAndStoreCircleUVs(float v, List<Vector2> uvsResult) {
+    //    //float circle_segment_size = 0.5f / geometryProperties.GetCircleResolution();
+    //    //float circle_segment_size = 0.4f / geometryProperties.GetCircleResolution();
+
+    //    float u = 0.1f; //this way the color is picked from the mid of the stem texture and not from the leaf part
+    //    //float u = 0f;
+    //    for (int i = 0; i < geometryProperties.GetCircleResolution() + 1; i++) {
+    //        Vector2 uv = new Vector2(u, v);
+    //        uvsResult.Add(uv);
+
+    //        //u += circle_segment_size;
+    //    }
+    //}
+
     //TODO: u in Abhängigkeit von Radius?
     //TODO: v kontinuierlich und abhängig von der growthDistance -> uPointer oder sowas, Distancen zu vorherigen Nodes benötigt...
-    private void CalculateAndStoreCircleUVs(float v, List<Vector2> uvsResult) {
-        //float circle_segment_size = 0.5f / geometryProperties.GetCircleResolution();
-        //float circle_segment_size = 0.4f / geometryProperties.GetCircleResolution();
+    private void CalculateAndStoreCircleUVs(float v, List<Vector2> uvsResult, bool tipNode=false) {
+        if (tipNode) {
+            debug("adding one uv");
+            uvsResult.Add(new Vector2(v, 0.25f));
+        } else {
+            float circle_segment_size = 0.49f / geometryProperties.GetCircleResolution();
+            //float circle_segment_size = 0.4f / geometryProperties.GetCircleResolution();
 
-        float u = 0.1f; //this way the color is picked from the mid of the stem texture and not from the leaf part
-        //float u = 0f;
-        for (int i = 0; i < geometryProperties.GetCircleResolution() + 1; i++) {
-            Vector2 uv = new Vector2(u, v);
-            uvsResult.Add(uv);
+            //float u = 0.1f; //this way the color is picked from the mid of the stem texture and not from the leaf part
+            float u = 0.01f;
+            for (int i = 0; i < geometryProperties.GetCircleResolution() + 1; i++) {
+                Vector2 uv = new Vector2(u, v);
+                uvsResult.Add(uv);
 
-            //u += circle_segment_size;
+                u += circle_segment_size;
+            }
         }
     }
 
-    private void CalculateAndStoreCylinderTriangles(int from, int to, List<int> trianglesResult) {
+    private void CalculateAndStoreCylinderTriangles(int from, int to, List<int> trianglesResult, bool tipNode=false) {
         //statistics
         int triangles_ = trianglesResult.Count;
 
-        TreeUtil.CalculateCylinderTriangles(trianglesResult, from, to, geometryProperties.GetCircleResolution());
+        TreeUtil.CalculateCylinderTriangles(trianglesResult, from, to, geometryProperties.GetCircleResolution(), tipNode);
 
         //statistics
         twigTriangles += trianglesResult.Count - triangles_;

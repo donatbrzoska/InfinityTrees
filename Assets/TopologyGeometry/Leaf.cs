@@ -10,25 +10,29 @@ public class Leaf {
     public enum LeafType {
         Square,
         ParticleSquare,
+        ParticleCrossFoil,
         Triangle
     }
 
     public static Dictionary<Leaf.LeafType, string> LeafTypeToString = new Dictionary<Leaf.LeafType, string> {
         { Leaf.LeafType.ParticleSquare, "Particle"},
+        { Leaf.LeafType.ParticleCrossFoil, "Particle Cross Foil"},
         { Leaf.LeafType.Triangle, "Triangle" }
     };
 
     public static Dictionary<Leaf.LeafType, string> LeafTypeToFilename = new Dictionary<Leaf.LeafType, string> {
         { Leaf.LeafType.ParticleSquare, "particle"},
+        { Leaf.LeafType.ParticleCrossFoil, "particle"},
         { Leaf.LeafType.Triangle, "triangle" }
     };
 
     public static Dictionary<string, Leaf.LeafType> LeafTypeStringToLeafType = new Dictionary<string, Leaf.LeafType> {
         { "Particle", Leaf.LeafType.ParticleSquare },
+        { "Particle Cross Foil", Leaf.LeafType.ParticleCrossFoil },
         { "Triangle", Leaf.LeafType.Triangle }
     };
 
-    public static List<string> LeafTypeStrings = new List<string> { "Particle", "Triangle" };
+    public static List<string> LeafTypeStrings = new List<string> { "Particle", "Particle Cross Foil", "Triangle" };
 
 	Vector3 position;
     public void UpdatePosition(Vector3 diff) {
@@ -50,6 +54,8 @@ public class Leaf {
     }
 
     public void CalculateAndStoreGeometry(List<Vector3> verticesResult, List<Vector2> uvsResult, List<int> trianglesResult) {
+
+        //Vector3 swooshVector = new Vector3(0, 0.0000f, 0);
 
 		float size = geometryProperties.GetLeafSize();
 
@@ -146,6 +152,110 @@ public class Leaf {
             verticesOffset += 4; //TODO: ADJUST THIS WHEN ADDING VERTICES FOR LEAVES
 
             //bottom side of leaf
+            //triangle 1
+            trianglesResult.Add(verticesOffset + 0);
+            trianglesResult.Add(verticesOffset + 2);
+            trianglesResult.Add(verticesOffset + 1);
+            //triangle 2
+            trianglesResult.Add(verticesOffset + 0);
+            trianglesResult.Add(verticesOffset + 3);
+            trianglesResult.Add(verticesOffset + 2);
+
+        } else if (geometryProperties.GetLeafType() == LeafType.ParticleCrossFoil) {
+
+            //top side of leaf square 1
+            verticesResult.Add(rotation * new Vector3(-0.5f, 0, -0.5f) * size + position);
+            verticesResult.Add(rotation * new Vector3(-0.5f, 0, 0.5f) * size + position);
+            verticesResult.Add(rotation * new Vector3(0.5f, 0, 0.5f) * size + position);
+            verticesResult.Add(rotation * new Vector3(0.5f, 0, -0.5f) * size + position);
+
+            //bottom side of leaf square 1
+            verticesResult.Add(rotation * new Vector3(-0.5f, 0.0001f, -0.5f) * size + position);
+            verticesResult.Add(rotation * new Vector3(-0.5f, 0.0001f, 0.5f) * size + position);
+            verticesResult.Add(rotation * new Vector3(0.5f, 0.0001f, 0.5f) * size + position);
+            verticesResult.Add(rotation * new Vector3(0.5f, 0.0001f, -0.5f) * size + position);
+
+
+            //top side of leaf square 1
+            uvsResult.Add(new Vector2(0.5f, 0));
+            uvsResult.Add(new Vector2(0.5f, 1));
+            uvsResult.Add(new Vector2(1, 1));
+            uvsResult.Add(new Vector2(1, 0));
+
+            //bottom side of leaf square 1
+            uvsResult.Add(new Vector2(0.5f, 0));
+            uvsResult.Add(new Vector2(0.5f, 1));
+            uvsResult.Add(new Vector2(1, 1));
+            uvsResult.Add(new Vector2(1, 0));
+
+
+            //top side of leaf square 1
+            //triangle 1
+            trianglesResult.Add(verticesOffset + 0);
+            trianglesResult.Add(verticesOffset + 1);
+            trianglesResult.Add(verticesOffset + 2);
+            //triangle 2
+            trianglesResult.Add(verticesOffset + 0);
+            trianglesResult.Add(verticesOffset + 2);
+            trianglesResult.Add(verticesOffset + 3);
+
+            verticesOffset += 4; //TODO: ADJUST THIS WHEN ADDING VERTICES FOR LEAVES
+
+            //bottom side of leaf square 1
+            //triangle 1
+            trianglesResult.Add(verticesOffset + 0);
+            trianglesResult.Add(verticesOffset + 2);
+            trianglesResult.Add(verticesOffset + 1);
+            //triangle 2
+            trianglesResult.Add(verticesOffset + 0);
+            trianglesResult.Add(verticesOffset + 3);
+            trianglesResult.Add(verticesOffset + 2);
+
+
+
+            verticesOffset += 4;
+
+
+
+            //top side of leaf square 2
+            verticesResult.Add(rotation * new Vector3(-0.5f, 0, -0.5f) * size + position);
+            verticesResult.Add(rotation * new Vector3(0.0f, 0.707f, 0.0f) * size + position);
+            verticesResult.Add(rotation * new Vector3(0.5f, 0, 0.5f) * size + position);
+            verticesResult.Add(rotation * new Vector3(0.0f, -0.707f, 0.0f) * size + position);
+
+            //bottom side of leaf square 2
+            verticesResult.Add(rotation * new Vector3(-0.5f, 0.000001f, -0.5f) * size + position);
+            verticesResult.Add(rotation * new Vector3(0.0f, 0.707001f, 0.0f) * size + position);
+            verticesResult.Add(rotation * new Vector3(0.5f, 0.000001f, 0.5f) * size + position);
+            verticesResult.Add(rotation * new Vector3(0.0f, -0.707001f, 0.0f) * size + position);
+
+
+            //top side of leaf square 2
+            uvsResult.Add(new Vector2(0.5f, 0));
+            uvsResult.Add(new Vector2(0.5f, 1));
+            uvsResult.Add(new Vector2(1, 1));
+            uvsResult.Add(new Vector2(1, 0));
+
+            //bottom side of leaf square 2
+            uvsResult.Add(new Vector2(0.5f, 0));
+            uvsResult.Add(new Vector2(0.5f, 1));
+            uvsResult.Add(new Vector2(1, 1));
+            uvsResult.Add(new Vector2(1, 0));
+
+
+            //top side of leaf square 2
+            //triangle 1
+            trianglesResult.Add(verticesOffset + 0);
+            trianglesResult.Add(verticesOffset + 1);
+            trianglesResult.Add(verticesOffset + 2);
+            //triangle 2
+            trianglesResult.Add(verticesOffset + 0);
+            trianglesResult.Add(verticesOffset + 2);
+            trianglesResult.Add(verticesOffset + 3);
+
+            verticesOffset += 4; //TODO: ADJUST THIS WHEN ADDING VERTICES FOR LEAVES
+
+            //bottom side of leaf square 2
             //triangle 1
             trianglesResult.Add(verticesOffset + 0);
             trianglesResult.Add(verticesOffset + 2);

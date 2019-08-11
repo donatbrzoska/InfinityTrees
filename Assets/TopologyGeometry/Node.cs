@@ -279,14 +279,20 @@ public class Node : IEquatable<Node> {
     }
 
     public void GetCircleVertices(List<Vector3> verticesResult) {
-        lock (this) {
-            TreeUtil.CalculateAndStoreCircleVertices(verticesResult, position, normal, radius, geometryProperties.GetCircleResolution());
-        }
+        //if (!HasSubnodes()) {
+        //    verticesResult.Add(position);
+        //    debug("adding one vertex");
+        //} else {
+            lock (this) {
+                TreeUtil.CalculateAndStoreCircleVertices(verticesResult, position, normal, radius, geometryProperties.GetCircleResolution());
+            }
+        //}
     }
 
     public void CalculateAndStoreLeafData(List<Vector3> verticesResult, List<Vector2> uvsResult, List<int> trianglesResult) {
         if (geometryProperties.GetLeavesEnabled()
-            && radius < geometryProperties.GetMaxTwigRadiusForLeaves()
+            //&& radius < geometryProperties.GetMaxTwigRadiusForLeaves()
+            && !HasSubnodes()
             /*&& !this.HasSubnodes()*/) {
             int n_leaves = (int)geometryProperties.GetDisplayedLeavesPerNode();
             float floatingRest = geometryProperties.GetDisplayedLeavesPerNode() - n_leaves;

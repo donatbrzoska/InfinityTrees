@@ -150,7 +150,7 @@ public class GrowthProperties {
     //this is based on a sigmoid funcion and basically returns the lower bound of the looked at part of the sigmoid function within a given range
     private float GetSigmoidEndValue(float range) {
         //return 4 + (1 - clearDistanceBegin_clearDistanceEnd_Ratio) * range;
-        return 8 + (1 - clearDistanceBegin_clearDistanceEnd_Ratio) * range; // earlier version
+        return 4 + (1 - clearDistanceBegin_clearDistanceEnd_Ratio) * range; // earlier version
     }
 
 
@@ -249,8 +249,11 @@ public class GrowthProperties {
         return squaredClearDistance;
     }
 
+    //0..1
+    //the biger, the earlier up tropisms get damped
+    //when 0.5, tropisms get damped when the height is equal to (width+depth)/2
+    public float UpTropismsDampRatio { get; set; }
 
-    public float UpTropismsDampRatio { get; set; } //0..1
     public float UpTropismsWhenDamped { get; set; }
 
     public void SetTropisms(Vector3 tropisms, bool temporary=false) {
