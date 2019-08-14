@@ -64,7 +64,7 @@ public class Leaf {
 
         //Vector3 swooshVector = new Vector3(0, 0.0000f, 0);
 
-        float size = geometryProperties.GetLeafSize();
+        float size = geometryProperties.GetLeafSizeValue();
 
         int verticesOffset = verticesResult.Count;
 

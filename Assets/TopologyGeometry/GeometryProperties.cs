@@ -79,7 +79,7 @@ public class GeometryProperties {
     private Dictionary<Leaf.LeafType, float> leafSizes = new Dictionary<Leaf.LeafType, float>();
     private Leaf.LeafType leafType;
     private Dictionary<Leaf.LeafType, float> displayedLeavesPerNode = new Dictionary<Leaf.LeafType, float>();
-    private bool leavesEnabled;
+    //private bool leavesEnabled;
 
 
 
@@ -99,19 +99,23 @@ public class GeometryProperties {
     }
 
     public float GetLeafSize() {
+        return leafSizes[leafType];
+    }
+
+    public float GetLeafSizeValue() {
         float leafSizeStdDev = 0.2f * leafSizes[leafType];
         return Util.RandomWithStdDev(leafSizes[leafType], leafSizeStdDev);
     }
 
 
 
-    public void SetLeavesEnabled(bool leavesEnabled) {
-        this.leavesEnabled = leavesEnabled;
-    }
+    //public void SetLeavesEnabled(bool leavesEnabled) {
+    //    this.leavesEnabled = leavesEnabled;
+    //}
 
-    public bool GetLeavesEnabled() {
-        return leavesEnabled;
-    }
+    //public bool GetLeavesEnabled() {
+    //    return leavesEnabled;
+    //}
 
 
 

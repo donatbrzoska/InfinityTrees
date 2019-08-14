@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Tree {
 
-    private static bool debugEnabled = true ;
+    private static bool debugEnabled = false ;
     private static void debug(string message, [CallerMemberName]string callerName = "") {
         if (debugEnabled) {
             UnityEngine.Debug.Log("DEBUG: Tree: " + callerName + "(): " + message);

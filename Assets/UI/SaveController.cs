@@ -1,10 +1,8 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 using System.Threading;
 
-public class Save : MonoBehaviour {
+public class SaveController : MonoBehaviour {
 
     Thread displayDoneThread;
     bool displayDoneThreadRunning;
@@ -23,7 +21,7 @@ public class Save : MonoBehaviour {
         displayDone = true;
         displayDoneThread = new Thread(() => {
             int slept = 0;
-            while (slept < 600) {
+            while (slept < 700) {
                 if (displayDoneThreadRunning) {
                     Thread.Sleep(50);
                     slept += 50;

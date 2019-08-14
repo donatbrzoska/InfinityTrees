@@ -292,10 +292,9 @@ public class Node : IEquatable<Node> {
     }
 
     public void CalculateAndStoreLeafData(List<Vector3> verticesResult, List<Vector2> uvsResult, List<int> trianglesResult) {
-        if (geometryProperties.GetLeavesEnabled()
-            //&& radius < geometryProperties.GetMaxTwigRadiusForLeaves()
-            && !HasSubnodes()
-            /*&& !this.HasSubnodes()*/) {
+        //if (geometryProperties.GetLeavesEnabled()
+        if (radius < geometryProperties.GetMaxTwigRadiusForLeaves()
+        /*&& !HasSubnodes()*/) {
             int n_leaves = (int)geometryProperties.GetDisplayedLeavesPerNode();
             float floatingRest = geometryProperties.GetDisplayedLeavesPerNode() - n_leaves;
 
@@ -314,6 +313,7 @@ public class Node : IEquatable<Node> {
                 leaves[i].CalculateAndStoreGeometry(verticesResult, uvsResult, trianglesResult);
             }
         }
+        //}
     }
 
     public bool Equals(Node other) {

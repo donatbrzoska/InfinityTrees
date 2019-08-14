@@ -11,8 +11,6 @@ public class PointCloudRenderer : MonoBehaviour {
     int[] triangles;
     float triangleSize;
 
-    public bool Enabled { get; set; } = false;
-
     // Start is called before the first frame update
     void Start() {
         mesh = new Mesh();
@@ -62,7 +60,7 @@ public class PointCloudRenderer : MonoBehaviour {
         //and display it, if Enabled
         mesh.Clear();
 
-        if (Enabled) {
+        if (GameObject.Find("Core").GetComponent<Core>().PointCloudRenderingEnabled) {
             mesh.vertices = vertices;
             mesh.triangles = triangles;
             mesh.uv = uvs;

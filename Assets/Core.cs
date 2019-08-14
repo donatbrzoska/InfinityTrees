@@ -3,7 +3,6 @@ using System.Runtime.CompilerServices;
 using UnityEngine;
 using UnityEngine.UI;
 using System.IO;
-using System;
 
 public class Core : MonoBehaviour, GrowerListener {
     private static void debug(string message, [CallerMemberName]string callerName = "") {
@@ -235,7 +234,6 @@ public class Core : MonoBehaviour, GrowerListener {
         geometryProperties.SetDisplayedLeavesPerNode(Leaf.LeafType.ParticleCrossFoil, 0.5f);
         //geometryProperties.SetLeafSize(0.5f);
         geometryProperties.SetLeafType(Leaf.LeafType.ParticleCrossFoil);
-        geometryProperties.SetLeavesEnabled(true);
 
         geometryProperties.StemColorStrings = new List<string> { "dark_brown", "brown", "light_brown", "grey_brown", "greyish" };
         geometryProperties.CurrentStemColorStringsIndex = 0;
@@ -272,19 +270,18 @@ public class Core : MonoBehaviour, GrowerListener {
         //GameObject.Find("Grow Towards Light Slider").GetComponent<Slider>().SetValueWithoutNotify(growthProperties.UpTropismWeightRatio);
 
 
-        GameObject.Find("Stem Color Dropdown").GetComponent<StemColor>().Initialize(tree.GetGeometryProperties().StemColorStrings);
+        GameObject.Find("Stem Color Dropdown").GetComponent<BasicsController>().Initialize_StemColors(tree.GetGeometryProperties().StemColorStrings);
         GameObject.Find("Stem Color Dropdown").GetComponent<Dropdown>().SetValueWithoutNotify(tree.GetGeometryProperties().CurrentStemColorStringsIndex);
         GameObject.Find("Stem Color Dropdown").GetComponent<Dropdown>().RefreshShownValue();
 
-        GameObject.Find("Leaf Color Dropdown").GetComponent<LeafColor>().Initialize(tree.GetGeometryProperties().LeafColorStrings);
+        GameObject.Find("Leaf Color Dropdown").GetComponent<BasicsController>().Initialize_LeafColors(tree.GetGeometryProperties().LeafColorStrings);
         GameObject.Find("Leaf Color Dropdown").GetComponent<Dropdown>().SetValueWithoutNotify(tree.GetGeometryProperties().CurrentLeafColorStringsIndex);
         GameObject.Find("Leaf Color Dropdown").GetComponent<Dropdown>().RefreshShownValue();
 
-        GameObject.Find("Leaf Type Dropdown").GetComponent<LeafType>().Initialize(tree.GetGeometryProperties().LeafTypeStrings);
+        GameObject.Find("Leaf Type Dropdown").GetComponent<BasicsController>().Initialize_LeafTypes(tree.GetGeometryProperties().LeafTypeStrings);
         GameObject.Find("Leaf Type Dropdown").GetComponent<Dropdown>().SetValueWithoutNotify(tree.GetGeometryProperties().CurrentLeafTypeStringsIndex);
         GameObject.Find("Leaf Type Dropdown").GetComponent<Dropdown>().RefreshShownValue();
 
-        GameObject.Find("Leaves Enabled Toggle").GetComponent<Toggle>().SetIsOnWithoutNotify(tree.GetGeometryProperties().GetLeavesEnabled());
         GameObject.Find("Foliage Density Slider").GetComponent<Slider>().SetValueWithoutNotify(tree.GetGeometryProperties().GetDisplayedLeavesPerNode());
         GameObject.Find("Foliage Lobe Size Slider").GetComponent<Slider>().SetValueWithoutNotify(tree.GetGeometryProperties().GetLeafSize());
 
@@ -342,6 +339,16 @@ public class Core : MonoBehaviour, GrowerListener {
     //##########                           POINT CLOUD AGENT                       ##########
     //#######################################################################################
 
+    public bool PointCloudRenderingEnabled { get; private set; }
+
+    public void EnablePointCloudRenderer() {
+        PointCloudRenderingEnabled = true;
+    }
+
+    public void DisablePointCloudRenderer() {
+        PointCloudRenderingEnabled = false;
+    }
+
     bool pointCloudReady = true;
 
     // called by PointCloudRenderer
@@ -359,6 +366,16 @@ public class Core : MonoBehaviour, GrowerListener {
     //#######################################################################################
     //##########                          CAMERA MOVEMENT                          ##########
     //#######################################################################################
+
+    public bool CameraMovementEnabled { get; private set; }
+
+    public void DisableCameraMovement() {
+        CameraMovementEnabled = false;
+    }
+
+    public void EnableCameraMovement() {
+        CameraMovementEnabled = true;
+    }
 
     public enum CameraMode {
         Tree,
@@ -649,12 +666,6 @@ public class Core : MonoBehaviour, GrowerListener {
 
     public string GetTexture() {
         return Leaf.LeafTypeToFilename[tree.GetGeometryProperties().GetLeafType()] + "/" + tree.GetGeometryProperties().StemColorStrings[tree.GetGeometryProperties().CurrentStemColorStringsIndex] + "_" + tree.GetGeometryProperties().LeafColorStrings[tree.GetGeometryProperties().CurrentLeafColorStringsIndex];
-    }
-
-    public void OnLeavesEnabled(bool enabled) {
-        tree.GetGeometryProperties().SetLeavesEnabled(enabled);
-
-        recalculateMesh = true;
     }
 
     public void OnFoliageDensity(float value) {

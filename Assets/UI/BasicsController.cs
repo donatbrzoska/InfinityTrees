@@ -1,16 +1,74 @@
-﻿using System.Collections;
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class CrownShape : MonoBehaviour {
-    Middleware middleware;
+public class BasicsController : MonoBehaviour {
 
-    public CrownShape() {
-        middleware = new Middleware();
+    Dropdown dropdown; // a reference to the dropdown, if there is one in the parent GameObject
+
+    private void Start() {
+        dropdown = GetComponent<Dropdown>();
     }
 
+    // DROPDOWNS
+
+    public void Initialize_StemColors(List<string> stemColors) {
+        dropdown.options.Clear();
+        foreach (string c in stemColors) {
+            dropdown.options.Add(new Dropdown.OptionData(c));
+        }
+    }
+
+    public void OnValueChanged_StemColor() {
+        GameObject.Find("Core").GetComponent<Core>().OnStemColor(dropdown.value);
+    }
+
+
+    public void Initialize_LeafColors(List<string> leafColors) {
+        dropdown.options.Clear();
+        foreach (string c in leafColors) {
+            dropdown.options.Add(new Dropdown.OptionData(c));
+        }
+    }
+
+    public void OnValueChanged_LeafColor() {
+        GameObject.Find("Core").GetComponent<Core>().OnLeafColor(dropdown.value);
+    }
+
+    ////https://answers.unity.com/questions/1303416/how-to-add-color-to-dropdown-item-in-runtime.html
+    ////Color color = new Color(0.2f, 0, 0.4f);
+    //Color color = Color.yellow;
+
+    //Texture2D texture = new Texture2D(1, 1); // creating texture with 1 pixel
+    //texture.SetPixel(0, 0, color); // setting to this pixel some color
+    //texture.Apply(); //applying texture. necessarily
+
+    //Dropdown.OptionData item = new Dropdown.OptionData();
+    //item.image = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0, 0)); // creating dropdown item and converting texture to sprite
+    ////item.image = 
+    ////Dropdown.OptionData item = new Dropdown.OptionData("weird item"); // creating dropdown item and converting texture to sprite
+    //dropdown.options.Add(item); // adding this item to dropdown options
+
+
+    public void Initialize_LeafTypes(List<string> leafTypes) {
+        dropdown.options.Clear();
+        foreach (string t in leafTypes) {
+            dropdown.options.Add(new Dropdown.OptionData(t));
+        }
+    }
+
+    public void OnValueChanged_LeafType() {
+        GameObject.Find("Core").GetComponent<Core>().OnLeafType(dropdown.value);
+    }
+
+    // SLIDERS
+
+    public void OnValueChanged_Age() {
+        int value = (int)GetComponent<Slider>().value;
+        GameObject.Find("Core").GetComponent<Core>().OnAge(value);
+    }
 
     public void OnValueChanged_Thickness() {
         float value = GetComponent<Slider>().value;
@@ -42,41 +100,26 @@ public class CrownShape : MonoBehaviour {
     public void OnValueChanged_Width() {
         float value = GetComponent<Slider>().value;
         GameObject.Find("Core").GetComponent<Core>().OnCrownWidth(value);
-
-        //middleware.DisableCameraMovement();
-        //middleware.EnablePointCloudRenderer();
     }
 
     public void OnValueChanged_Height() {
         float value = GetComponent<Slider>().value;
         GameObject.Find("Core").GetComponent<Core>().OnCrownHeight(value);
-
-        //middleware.DisableCameraMovement();
-        //middleware.EnablePointCloudRenderer();
     }
 
     public void OnValueChanged_Depth() {
         float value = GetComponent<Slider>().value;
         GameObject.Find("Core").GetComponent<Core>().OnCrownDepth(value);
-
-        //middleware.DisableCameraMovement();
-        //middleware.EnablePointCloudRenderer();
     }
 
     public void OnValueChanged_TopCutoff() {
         float value = GetComponent<Slider>().value;
         GameObject.Find("Core").GetComponent<Core>().OnCrownTopCutoff(value);
-
-        //middleware.DisableCameraMovement();
-        //middleware.EnablePointCloudRenderer();
     }
 
     public void OnValueChanged_BottomCutoff() {
         float value = GetComponent<Slider>().value;
         GameObject.Find("Core").GetComponent<Core>().OnCrownBottomCutoff(value);
-
-        //middleware.DisableCameraMovement();
-        //middleware.EnablePointCloudRenderer();
     }
 
 
@@ -116,56 +159,69 @@ public class CrownShape : MonoBehaviour {
     public void OnValueChanged_Density() {
         float value = GetComponent<Slider>().value;
         GameObject.Find("Core").GetComponent<Core>().OnDensity(value);
-        //GameObject.Find("Density Text").GetComponent<Text>().text = "Density " + value;
-        //GameObject.Find("Density Text").GetComponent<Text>().resizeTextForBestFit = true;
     }
 
     public void OnValueChanged_ClearDistanceBegin() {
         float value = GetComponent<Slider>().value;
         GameObject.Find("Core").GetComponent<Core>().OnClearDistanceBegin(value);
-        //GameObject.Find("Clear Distance Begin Text").GetComponent<Text>().text = "Begin " + value;
-        //GameObject.Find("Clear Distance Begin Text").GetComponent<Text>().resizeTextForBestFit = true;
     }
 
     public void OnValueChanged_ClearDistanceEnd() {
         float value = GetComponent<Slider>().value;
         GameObject.Find("Core").GetComponent<Core>().OnClearDistanceEnd(value);
-        //GameObject.Find("Clear Distance End Text").GetComponent<Text>().text = "End " + value;
-        //GameObject.Find("Clear Distance End Text").GetComponent<Text>().resizeTextForBestFit = true;
     }
 
     public void OnValueChanged_InfluenceDistance() {
         float value = GetComponent<Slider>().value;
         GameObject.Find("Core").GetComponent<Core>().OnInfluenceDistance(value);
-        //GameObject.Find("Influence Distance Text").GetComponent<Text>().text = "Influence Distance " + value;
-        //GameObject.Find("Influence Distance Text").GetComponent<Text>().resizeTextForBestFit = true;
     }
 
     public void OnValueChanged_GrowthDistance() {
         float value = GetComponent<Slider>().value;
         GameObject.Find("Core").GetComponent<Core>().OnGrowthDistance(value);
-        //GameObject.Find("Growth Distance Text").GetComponent<Text>().text = "GrowthDistance " + value;
-        //GameObject.Find("Growth Distance Text").GetComponent<Text>().resizeTextForBestFit = true;
     }
 
     public void OnValueChanged_PerceptionAngle() {
         float value = GetComponent<Slider>().value;
         GameObject.Find("Core").GetComponent<Core>().OnPerceptionAngle(value);
-        //GameObject.Find("Perception Angle Text").GetComponent<Text>().text = "PerceptionAngle " + value;
-        //GameObject.Find("Perception Angle Text").GetComponent<Text>().resizeTextForBestFit = true;
+    }
+
+    // BUTTONS
+
+
+    public void OnClick_NewSeed() {
+        GameObject.Find("Core").GetComponent<Core>().OnNewSeed();
     }
 
 
+    public void OnClick_Quit() {
+        Application.Quit();
+    }
+
+
+    public void OnClick_ResetToDefaults() {
+        GameObject.Find("Core").GetComponent<Core>().OnResetToDefaults();
+    }
+
+    // SIDE EFFECTS
+
     void Update() {
+
         if (Input.GetMouseButtonDown(0) && GameObject.Find("EventSystem").GetComponent<EventSystem>().currentSelectedGameObject == gameObject) {
-            middleware.DisableCameraMovement();
-            middleware.EnablePointCloudRenderer();
+            GameObject.Find("Core").GetComponent<Core>().DisableCameraMovement();
+            GameObject.Find("Core").GetComponent<Core>().EnablePointCloudRenderer();
         }
 
         if (Input.GetMouseButtonUp(0)) {
-            middleware.EnableCameraMovement();
-            middleware.DisablePointCloudRenderer();
-            GameObject.Find("Core").GetComponent<Core>().OnCrownShapeDone();
+            GameObject.Find("Core").GetComponent<Core>().EnableCameraMovement();
+            GameObject.Find("Core").GetComponent<Core>().DisablePointCloudRenderer();
+            //GameObject.Find("Core").GetComponent<Core>().OnCrownShapeDone(); //set boolean flag for this
+        }
+
+
+
+        if (Input.GetKey("escape")) {
+            Application.Quit();
         }
     }
 }

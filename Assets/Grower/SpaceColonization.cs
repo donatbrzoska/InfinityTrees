@@ -47,11 +47,11 @@ public class SpaceColonization {
     //private object stopLock = new object();
     public void Stop() {
         //lock (stopLock) {
-            if (running) {
+            //if (running) {
                 running = false;
                 growerThread.Join();
             //growerThread = null;
-        }
+        //}
         //}
     }
 

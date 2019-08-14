@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class CameraMovement : MonoBehaviour {
+public class CameraMovementController : MonoBehaviour {
     public EventSystem eventSystem;
 
     float mouse_x;
@@ -13,8 +13,6 @@ public class CameraMovement : MonoBehaviour {
 
     float y_position;
     float speed = 0.1f;
-
-    public bool Enabled { get; set; } = true;
 
     // Start is called before the first frame update
     void Start() {
@@ -51,7 +49,7 @@ public class CameraMovement : MonoBehaviour {
 
 
 
-        if (Enabled) {
+        if (GameObject.Find("Core").GetComponent<Core>().CameraMovementEnabled) {
             // 1. determine mouse difference
             if (!eventSystem.IsPointerOverGameObject()) {
                 // detect mouse click
