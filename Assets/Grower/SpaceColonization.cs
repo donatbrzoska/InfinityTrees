@@ -6,7 +6,7 @@ using System.Threading;
 using UnityEngine;
 using System.Diagnostics;
 
-public class SpaceColonization : Grower {
+public class SpaceColonization {
 
     private static bool debugEnabled = false;
     private static void debug(string message, [CallerMemberName]string callerName = "") {
@@ -44,11 +44,15 @@ public class SpaceColonization : Grower {
     //interrupt thread nicely when growthProperties change
     private bool running;
 
+    //private object stopLock = new object();
     public void Stop() {
-        if (running) {
-            running = false;
-            growerThread.Join();
+        //lock (stopLock) {
+            if (running) {
+                running = false;
+                growerThread.Join();
+            //growerThread = null;
         }
+        //}
     }
 
 
@@ -57,23 +61,28 @@ public class SpaceColonization : Grower {
             nodeList = new List<Node> { tree.StemRoot };
         } else {
             nearestNodeAlgorithm = new NearestNodeAlgorithm();
-            nearestNodeAlgorithm.Add(tree.StemRoot);
+            //nearestNodeAlgorithm.Add(tree.StemRoot);
             //nearestNodeAlgorithm.Add(initialNode);
         }
 
+        //if (growerThread == null) {
+            growerThread = new Thread(() => {
+                running = true;
 
-        growerThread = new Thread(() => {
-            Stopwatch growingStopwatch = new Stopwatch();
-            growingStopwatch.Start();
+                Stopwatch growingStopwatch = new Stopwatch();
+                growingStopwatch.Start();
 
-            GrowStem(tree);
-            GrowCrown(tree);
+                GrowStem(tree);
+                GrowCrown(tree);
 
-            growingStopwatch.Stop();
-            debug(new FormatString("grew {0} times in {1}", growthProperties.GetIterations(), growingStopwatch.Elapsed));
-        });
-        growerThread.IsBackground = true;
-        growerThread.Start();
+                growingStopwatch.Stop();
+                debug(new FormatString("grew {0} times in {1}", growthProperties.GetIterations(), growingStopwatch.Elapsed));
+            });
+            growerThread.IsBackground = true;
+            growerThread.Start();
+        //} else {
+            //throw new Exception("attempted to loose reference to runnning thread");
+        //}
     }
 
     private AdvancedRandom stemRandom;
@@ -96,7 +105,7 @@ public class SpaceColonization : Grower {
             //have a look at the Add method again, if you want the move the attraction points towards the stem too
         }
 
-        growerListener.OnUpdate();
+        growerListener.OnIterationFinished();
     }
 
     private void GrowStem(Tree tree) {
@@ -104,13 +113,11 @@ public class SpaceColonization : Grower {
             tree.CrownRoot = tree.StemRoot;
             //tree.StemTip = tree.StemRoot;
         } else {
-            stemRandom = new AdvancedRandom(((PseudoEllipsoid)growthProperties.GetAttractionPoints()).Seed);
-
-            float angleRange = 5;
+            stemRandom = new AdvancedRandom(growthProperties.GetAttractionPoints().Seed);
 
             int iterations = (int)(growthProperties.StemLength / growthProperties.GetGrowthDistance());
             for (int i = 0; i < iterations; i++) {
-                float angle = stemRandom.RandomInRange(-angleRange, angleRange);
+                float angle = stemRandom.RandomInRange(-growthProperties.StemAngleRange, growthProperties.StemAngleRange);
                 Vector3 axis = stemRandom.RandomVector3();
                 axis.y = 0;
 
@@ -133,7 +140,7 @@ public class SpaceColonization : Grower {
 
             float rest = growthProperties.StemLength % growthProperties.GetGrowthDistance();
             if (!Util.AlmostEqual(rest, 0)) {
-                float angle = stemRandom.RandomInRange(-angleRange, angleRange);
+                float angle = stemRandom.RandomInRange(-growthProperties.StemAngleRange, growthProperties.StemAngleRange);
                 Vector3 axis = stemRandom.RandomVector3();
                 axis.y = 0;
 
@@ -157,12 +164,11 @@ public class SpaceColonization : Grower {
 
         nearestNodeAlgorithm.Add(tree.CrownRoot);
         //nodeList.Add(newNode);
-        ((PseudoEllipsoid)growthProperties.GetAttractionPoints()).UpdatePosition(tree.CrownRoot.GetPosition());
+        growthProperties.GetAttractionPoints().UpdatePosition(tree.CrownRoot.GetPosition());
     }
 
     private void GrowCrown(Tree tree) {
         treeHeight = 0;
-        running = true;
 
         Stopwatch findClosePointStopwatch = new Stopwatch();
         Stopwatch removeClosePointsStopwatch = new Stopwatch();
@@ -203,7 +209,8 @@ public class SpaceColonization : Grower {
                 }
 
                 if (!running) {
-                    break;
+                    return;
+                    //break;
                 }
             }
             findClosePointStopwatch.Stop();
@@ -284,7 +291,7 @@ public class SpaceColonization : Grower {
             RemoveClosePoints(newPositions, i);
             removeClosePointsStopwatch.Stop();
 
-            growerListener.OnUpdate();
+            growerListener.OnIterationFinished();
 
 
             //Prune(tree);
@@ -305,38 +312,38 @@ public class SpaceColonization : Grower {
         return false;
     }
 
-	private int maxConsecutiveNonBranchingNodes = 8;
+	//private int maxConsecutiveNonBranchingNodes = 8;
 
-	private void Prune(Tree tree)
-	{
-		PruneHelper(tree.CrownRoot, 0);
-	}
+	//private void Prune(Tree tree)
+	//{
+	//	PruneHelper(tree.CrownRoot, 0);
+	//}
 
-	private void PruneHelper(Node currentNode, int consecutiveNonBranchingNodes)
-	{
-		if (consecutiveNonBranchingNodes == maxConsecutiveNonBranchingNodes)
-		{
-			currentNode.Active = false;
-		}
-		else
-		{
+	//private void PruneHelper(Node currentNode, int consecutiveNonBranchingNodes)
+	//{
+	//	if (consecutiveNonBranchingNodes == maxConsecutiveNonBranchingNodes)
+	//	{
+	//		currentNode.Active = false;
+	//	}
+	//	else
+	//	{
 
-			if (currentNode.HasSubnodes())
-			{
-				if (currentNode.GetSubnodes().Count == 1)
-				{
-					PruneHelper(currentNode.GetSubnodes()[0], consecutiveNonBranchingNodes + 1);
-				}
-				else
-				{ //(currentNode.GetSubnodes().Count > 1)
-					foreach (Node sn in currentNode.GetSubnodes())
-					{
-						PruneHelper(sn, 0);
-					}
-				}
-			}
-		}
-	}
+	//		if (currentNode.HasSubnodes())
+	//		{
+	//			if (currentNode.GetSubnodes().Count == 1)
+	//			{
+	//				PruneHelper(currentNode.GetSubnodes()[0], consecutiveNonBranchingNodes + 1);
+	//			}
+	//			else
+	//			{ //(currentNode.GetSubnodes().Count > 1)
+	//				foreach (Node sn in currentNode.GetSubnodes())
+	//				{
+	//					PruneHelper(sn, 0);
+	//				}
+	//			}
+	//		}
+	//	}
+	//}
 
 
 	//private int minBranching = 2; //how often in perNodes the tree as to branch

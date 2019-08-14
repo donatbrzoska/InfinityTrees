@@ -114,7 +114,6 @@ public class Tree {
         List<int> trianglesTmp = new List<int>();// trianglesTmp.Capacity = 5000;
 
         CalculateEverything(StemRoot, nodeVerticesPositions, 0, verticesTmp, uvsTmp, trianglesTmp);
-        //CalculateEverything(CrownRoot, nodeVerticesPositions, 0, verticesTmp, uvsTmp, trianglesTmp);
 
 
         vertices = new Vector3[verticesTmp.Count];
@@ -194,8 +193,8 @@ public class Tree {
 
                 //calculate triangles between the node's vertices and the subnode's vertices
                 ////bool tipNode = !subnode.HasSubnodes(); //close tips
-                //CalculateAndStoreCylinderTriangles(nodeVerticesPositions[node], nodeVerticesPositions[subnode], trianglesResult, tipNode);
-                CalculateAndStoreCylinderTriangles(nodeVerticesPositions[node], nodeVerticesPositions[subnode], trianglesResult);
+                //CalculateAndStoreCylinderTriangles(nodeVerticesPositions[node_], nodeVerticesPositions[subnode], trianglesResult, tipNode);
+                CalculateAndStoreCylinderTriangles(nodeVerticesPositions[node_], nodeVerticesPositions[subnode], trianglesResult);
             }
 
 

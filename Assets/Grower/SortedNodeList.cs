@@ -35,7 +35,8 @@ public class SortedNodeList : List<Node> {
 
     public int GetNearestIndex(Node e) {
         if (base.Count == 0) {
-            throw new System.Exception("List is empty...");
+            //throw new System.Exception("List is empty...");
+            return -1;
         } else if (base.Count == 1) {
             return 0;
         } else {

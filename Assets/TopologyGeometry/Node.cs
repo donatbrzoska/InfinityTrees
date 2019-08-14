@@ -210,7 +210,8 @@ public class Node : IEquatable<Node> {
 
                 //normal = Vector3.up;
 
-                normal = Vector3.up * this.radius;
+                //normal = Vector3.up * this.radius;
+                normal = Vector3.zero;
                 foreach (Node subnode in subnodes) {
                     normal = normal + (subnode.GetPosition() - position) * subnode.GetRadius();
                 }
@@ -241,9 +242,10 @@ public class Node : IEquatable<Node> {
 
                 //normal = position - supernode.GetPosition();
 
-                normal = (position - supernode.GetPosition()) * this.radius;
+                //normal = (position - supernode.GetPosition()) * this.radius;
+                normal = Vector3.zero;
                 foreach (Node subnode in subnodes) {
-                    normal = normal + (subnode.GetPosition() - position) * subnode.GetRadius();
+                    normal = normal + (subnode.GetPosition() - position) * subnode.GetRadius() * subnode.GetRadius();
                 }
             }
         }

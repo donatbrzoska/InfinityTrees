@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class GrowthProperties {
     public float StemLength { get; set; }
+    public float StemAngleRange { get; set; }
 
     private float influenceDistance; //FREE
     private float squaredInfluenceDistance; //FREE

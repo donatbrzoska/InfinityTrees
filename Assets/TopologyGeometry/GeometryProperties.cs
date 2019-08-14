@@ -59,8 +59,9 @@ public class GeometryProperties {
         return circleResolution;
     }
 
-
-	private float minRadiusRatioForNormalConnection;
+    //subnode radius has to be at least x*node.GetRadius() for a usual connection
+    //the bigger the value, the less usual connections will be made
+    private float minRadiusRatioForNormalConnection;
 
 	public void SetMinRadiusRatioForNormalConnection(float minRadiusRatioForNormalConnection) {
         this.minRadiusRatioForNormalConnection = minRadiusRatioForNormalConnection;

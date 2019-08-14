@@ -39,6 +39,11 @@ public class Leaf {
         position = position + diff;
     }
 
+    //float size;
+    //public void UpdateSize() {
+    //    size = geometryProperties.GetLeafSize();
+    //}
+
     GeometryProperties geometryProperties;
 
     Quaternion rotation;
@@ -51,15 +56,17 @@ public class Leaf {
         float rotationAngle = Util.RandomInRange(0, 360);
         Vector3 rotationAxis = Util.RandomVector3();
         rotation = Quaternion.AngleAxis(rotationAngle, rotationAxis);
+
+        //size = geometryProperties.GetLeafSize();
     }
 
     public void CalculateAndStoreGeometry(List<Vector3> verticesResult, List<Vector2> uvsResult, List<int> trianglesResult) {
 
         //Vector3 swooshVector = new Vector3(0, 0.0000f, 0);
 
-		float size = geometryProperties.GetLeafSize();
+        float size = geometryProperties.GetLeafSize();
 
-		int verticesOffset = verticesResult.Count;
+        int verticesOffset = verticesResult.Count;
 
         if (geometryProperties.GetLeafType() == LeafType.Square) {
 

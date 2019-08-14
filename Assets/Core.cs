@@ -12,7 +12,7 @@ public class Core : MonoBehaviour, GrowerListener {
         }
     }
 
-    Grower grower;
+    SpaceColonization grower;
     Tree tree;
 
     // Start is called before the first frame update
@@ -104,6 +104,7 @@ public class Core : MonoBehaviour, GrowerListener {
         growthProperties.UpTropismWeightRatio = 0.2f;
 
         growthProperties.StemLength = 2;
+        growthProperties.StemAngleRange = 5;
 
         growthProperties.SetGrowthDistance(0.25f);
         growthProperties.SetLeavesPerNode(10);
@@ -332,7 +333,7 @@ public class Core : MonoBehaviour, GrowerListener {
     //##########                           GROWER LISTENER                         ##########
     //#######################################################################################
 
-    public void OnUpdate() {
+    public void OnIterationFinished() {
         recalculateMesh = true;
     }
 
