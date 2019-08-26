@@ -263,11 +263,13 @@ public class SpaceColonization {
                     closest = voxelGridAlgorithm.GetNearestWithinSquaredDistance(attractionPoint, growthProperties.GetSquaredInfluenceDistance(), growthProperties.GetPerceptionAngle());
 
                     // Rudis ultimate plan to make the removal in the next iteration
-                    if (closest != null) {
-                        if (SquaredDistance(attractionPoint, closest.GetPosition()) < growthProperties.GetSquaredClearDistance(i)) {
-                            j--;
-                            growthProperties.GetAttractionPoints().Remove(attractionPoint);
-                            continue;
+                    if (i > 0) {
+                        if (closest != null) {
+                            if (SquaredDistance(attractionPoint, closest.GetPosition()) < growthProperties.GetSquaredClearDistance(i)) {
+                                j--;
+                                growthProperties.GetAttractionPoints().Remove(attractionPoint);
+                                continue;
+                            }
                         }
                     }
                     //closest = voxelGridAlgorithm.GetNearestWithinSquaredDistance(j, growthProperties.GetSquaredInfluenceDistance(), growthProperties.GetPerceptionAngle());

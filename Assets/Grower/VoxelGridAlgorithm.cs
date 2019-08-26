@@ -41,11 +41,11 @@ public class VoxelGridAlgorithm {
 
 
         //x direction
-        n_is = (int)Math.Ceiling(attractionPoints.GetWidth() / voxelSize);
+        n_is = (int)Math.Ceiling(attractionPoints.GetWidth() / voxelSize) + 2;
         //y direction
         n_js = (int)Math.Ceiling(attractionPoints.GetHeight() / voxelSize) + 1;
         //z direction
-        n_ks = (int)Math.Ceiling(attractionPoints.GetDepth() / voxelSize);
+        n_ks = (int)Math.Ceiling(attractionPoints.GetDepth() / voxelSize) + 2;
 
         voxelGrid = new List<Node>[n_is, n_js, n_ks];
         debug("Cloud width: " + attractionPoints.GetWidth());
@@ -119,9 +119,9 @@ public class VoxelGridAlgorithm {
     }
 
     private Vector3Int PositionToGridPosition(Vector3 pos/*, float gridWidth, float gridDepth, float gridHeight*/) {
-        int i = (int)((attractionPoints.GetWidth() / 2 + pos.x) / voxelSize);
+        int i = 1 + (int)((attractionPoints.GetWidth() / 2 + pos.x) / voxelSize);
         int j = (int)(pos.y / voxelSize);
-        int k = (int)((attractionPoints.GetDepth() / 2 + pos.z) / voxelSize);
+        int k = 1 + (int)((attractionPoints.GetDepth() / 2 + pos.z) / voxelSize);
 
         return new Vector3Int(i, j, k);
     }
