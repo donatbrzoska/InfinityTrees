@@ -96,8 +96,8 @@ public class Core : MonoBehaviour, GrowerListener {
         //LoadBushGeometry();
 
 
-        //LoadBigGrowth();
-        //LoadDefaultGeometry();
+        LoadBigGrowth();
+        LoadDefaultGeometry();
 
 
         grower.Grow(tree);

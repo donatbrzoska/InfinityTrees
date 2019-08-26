@@ -26,7 +26,7 @@ public class VoxelGridAlgorithm {
     PseudoEllipsoid attractionPoints;
     float voxelSize;
 
-    Dictionary<Vector3, Vector3Int> attractionPoints_to_voxelCoordinates;
+    //Dictionary<Vector3, Vector3Int> attractionPoints_to_voxelCoordinates;
 
     public VoxelGridAlgorithm(PseudoEllipsoid attractionPoints, float voxelSize) {
         this.attractionPoints = attractionPoints;
@@ -64,15 +64,17 @@ public class VoxelGridAlgorithm {
 
     public void Add(Node node) {
         Vector3Int gridPos = PositionToGridPosition(node.GetPosition());
-        debug("acessing: " + gridPos);
+        //debug("acessing: " + gridPos);
         voxelGrid[gridPos.x, gridPos.y, gridPos.z].Add(node);
     }
 
 
     public Node GetNearestWithinSquaredDistance(Vector3 position, float maxSquaredDistance, float nodePerceptionAngle) {
         Vector3Int gridPosition = PositionToGridPosition(position);
-        //Vector3Int gridPosition = attractionPoints_to_voxelCoordinates[position];
         List<Node> candidates = NodesAroundVoxel(gridPosition);
+        //if (candidates.Count > 0) {
+        //    debug("n candidates: " + candidates.Count);
+        //}
 
         Node closest = null;
         float closestDistance = float.MaxValue;
@@ -90,6 +92,25 @@ public class VoxelGridAlgorithm {
 
         return closest;
     }
+
+    //public void RemoveClosePoints(List<Vector3> newPositions, float squaredClearDistance) {
+    //    foreach (Vector3 newPosition in newPositions) {
+    //        List<Vector3> closePoints;
+
+    //        //PositionToGridPosition
+
+    //        //debug("squared cleardistance is " + growthProperties.GetSquaredClearDistance(iteration));
+    //        closePoints = DetermineAttractionPointsWithinQuadraticDistance(newPosition, growthProperties.GetSquaredClearDistance(iteration));
+    //        //closePoints = DetermineAttractionPointsWithinQuadraticDistance(newPosition, growthProperties.GetSquaredClearDistance()); //near the envelope test
+    //        //debug("removing " + closePoints.Count + " close points");
+    //        foreach (Vector3 closePoint in closePoints) {
+    //            growthProperties.GetAttractionPoints().Remove(closePoint);
+    //            //if (voxelGridAlgorithm != null) {
+    //            //    voxelGridAlgorithm.RemoveAttractionPoint(closePoint);
+    //            //}
+    //        }
+    //    }
+    //}
 
     private bool AttractionPointInPerceptionAngle(Node node, Vector3 attractionPoint, float nodePerceptionAngle) {
         float angle = Vector3.Angle(node.GetDirection(), attractionPoint - node.GetPosition());
@@ -126,4 +147,26 @@ public class VoxelGridAlgorithm {
 
         return result;
     }
+
+    //private List<Vector3> PositionsAroundVoxel(Vector3Int voxel) {
+    //    List<Vector3> result = new List<Vector3>();
+
+    //    for (int i = -1; i <= 1; i++) {
+    //        for (int j = -1; j <= 1; j++) {
+    //            for (int k = -1; k <= 1; k++) {
+    //                Vector3Int pos = voxel + new Vector3Int(i, j, k);
+    //                if (pos.x > -1 && pos.x < n_is
+    //                    && pos.y > -1 && pos.y < n_js
+    //                    && pos.z > -1 && pos.z < n_ks) {
+
+    //                    foreach (Node n in voxelGrid[pos.x, pos.y, pos.z]) {
+    //                        result.Add(n);
+    //                    }
+    //                }
+    //            }
+    //        }
+    //    }
+
+    //    return result;
+    //}
 }

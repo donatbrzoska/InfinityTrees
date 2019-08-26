@@ -21,11 +21,18 @@ public class SpaceColonization {
         }
     }
 
-    bool standard_algorithm = false;
+    enum DistanceCalculationAlgorithm {
+        Standard,
+        BinarySearch,
+        VoxelGrid
+    }
 
-    bool binarySearch_algorithm = false;
+    DistanceCalculationAlgorithm distanceCalculationAlgorithm = DistanceCalculationAlgorithm.VoxelGrid;
+    //bool standard_algorithm = false;
 
-    bool voxelGrid_algorithm = true;
+    //bool binarySearch_algorithm = false;
+
+    //bool voxelGrid_algorithm = true;
 
     List<Node> nodeList;
     BinarySearchAlgorithm binarySearchAlgorithm;
@@ -61,9 +68,9 @@ public class SpaceColonization {
     }
 
     private void InsertToAlgorithm(Node node) {
-        if (standard_algorithm) {
+        if (distanceCalculationAlgorithm == DistanceCalculationAlgorithm.Standard) {
             nodeList.Add(node);
-        } else if (binarySearch_algorithm) {
+        } else if (distanceCalculationAlgorithm == DistanceCalculationAlgorithm.BinarySearch) {
             binarySearchAlgorithm.Add(node);
         } else {
             voxelGridAlgorithm.Add(node);
@@ -71,9 +78,9 @@ public class SpaceColonization {
     }
 
     public void Grow(Tree tree) {
-        if (standard_algorithm) {
+        if (distanceCalculationAlgorithm == DistanceCalculationAlgorithm.Standard) {
             nodeList = new List<Node>();// { tree.StemRoot };
-        } else if (binarySearch_algorithm) {
+        } else if (distanceCalculationAlgorithm == DistanceCalculationAlgorithm.BinarySearch) {
             binarySearchAlgorithm = new BinarySearchAlgorithm();
             //binarySearchAlgorithm.Add(tree.StemRoot);
             //binarySearchAlgorithm.Add(initialNode);
@@ -219,6 +226,10 @@ public class SpaceColonization {
         }
     }
 
+    private float SquaredDistance(Vector3 a, Vector3 b) {
+        Vector3 d = a - b;
+        return d.x * d.x + d.y * d.y + d.z * d.z;
+    }
 
     private void GrowCrown(Tree tree) {
         treeHeight = 0;
@@ -243,13 +254,23 @@ public class SpaceColonization {
                 Vector3 attractionPoint = growthProperties.GetAttractionPoints()[j];
 
                 //and find the closest Node respectively
-                Node closest;
-                if (standard_algorithm) {
+                Node closest;// = FindClosestNode(attractionPoint);
+                if (distanceCalculationAlgorithm == DistanceCalculationAlgorithm.Standard) {
                     closest = FindClosestNode(attractionPoint);
-                } else if (binarySearch_algorithm) {
+                } else if (distanceCalculationAlgorithm == DistanceCalculationAlgorithm.BinarySearch) {
                     closest = binarySearchAlgorithm.GetNearestWithinSquaredDistance(attractionPoint, growthProperties.GetSquaredInfluenceDistance(), growthProperties.GetPerceptionAngle());
                 } else {
                     closest = voxelGridAlgorithm.GetNearestWithinSquaredDistance(attractionPoint, growthProperties.GetSquaredInfluenceDistance(), growthProperties.GetPerceptionAngle());
+
+                    // Rudis ultimate plan to make the removal in the next iteration
+                    if (closest != null) {
+                        if (SquaredDistance(attractionPoint, closest.GetPosition()) < growthProperties.GetSquaredClearDistance(i)) {
+                            j--;
+                            growthProperties.GetAttractionPoints().Remove(attractionPoint);
+                            continue;
+                        }
+                    }
+                    //closest = voxelGridAlgorithm.GetNearestWithinSquaredDistance(j, growthProperties.GetSquaredInfluenceDistance(), growthProperties.GetPerceptionAngle());
                 }
 
 
@@ -340,7 +361,7 @@ public class SpaceColonization {
             }
 
             removeClosePointsStopwatch.Start();
-            RemoveClosePoints(newPositions, i);
+            //RemoveClosePoints(newPositions, i);
             removeClosePointsStopwatch.Stop();
 
             growerListener.OnIterationFinished();
@@ -490,6 +511,9 @@ public class SpaceColonization {
             //debug("removing " + closePoints.Count + " close points");
             foreach (Vector3 closePoint in closePoints) {
                 growthProperties.GetAttractionPoints().Remove(closePoint);
+                //if (voxelGridAlgorithm != null) {
+                //    voxelGridAlgorithm.RemoveAttractionPoint(closePoint);
+                //}
             }
         }
     }
