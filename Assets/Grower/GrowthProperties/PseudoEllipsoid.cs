@@ -10,13 +10,13 @@ public sealed class PseudoEllipsoid : List<Vector3> {
     }
 
 
-    float smallest_x;
+    public float smallest_x { get; private set; }
     float biggest_x;
     public float GetWidth() {
         //Debug.Log("width: " + (biggest_x - smallest_x));
         return biggest_x - smallest_x;
     }
-    float smallest_y;
+    public float smallest_y { get; private set; }
     float biggest_y;
     public float GetHeight() {
         //Debug.Log("height: " + (biggest_y - smallest_y));
@@ -27,7 +27,7 @@ public sealed class PseudoEllipsoid : List<Vector3> {
         return biggest_y;
     }
 
-    float smallest_z;
+    public float smallest_z { get; private set; }
     float biggest_z;
     public float GetDepth() {
         //Debug.Log("depth: " + (biggest_z - smallest_z));
@@ -147,7 +147,7 @@ public sealed class PseudoEllipsoid : List<Vector3> {
             center = new Vector3(0, 0, 0);
             //Center = new Vector3(0, 0, 0);
 
-            //1. Calculate volume of sphere cut with radius 1
+            //1. Calculate volume of sphere layer with radius 1
             float radius = 1f;
 
             float cutoffThreshhold_top = 2f * radius * cutoffRatio_top;

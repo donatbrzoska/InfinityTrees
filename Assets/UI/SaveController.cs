@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using System.Threading;
+using UnityEngine.EventSystems;
 
 public class SaveController : MonoBehaviour {
 
@@ -9,8 +10,6 @@ public class SaveController : MonoBehaviour {
     bool displayDone;
 
     public void OnClick() {
-        //Debug.Log("UI: Button: Save");
-
         GameObject.Find("Core").GetComponent<Core>().OnSave();
 
         if (displayDoneThread != null){
@@ -40,6 +39,16 @@ public class SaveController : MonoBehaviour {
             GetComponentInChildren<Text>().text = "Done :)";
         } else {
             GetComponentInChildren<Text>().text = "Save";
+        }
+
+        if (Input.GetMouseButtonDown(0) && GameObject.Find("EventSystem").GetComponent<EventSystem>().currentSelectedGameObject == gameObject) {
+            GameObject.Find("Core").GetComponent<Core>().DisableCameraMovement();
+            GameObject.Find("Core").GetComponent<Core>().EnablePointCloudRenderer();
+        }
+
+        if (Input.GetMouseButtonUp(0)) {
+            GameObject.Find("Core").GetComponent<Core>().EnableCameraMovement();
+            GameObject.Find("Core").GetComponent<Core>().DisablePointCloudRenderer();
         }
     }
 

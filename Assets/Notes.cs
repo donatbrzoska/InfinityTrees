@@ -15,15 +15,15 @@
 
 /* CODE
  *
- * UI Schicht soll sich default-Werte aus Core pollen
- * 
- * CrownShape Script aufteilen, dann werden auch nicht immer die AttractionPoints angezeigt
- * CrownShape -> SliderScript
- * 
- * Middleware in Core verschieben
- * AttractionPoints aus GrowthProperties nehmen?
+ * Tree und SpaceColonization entkoppeln, SpaceColonization soll selbst CrownRoot speichern
  * 
  * Festen AttractionPoints Seed rausnehmen
+ *
+ * 
+ * UI Schicht soll sich default-Werte aus Core pollen
+ * 
+ * AttractionPoints aus GrowthProperties nehmen?
+ * 
  * Getter und Setter konsistenter machen
  * 
  * Seed für Stamm, auch erneuerbar

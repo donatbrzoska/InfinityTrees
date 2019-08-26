@@ -227,9 +227,6 @@ public class Node : IEquatable<Node> {
                 //normal = thisToSub.normalized + superToThis.normalized;
                 normal = thisToSub + superToThis;
             } else { //many subnodes
-                // #####
-                // TODO: SOMETHING IS WRONG HERE MAKING THE NORMALS FLIP OVER SOMETIMES
-                // #####
 
                 //normal = supernode.GetNormal();
 
@@ -263,7 +260,7 @@ public class Node : IEquatable<Node> {
 		}
 	}
 
-	public void RecalculateRadius() {
+	private void RecalculateRadius() {
         float summedPottedSubnodeRadii = 0;
         foreach (Node subnode in subnodes) {
             summedPottedSubnodeRadii += (float) Math.Pow(subnode.GetRadius(), geometryProperties.GetNthRoot());
@@ -293,8 +290,8 @@ public class Node : IEquatable<Node> {
 
     public void CalculateAndStoreLeafData(List<Vector3> verticesResult, List<Vector2> uvsResult, List<int> trianglesResult) {
         //if (geometryProperties.GetLeavesEnabled()
-        if (radius < geometryProperties.GetMaxTwigRadiusForLeaves()
-        /*&& !HasSubnodes()*/) {
+        if (radius < geometryProperties.GetMaxTwigRadiusForLeaves()) {
+            //if (!HasSubnodes()) {
             int n_leaves = (int)geometryProperties.GetDisplayedLeavesPerNode();
             float floatingRest = geometryProperties.GetDisplayedLeavesPerNode() - n_leaves;
 

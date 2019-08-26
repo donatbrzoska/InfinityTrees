@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class GrowthProperties {
     public float StemLength { get; set; }
+    public float CrownStemLengthRatio { get; set; } //how much of the crown is filled with an initial stem?
     public float StemAngleRange { get; set; }
 
     private float influenceDistance; //FREE
@@ -17,7 +18,7 @@ public class GrowthProperties {
     private float clearDistance_end; //DEPENDS
     private float squaredClearDistance_end; //DEPENDS
 
-    private Vector3 tropismsBackup;
+    //private Vector3 tropismsBackup;
     private Vector3 tropisms;
     private Vector3 tropismsWeights;
     //private bool hangingBranchesEnabled;
@@ -208,7 +209,7 @@ public class GrowthProperties {
 
     private float MapIteration(int iteration, float begin, float end) {
         float d = end - begin;
-        float step = d / iterations;
+        float step = d / (iterations-1);
 
         return begin + step * iteration;
     }
@@ -257,11 +258,11 @@ public class GrowthProperties {
 
     public float UpTropismsWhenDamped { get; set; }
 
-    public void SetTropisms(Vector3 tropisms, bool temporary=false) {
+    public void SetTropisms(Vector3 tropisms/*, bool temporary=false*/) {
         this.tropisms = tropisms.normalized;
-        if (!temporary) {
-            this.tropismsBackup = new Vector3(tropisms.x, tropisms.y, tropisms.z);
-        }
+        //if (!temporary) {
+        //    this.tropismsBackup = new Vector3(tropisms.x, tropisms.y, tropisms.z);
+        //}
     }
 
     public Vector3 GetTropisms(int iteration) {
@@ -365,9 +366,9 @@ public class GrowthProperties {
 
 
 
-    public void ResetTropisms() {
-        this.tropisms.x = tropismsBackup.x;
-        this.tropisms.y = tropismsBackup.y;
-        this.tropisms.z = tropismsBackup.z;
-    }
+    //public void ResetTropisms() {
+    //    this.tropisms.x = tropismsBackup.x;
+    //    this.tropisms.y = tropismsBackup.y;
+    //    this.tropisms.z = tropismsBackup.z;
+    //}
 }

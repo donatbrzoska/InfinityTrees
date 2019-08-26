@@ -16,7 +16,13 @@ class LeafSize:
         self.suffix = suffix
 
 tiny = LeafSize(n_circles = 400, min_radius = 0.005, max_radius = 0.015, max_diff_ratio_between = 0.3, min_distance_to_others = 0.0018, suffix = "tiny")
-small = LeafSize(n_circles = 150,
+small = LeafSize(n_circles = 250,
+                 min_radius = 0.002,
+                 max_radius = 0.04,
+                 max_diff_ratio_between = 0.3,
+                 min_distance_to_others = 0.03,
+                 suffix = "small")
+small_ = LeafSize(n_circles = 150,
                  min_radius = 0.002,
                  max_radius = 0.04,
                  max_diff_ratio_between = 0.3,
@@ -197,7 +203,7 @@ def generate_for_parameters(texture_type_list,
                                 leaf_color_name_list[k],
                                 leaf_size_list[0])
                 n_done += 1
-                print("\r"+str(int(100 * n_done / n_textures)) + "%", end='', flush=True)
+                print("\rGenerating Textures "+str(int(100 * n_done / n_textures)) + "%", end='', flush=True)
 
 stem_color_list = [(10, 31, 50), (52, 84, 122), (88, 165, 220), (92, 111, 122), (235, 241, 237)]
 stem_color_name_list = ["dark_brown", "brown", "light_brown", "grey_brown", "greyish"]

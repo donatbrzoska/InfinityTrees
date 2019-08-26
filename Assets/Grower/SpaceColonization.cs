@@ -8,7 +8,7 @@ using System.Diagnostics;
 
 public class SpaceColonization {
 
-    private static bool debugEnabled = false;
+    private static bool debugEnabled = true;
     private static void debug(string message, [CallerMemberName]string callerName = "") {
         if (debugEnabled) {
             UnityEngine.Debug.Log("DEBUG: SpaceColonization: " + callerName + "(): " + message);
@@ -73,6 +73,7 @@ public class SpaceColonization {
                 growingStopwatch.Start();
 
                 GrowStem(tree);
+                GrowCrownStem(tree);
                 GrowCrown(tree);
 
                 growingStopwatch.Stop();
@@ -167,8 +168,46 @@ public class SpaceColonization {
         growthProperties.GetAttractionPoints().UpdatePosition(tree.CrownRoot.GetPosition());
     }
 
+
+
+    private void GrowCrownStem(Tree tree) {
+        if (!Util.AlmostEqual(growthProperties.CrownStemLengthRatio, 0)) {
+            Node crownStemTip = tree.CrownRoot;
+
+            stemRandom = new AdvancedRandom(growthProperties.GetAttractionPoints().Seed);
+
+            int iterations = (int)(growthProperties.CrownStemLengthRatio * growthProperties.GetAttractionPoints().GetHeight() / growthProperties.GetGrowthDistance());
+            for (int i = 0; i < iterations; i++) {
+                float angle = stemRandom.RandomInRange(-growthProperties.StemAngleRange, growthProperties.StemAngleRange);
+                Vector3 axis = stemRandom.RandomVector3();
+                axis.y = 0;
+
+                Vector3 direction = Quaternion.AngleAxis(angle, axis) * tree.CrownRoot.GetDirection(true);
+                crownStemTip = crownStemTip.Add(crownStemTip.GetPosition() + direction * growthProperties.GetGrowthDistance());
+                nearestNodeAlgorithm.Add(crownStemTip);
+            }
+
+            float rest = growthProperties.StemLength % growthProperties.GetGrowthDistance();
+            if (!Util.AlmostEqual(rest, 0)) {
+                float angle = stemRandom.RandomInRange(-growthProperties.StemAngleRange, growthProperties.StemAngleRange);
+                Vector3 axis = stemRandom.RandomVector3();
+                axis.y = 0;
+
+                Vector3 direction = Quaternion.AngleAxis(angle, axis) * tree.CrownRoot.GetDirection(true);
+                crownStemTip = crownStemTip.Add(crownStemTip.GetPosition() + direction * growthProperties.GetGrowthDistance());
+                nearestNodeAlgorithm.Add(crownStemTip);
+            }
+        }
+    }
+
+
     private void GrowCrown(Tree tree) {
         treeHeight = 0;
+
+        //int n_is = growthProperties.GetAttractionPoints().smallest_x / growthProperties.GetInfluenceDistance//x direction
+
+        //List<Node>[][][] voxelGrid = new List<Node>[][][];
+
 
         Stopwatch findClosePointStopwatch = new Stopwatch();
         Stopwatch removeClosePointsStopwatch = new Stopwatch();
@@ -294,11 +333,13 @@ public class SpaceColonization {
             growerListener.OnIterationFinished();
 
 
-            //Prune(tree);
         }
 
         debug(new FormatString("finding close points took {0}", findClosePointStopwatch.Elapsed));
         debug(new FormatString("removing close points took {0}", removeClosePointsStopwatch.Elapsed));
+
+        //Prune(tree);
+        //tree.StemRoot.RecalculateRadii();
 
         running = false;
     }
@@ -312,67 +353,94 @@ public class SpaceColonization {
         return false;
     }
 
-	//private int maxConsecutiveNonBranchingNodes = 8;
 
-	//private void Prune(Tree tree)
-	//{
-	//	PruneHelper(tree.CrownRoot, 0);
-	//}
+    //PRUNING FOR ONCE IN THE END
+    //private int maxConsecutiveNonBranchingNodes = 7;
 
-	//private void PruneHelper(Node currentNode, int consecutiveNonBranchingNodes)
-	//{
-	//	if (consecutiveNonBranchingNodes == maxConsecutiveNonBranchingNodes)
-	//	{
-	//		currentNode.Active = false;
-	//	}
-	//	else
-	//	{
+    //private void Prune(Tree tree) {
+    //    PruneHelper(tree.CrownRoot, 0);
+    //}
 
-	//		if (currentNode.HasSubnodes())
-	//		{
-	//			if (currentNode.GetSubnodes().Count == 1)
-	//			{
-	//				PruneHelper(currentNode.GetSubnodes()[0], consecutiveNonBranchingNodes + 1);
-	//			}
-	//			else
-	//			{ //(currentNode.GetSubnodes().Count > 1)
-	//				foreach (Node sn in currentNode.GetSubnodes())
-	//				{
-	//					PruneHelper(sn, 0);
-	//				}
-	//			}
-	//		}
-	//	}
-	//}
+    //private void PruneHelper(Node currentNode, int consecutiveNonBranchingNodes) {
+    //    if (consecutiveNonBranchingNodes == maxConsecutiveNonBranchingNodes) {
+    //        currentNode.GetSubnodes().Clear();
+    //    } else {
+
+    //        if (currentNode.HasSubnodes()) {
+    //            if (currentNode.GetSubnodes().Count == 1) {
+    //                PruneHelper(currentNode.GetSubnodes()[0], consecutiveNonBranchingNodes + 1);
+    //            } else { //(currentNode.GetSubnodes().Count > 1)
+    //                foreach (Node sn in currentNode.GetSubnodes()) {
+    //                    PruneHelper(sn, 0);
+    //                }
+    //            }
+    //        }
+    //    }
+    //}
 
 
-	//private int minBranching = 2; //how often in perNodes the tree as to branch
-	//private int perNodes = 8;
 
-	//private void Prune(Tree tree) {
-	//    PruneHelper(tree.CrownRoot, 0, perNodes);
-	//}
+    //private int maxConsecutiveNonBranchingNodes = 8;
 
-	//private void PruneHelper(Node currentNode, int branches, int nodesLeft) {
-	//    if (nodesLeft == 0) {
-	//        if (branches < minBranching) {
-	//            currentNode.Active = false;
-	//        } else {
-	//            foreach (Node sn in currentNode.GetSubnodes()) {
-	//                PruneHelper(sn, 0, perNodes);
-	//            }
-	//        }
-	//    } else {
-	//        if (currentNode.HasSubnodes()) {
-	//            foreach (Node sn in currentNode.GetSubnodes()) {
-	//                PruneHelper(sn, branches+currentNode.GetSubnodes().Count, nodesLeft - 1);
-	//            }
-	//        }
-	//    }
-	//}
+    //private void Prune(Tree tree)
+    //{
+    //	PruneHelper(tree.CrownRoot, 0);
+    //}
 
-	//returns null if there is no closest node
-	private Node FindClosestNode(Vector3 attractionPoint) {
+    //private void PruneHelper(Node currentNode, int consecutiveNonBranchingNodes)
+    //{
+    //	if (consecutiveNonBranchingNodes == maxConsecutiveNonBranchingNodes)
+    //	{
+    //		currentNode.Active = false;
+    //	}
+    //	else
+    //	{
+
+    //		if (currentNode.HasSubnodes())
+    //		{
+    //			if (currentNode.GetSubnodes().Count == 1)
+    //			{
+    //				PruneHelper(currentNode.GetSubnodes()[0], consecutiveNonBranchingNodes + 1);
+    //			}
+    //			else
+    //			{ //(currentNode.GetSubnodes().Count > 1)
+    //				foreach (Node sn in currentNode.GetSubnodes())
+    //				{
+    //					PruneHelper(sn, 0);
+    //				}
+    //			}
+    //		}
+    //	}
+    //}
+
+
+    //private int minBranching = 2; //how often in perNodes the tree as to branch
+    //private int perNodes = 8;
+
+    //private void Prune(Tree tree) {
+    //    PruneHelper(tree.CrownRoot, 0, perNodes);
+    //}
+
+    //private void PruneHelper(Node currentNode, int branches, int nodesLeft) {
+    //    if (nodesLeft == 0) {
+    //        if (branches < minBranching) {
+    //            currentNode.Active = false;
+    //        } else {
+    //            foreach (Node sn in currentNode.GetSubnodes()) {
+    //                PruneHelper(sn, 0, perNodes);
+    //            }
+    //        }
+    //    } else {
+    //        if (currentNode.HasSubnodes()) {
+    //            foreach (Node sn in currentNode.GetSubnodes()) {
+    //                PruneHelper(sn, branches+currentNode.GetSubnodes().Count, nodesLeft - 1);
+    //            }
+    //        }
+    //    }
+    //}
+
+    //returns null if there is no closest node
+    private Node FindClosestNode(Vector3 attractionPoint) {
         Node closest = null;
 
         float currentSmallestDistance = growthProperties.GetSquaredInfluenceDistance();

@@ -91,7 +91,7 @@ public class CameraMovementController : MonoBehaviour {
         float y = distanceToTreeCenter * Mathf.Cos(Util.DegreesToRadians(verticalRotation));
         float z = distanceToTreeCenter * Mathf.Sin(Util.DegreesToRadians(horizontalRotation)) * Mathf.Sin(Util.DegreesToRadians(verticalRotation));
         //Vector3 position = new Vector3(x, y, z) * distanceToTreeCenter + treeCenter;
-
+        
         Vector3 position;
 
         float distanceToAttractionPoints = GameObject.Find("Core").GetComponent<Core>().GetDistanceToAttractionPoints();
@@ -99,6 +99,9 @@ public class CameraMovementController : MonoBehaviour {
             position = new Vector3(x, y, z) * distanceToTreeCenter + lookAt;
         } else { //case when attraction points currently are beeing modified
             position = new Vector3(x, y, z) * distanceToAttractionPoints + lookAt - new Vector3(0, y_position, 0);
+            distanceToTreeCenter = distanceToAttractionPoints;
+            y_position = 0;
+            // -> every time changed to the attraction points are made, the normal viewing mode is going to be reset to the one when modifying attraction points
         }
 
         // update position and lookAt

@@ -80,6 +80,11 @@ public class BasicsController : MonoBehaviour {
         GameObject.Find("Core").GetComponent<Core>().OnLength(value);
     }
 
+    public void OnValueChanged_CrownStemLength() {
+        float value = GetComponent<Slider>().value;
+        GameObject.Find("Core").GetComponent<Core>().OnCrownStemLength(value);
+    }
+
 
 
 
@@ -96,28 +101,34 @@ public class BasicsController : MonoBehaviour {
 
 
 
+    bool modifyingCrownShape;
 
     public void OnValueChanged_Width() {
+        modifyingCrownShape = true;
         float value = GetComponent<Slider>().value;
         GameObject.Find("Core").GetComponent<Core>().OnCrownWidth(value);
     }
 
     public void OnValueChanged_Height() {
+        modifyingCrownShape = true;
         float value = GetComponent<Slider>().value;
         GameObject.Find("Core").GetComponent<Core>().OnCrownHeight(value);
     }
 
     public void OnValueChanged_Depth() {
+        modifyingCrownShape = true;
         float value = GetComponent<Slider>().value;
         GameObject.Find("Core").GetComponent<Core>().OnCrownDepth(value);
     }
 
     public void OnValueChanged_TopCutoff() {
+        modifyingCrownShape = true;
         float value = GetComponent<Slider>().value;
         GameObject.Find("Core").GetComponent<Core>().OnCrownTopCutoff(value);
     }
 
     public void OnValueChanged_BottomCutoff() {
+        modifyingCrownShape = true;
         float value = GetComponent<Slider>().value;
         GameObject.Find("Core").GetComponent<Core>().OnCrownBottomCutoff(value);
     }
@@ -215,7 +226,10 @@ public class BasicsController : MonoBehaviour {
         if (Input.GetMouseButtonUp(0)) {
             GameObject.Find("Core").GetComponent<Core>().EnableCameraMovement();
             GameObject.Find("Core").GetComponent<Core>().DisablePointCloudRenderer();
-            //GameObject.Find("Core").GetComponent<Core>().OnCrownShapeDone(); //set boolean flag for this
+            //if (modifyingCrownShape) {
+            //    modifyingCrownShape = false;
+                GameObject.Find("Core").GetComponent<Core>().OnCrownShapeDone();
+            //}
         }
 
 
