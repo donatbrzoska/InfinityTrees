@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-public class NearestNodeAlgorithm {
+public class BinarySearchAlgorithm {
 
     SortedNodeList x = new SortedNodeList(CoordinateType.x);
     SortedNodeList y = new SortedNodeList(CoordinateType.y);

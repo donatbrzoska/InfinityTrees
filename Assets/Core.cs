@@ -96,6 +96,10 @@ public class Core : MonoBehaviour, GrowerListener {
         //LoadBushGeometry();
 
 
+        //LoadBigGrowth();
+        //LoadDefaultGeometry();
+
+
         grower.Grow(tree);
     }
 
@@ -115,7 +119,7 @@ public class Core : MonoBehaviour, GrowerListener {
 
         GrowthProperties growthProperties = new GrowthProperties();
         growthProperties.SetInfluenceDistance(1f);
-        growthProperties.SetPerceptionAngle(360);
+        growthProperties.SetPerceptionAngle(160);
         growthProperties.SetMinClearDistanceRatio(0.1f);
         growthProperties.SetMaxClearDistanceRatio(0.95f);
         growthProperties.SetBranchDensityBegin(0f);
@@ -185,7 +189,7 @@ public class Core : MonoBehaviour, GrowerListener {
 
         GrowthProperties growthProperties = new GrowthProperties();
         growthProperties.SetInfluenceDistance(1f);
-        growthProperties.SetPerceptionAngle(360);
+        growthProperties.SetPerceptionAngle(160);
         growthProperties.SetMinClearDistanceRatio(0.1f);
         growthProperties.SetMaxClearDistanceRatio(0.95f);
         growthProperties.SetBranchDensityBegin(0f);
@@ -421,6 +425,43 @@ public class Core : MonoBehaviour, GrowerListener {
         growthProperties.SetLeavesPerNode(10);
         growthProperties.SetAttractionPoints(attractionPoints);
         growthProperties.SetIterations(40);
+
+
+        grower = new SpaceColonization(growthProperties, this);
+    }
+
+
+
+    void LoadBigGrowth() {
+        PseudoEllipsoid attractionPoints = new PseudoEllipsoid(new Vector3(0, 0f, 0), 10, 10, 10, 15, 0.15f, 0.05f);
+
+
+        GrowthProperties growthProperties = new GrowthProperties();
+        growthProperties.SetInfluenceDistance(1f);
+        growthProperties.SetPerceptionAngle(360);
+        growthProperties.SetMinClearDistanceRatio(0.1f);
+        growthProperties.SetMaxClearDistanceRatio(0.95f);
+        growthProperties.SetBranchDensityBegin(0f);
+        growthProperties.SetBranchDensityEnd(0.8f);
+        growthProperties.SetClearDistanceBegin_clearDistanceEnd_Ratio(0.5f);
+        growthProperties.SetTropisms(new Vector3(0f, 1f, 0));
+        growthProperties.SetTropismsWeights(new Vector3(1, 1f, 1));
+        growthProperties.UpTropismsDampRatio = 0.36f;
+        growthProperties.UpTropismsWhenDamped = 0.3f;
+        growthProperties.SetHangingBranchesIntensity(0);
+
+        growthProperties.UpTropismWeight_min = 0;
+        growthProperties.UpTropismWeight_max = 5;
+        growthProperties.UpTropismWeightRatio = 0.2f;
+
+        growthProperties.StemLength = 2;
+        growthProperties.StemAngleRange = 2;
+        growthProperties.CrownStemLengthRatio = 0f;
+
+        growthProperties.SetGrowthDistance(0.25f);
+        growthProperties.SetLeavesPerNode(10);
+        growthProperties.SetAttractionPoints(attractionPoints);
+        growthProperties.SetIterations(50);
 
 
         grower = new SpaceColonization(growthProperties, this);

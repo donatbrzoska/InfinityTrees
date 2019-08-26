@@ -21,10 +21,15 @@ public class SpaceColonization {
         }
     }
 
+    bool standard_algorithm = false;
 
-    bool advanced_algorithm = true;
+    bool binarySearch_algorithm = false;
+
+    bool voxelGrid_algorithm = true;
+
     List<Node> nodeList;
-    NearestNodeAlgorithm nearestNodeAlgorithm;
+    BinarySearchAlgorithm binarySearchAlgorithm;
+    VoxelGridAlgorithm voxelGridAlgorithm;
 
     private float treeHeight;
     public float GetTreeHeight() {
@@ -55,18 +60,30 @@ public class SpaceColonization {
         //}
     }
 
+    private void InsertToAlgorithm(Node node) {
+        if (standard_algorithm) {
+            nodeList.Add(node);
+        } else if (binarySearch_algorithm) {
+            binarySearchAlgorithm.Add(node);
+        } else {
+            voxelGridAlgorithm.Add(node);
+        }
+    }
 
     public void Grow(Tree tree) {
-        if (!advanced_algorithm) {
-            nodeList = new List<Node> { tree.StemRoot };
-        } else {
-            nearestNodeAlgorithm = new NearestNodeAlgorithm();
-            //nearestNodeAlgorithm.Add(tree.StemRoot);
-            //nearestNodeAlgorithm.Add(initialNode);
+        if (standard_algorithm) {
+            nodeList = new List<Node>();// { tree.StemRoot };
+        } else if (binarySearch_algorithm) {
+            binarySearchAlgorithm = new BinarySearchAlgorithm();
+            //binarySearchAlgorithm.Add(tree.StemRoot);
+            //binarySearchAlgorithm.Add(initialNode);
+        } else { //if(voxelGrid_algorithm)
+            voxelGridAlgorithm = new VoxelGridAlgorithm(growthProperties.GetAttractionPoints(), growthProperties.GetInfluenceDistance());
         }
 
+
         //if (growerThread == null) {
-            growerThread = new Thread(() => {
+        growerThread = new Thread(() => {
                 running = true;
 
                 Stopwatch growingStopwatch = new Stopwatch();
@@ -125,14 +142,14 @@ public class SpaceColonization {
                 if (tree.StemRoot.HasSubnodes()) {
                     Vector3 direction = Quaternion.AngleAxis(angle, axis) * tree.CrownRoot.GetDirection(true);
                     Node newNode = tree.CrownRoot.Add(tree.CrownRoot.GetPosition() + direction * growthProperties.GetGrowthDistance());
-                    //nearestNodeAlgorithm.Add(newNode);
+                    //binarySearchAlgorithm.Add(newNode);
                     //nodeList.Add(newNode);
                     tree.CrownRoot = newNode;
                     //tree.StemTip = newNode;
                 } else {
                     Vector3 direction = Quaternion.AngleAxis(angle, axis) * tree.StemRoot.GetDirection(true);
                     Node newNode = tree.StemRoot.Add(tree.StemRoot.GetPosition() + direction * growthProperties.GetGrowthDistance());
-                    //nearestNodeAlgorithm.Add(newNode);
+                    //binarySearchAlgorithm.Add(newNode);
                     //nodeList.Add(newNode);
                     tree.CrownRoot = newNode;
                     //tree.StemTip = newNode;
@@ -148,14 +165,14 @@ public class SpaceColonization {
                 if (tree.StemRoot.HasSubnodes()) {
                     Vector3 direction = Quaternion.AngleAxis(angle, axis) * tree.CrownRoot.GetDirection(true);
                     Node newNode = tree.CrownRoot.Add(tree.CrownRoot.GetPosition() + direction * rest);
-                    //nearestNodeAlgorithm.Add(newNode);
+                    //binarySearchAlgorithm.Add(newNode);
                     //nodeList.Add(newNode);
                     tree.CrownRoot = newNode;
                     //tree.StemTip = newNode;
                 } else {
                     Vector3 direction = Quaternion.AngleAxis(angle, axis) * tree.StemRoot.GetDirection(true);
                     Node newNode = tree.StemRoot.Add(tree.StemRoot.GetPosition() + direction * rest);
-                    //nearestNodeAlgorithm.Add(newNode);
+                    //binarySearchAlgorithm.Add(newNode);
                     //nodeList.Add(newNode);
                     tree.CrownRoot = newNode;
                     //tree.StemTip = newNode;
@@ -163,7 +180,7 @@ public class SpaceColonization {
             }
         }
 
-        nearestNodeAlgorithm.Add(tree.CrownRoot);
+        InsertToAlgorithm(tree.CrownRoot);
         //nodeList.Add(newNode);
         growthProperties.GetAttractionPoints().UpdatePosition(tree.CrownRoot.GetPosition());
     }
@@ -184,7 +201,8 @@ public class SpaceColonization {
 
                 Vector3 direction = Quaternion.AngleAxis(angle, axis) * tree.CrownRoot.GetDirection(true);
                 crownStemTip = crownStemTip.Add(crownStemTip.GetPosition() + direction * growthProperties.GetGrowthDistance());
-                nearestNodeAlgorithm.Add(crownStemTip);
+
+                InsertToAlgorithm(crownStemTip);
             }
 
             float rest = growthProperties.StemLength % growthProperties.GetGrowthDistance();
@@ -195,7 +213,8 @@ public class SpaceColonization {
 
                 Vector3 direction = Quaternion.AngleAxis(angle, axis) * tree.CrownRoot.GetDirection(true);
                 crownStemTip = crownStemTip.Add(crownStemTip.GetPosition() + direction * growthProperties.GetGrowthDistance());
-                nearestNodeAlgorithm.Add(crownStemTip);
+
+                InsertToAlgorithm(crownStemTip);
             }
         }
     }
@@ -203,11 +222,6 @@ public class SpaceColonization {
 
     private void GrowCrown(Tree tree) {
         treeHeight = 0;
-
-        //int n_is = growthProperties.GetAttractionPoints().smallest_x / growthProperties.GetInfluenceDistance//x direction
-
-        //List<Node>[][][] voxelGrid = new List<Node>[][][];
-
 
         Stopwatch findClosePointStopwatch = new Stopwatch();
         Stopwatch removeClosePointsStopwatch = new Stopwatch();
@@ -230,10 +244,12 @@ public class SpaceColonization {
 
                 //and find the closest Node respectively
                 Node closest;
-                if (!advanced_algorithm) {
+                if (standard_algorithm) {
                     closest = FindClosestNode(attractionPoint);
+                } else if (binarySearch_algorithm) {
+                    closest = binarySearchAlgorithm.GetNearestWithinSquaredDistance(attractionPoint, growthProperties.GetSquaredInfluenceDistance(), growthProperties.GetPerceptionAngle());
                 } else {
-                    closest = nearestNodeAlgorithm.GetNearestWithinSquaredDistance(attractionPoint, growthProperties.GetSquaredInfluenceDistance(), growthProperties.GetPerceptionAngle());
+                    closest = voxelGridAlgorithm.GetNearestWithinSquaredDistance(attractionPoint, growthProperties.GetSquaredInfluenceDistance(), growthProperties.GetPerceptionAngle());
                 }
 
 
@@ -307,14 +323,11 @@ public class SpaceColonization {
 
                 if (!IsDuplicateNode(happyNodePosition, currentNode)) {
                     //add new node to currentNode
-                    currentNode.Add(happyNodePosition).AddLeaves(growthProperties.GetLeavesPerNode());
+                    Node newNode = currentNode.Add(happyNodePosition);
+                    newNode.AddLeaves(growthProperties.GetLeavesPerNode());
 
                     //add to the nodeList
-                    if (!advanced_algorithm) {
-                        nodeList.Add(currentNode.GetSubnodes()[currentNode.GetSubnodes().Count - 1]);
-                    } else {
-                        nearestNodeAlgorithm.Add(currentNode.GetSubnodes()[currentNode.GetSubnodes().Count - 1]);
-                    }
+                    InsertToAlgorithm(newNode);
 
                     //and to the newPositions list
                     newPositions.Add(happyNodePosition);
@@ -331,7 +344,7 @@ public class SpaceColonization {
             removeClosePointsStopwatch.Stop();
 
             growerListener.OnIterationFinished();
-
+            debug("finished iteration " + i);
 
         }
 

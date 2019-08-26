@@ -1,0 +1,129 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Runtime.CompilerServices;
+using UnityEngine;
+
+public class VoxelGridAlgorithm {
+
+    private static bool debugEnabled = true;
+    private static void debug(string message, [CallerMemberName]string callerName = "") {
+        if (debugEnabled) {
+            UnityEngine.Debug.Log("DEBUG: VoxelGridAlgorithm: " + callerName + "(): " + message);
+        }
+    }
+
+    private static void debug(FormatString formatString, [CallerMemberName]string callerName = "") {
+        if (debugEnabled) {
+            UnityEngine.Debug.Log("DEBUG: VoxelGridAlgorithm: " + callerName + "(): " + formatString);
+        }
+    }
+
+    List<Node>[,,] voxelGrid;
+    int n_is;
+    int n_js;
+    int n_ks;
+
+    PseudoEllipsoid attractionPoints;
+    float voxelSize;
+
+    Dictionary<Vector3, Vector3Int> attractionPoints_to_voxelCoordinates;
+
+    public VoxelGridAlgorithm(PseudoEllipsoid attractionPoints, float voxelSize) {
+        this.attractionPoints = attractionPoints;
+        this.voxelSize = voxelSize;
+
+        //for every attraction point, cache its voxel
+        //attractionPoints_to_voxelCoordinates = new Dictionary<Vector3, Vector3Int>();
+        //foreach (Vector3 a in attractionPoints) {
+        //    Vector3Int gridPos = PositionToGridPosition(a);
+        //    attractionPoints_to_voxelCoordinates.Add(a, gridPos);
+        //}
+
+
+        //x direction
+        n_is = (int)Math.Ceiling(attractionPoints.GetWidth() / voxelSize);
+        //y direction
+        n_js = (int)Math.Ceiling(attractionPoints.GetHeight() / voxelSize) + 1;
+        //z direction
+        n_ks = (int)Math.Ceiling(attractionPoints.GetDepth() / voxelSize);
+
+        voxelGrid = new List<Node>[n_is, n_js, n_ks];
+        debug("Cloud width: " + attractionPoints.GetWidth());
+        debug("Cloud height: " + attractionPoints.GetHeight());
+        debug("Cloud depth: " + attractionPoints.GetDepth());
+        debug("Grid dimensions: " + n_is + "x" + n_js + "x" + n_ks);
+
+        for (int i = 0; i < n_is; i++) {
+            for (int j = 0; j < n_js; j++) {
+                for (int k = 0; k < n_ks; k++) {
+                    voxelGrid[i, j, k] = new List<Node>();
+                }
+            }
+        }
+    }
+
+    public void Add(Node node) {
+        Vector3Int gridPos = PositionToGridPosition(node.GetPosition());
+        debug("acessing: " + gridPos);
+        voxelGrid[gridPos.x, gridPos.y, gridPos.z].Add(node);
+    }
+
+
+    public Node GetNearestWithinSquaredDistance(Vector3 position, float maxSquaredDistance, float nodePerceptionAngle) {
+        Vector3Int gridPosition = PositionToGridPosition(position);
+        //Vector3Int gridPosition = attractionPoints_to_voxelCoordinates[position];
+        List<Node> candidates = NodesAroundVoxel(gridPosition);
+
+        Node closest = null;
+        float closestDistance = float.MaxValue;
+
+        foreach (Node n in candidates) {
+            Vector3 d = n.GetPosition() - position;
+            float squaredDistance = d.x * d.x + d.y * d.y + d.z * d.z;
+            if (squaredDistance < closestDistance && squaredDistance < maxSquaredDistance) {
+                if (AttractionPointInPerceptionAngle(n, position, nodePerceptionAngle)) {
+                    closest = n;
+                    closestDistance = squaredDistance;
+                }
+            }
+        }
+
+        return closest;
+    }
+
+    private bool AttractionPointInPerceptionAngle(Node node, Vector3 attractionPoint, float nodePerceptionAngle) {
+        float angle = Vector3.Angle(node.GetDirection(), attractionPoint - node.GetPosition());
+        bool isInPerceptionAngle = angle <= nodePerceptionAngle / 2f;
+        return isInPerceptionAngle;
+    }
+
+    private Vector3Int PositionToGridPosition(Vector3 pos/*, float gridWidth, float gridDepth, float gridHeight*/) {
+        int i = (int)((attractionPoints.GetWidth() / 2 + pos.x) / voxelSize);
+        int j = (int)(pos.y / voxelSize);
+        int k = (int)((attractionPoints.GetDepth() / 2 + pos.z) / voxelSize);
+
+        return new Vector3Int(i, j, k);
+    }
+
+    private List<Node> NodesAroundVoxel(Vector3Int voxel) {
+        List<Node> result = new List<Node>();
+
+        for (int i = -1; i <= 1; i++) {
+            for (int j = -1; j <= 1; j++) {
+                for (int k = -1; k <= 1; k++) {
+                    Vector3Int pos = voxel + new Vector3Int(i, j, k);
+                    if (pos.x > -1 && pos.x < n_is
+                        && pos.y > -1 && pos.y < n_js
+                        && pos.z > -1 && pos.z < n_ks) {
+
+                        foreach (Node n in voxelGrid[pos.x, pos.y, pos.z]) {
+                            result.Add(n);
+                        }
+                    }
+                }
+            }
+        }
+
+        return result;
+    }
+}

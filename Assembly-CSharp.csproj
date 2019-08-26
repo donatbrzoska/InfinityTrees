@@ -65,12 +65,13 @@
     <Compile Include="Assets\AdvancedRandom.cs" />
     <Compile Include="Assets\Core.cs" />
     <Compile Include="Assets\FormatString.cs" />
+    <Compile Include="Assets\Grower\BinarySearchAlgorithm.cs" />
     <Compile Include="Assets\Grower\GrowerListener.cs" />
     <Compile Include="Assets\Grower\GrowthProperties\GrowthProperties.cs" />
     <Compile Include="Assets\Grower\GrowthProperties\PseudoEllipsoid.cs" />
-    <Compile Include="Assets\Grower\NearestNodeAlgorithm.cs" />
     <Compile Include="Assets\Grower\SortedNodeList.cs" />
     <Compile Include="Assets\Grower\SpaceColonization.cs" />
+    <Compile Include="Assets\Grower\VoxelGridAlgorithm.cs" />
     <Compile Include="Assets\Notes.cs" />
     <Compile Include="Assets\TopologyGeometry\GeometryProperties.cs" />
     <Compile Include="Assets\TopologyGeometry\Leaf.cs" />
