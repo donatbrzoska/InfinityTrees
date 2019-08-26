@@ -41,11 +41,11 @@ public class VoxelGridAlgorithm {
 
 
         //x direction
-        n_is = (int)Math.Ceiling(attractionPoints.GetWidth() / voxelSize) + 2;
+        n_is = (int)Math.Ceiling(attractionPoints.GetWidth() / voxelSize);
         //y direction
-        n_js = (int)Math.Ceiling(attractionPoints.GetHeight() / voxelSize) + 1;
+        n_js = (int)Math.Ceiling(attractionPoints.GetHeight() / voxelSize);
         //z direction
-        n_ks = (int)Math.Ceiling(attractionPoints.GetDepth() / voxelSize) + 2;
+        n_ks = (int)Math.Ceiling(attractionPoints.GetDepth() / voxelSize);
 
         voxelGrid = new List<Node>[n_is, n_js, n_ks];
         debug("Cloud width: " + attractionPoints.GetWidth());
@@ -118,10 +118,22 @@ public class VoxelGridAlgorithm {
         return isInPerceptionAngle;
     }
 
+    private int Crop(int v, int lo, int hi) {
+        if (v < lo) {
+            return lo;
+        }
+        if (v > hi) {
+            return hi;
+        } else {
+            return v;
+        }
+        //return Math.Max(Math.Min(v, hi), lo);
+    }
+
     private Vector3Int PositionToGridPosition(Vector3 pos/*, float gridWidth, float gridDepth, float gridHeight*/) {
-        int i = 1 + (int)((attractionPoints.GetWidth() / 2 + pos.x) / voxelSize);
-        int j = (int)(pos.y / voxelSize);
-        int k = 1 + (int)((attractionPoints.GetDepth() / 2 + pos.z) / voxelSize);
+        int i = Crop((int)((attractionPoints.GetWidth() / 2 + pos.x) / voxelSize), 0, n_is-1);
+        int j = Crop((int)(pos.y / voxelSize), 0, n_js-1);
+        int k = Crop((int)((attractionPoints.GetDepth() / 2 + pos.z) / voxelSize), 0, n_ks-1);
 
         return new Vector3Int(i, j, k);
     }
