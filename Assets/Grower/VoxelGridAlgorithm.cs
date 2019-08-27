@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using UnityEngine;
 
-public class VoxelGridAlgorithm {
+public class VoxelGridAlgorithm : NearestNodeAlgorithm {
 
     private static bool debugEnabled = true;
     private static void debug(string message, [CallerMemberName]string callerName = "") {

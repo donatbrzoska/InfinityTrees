@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SquaredDistanceAlgorithm {
+public class SquaredDistanceAlgorithm : NearestNodeAlgorithm{
 
     List<Node> nodeList;
     PseudoEllipsoid attractionPoints;

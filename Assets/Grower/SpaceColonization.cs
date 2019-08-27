@@ -21,18 +21,7 @@ public class SpaceColonization {
         }
     }
 
-    enum DistanceCalculationAlgorithm {
-        Standard,
-        BinarySearch,
-        VoxelGrid
-    }
-    DistanceCalculationAlgorithm distanceCalculationAlgorithm = DistanceCalculationAlgorithm.Standard;
-    //DistanceCalculationAlgorithm distanceCalculationAlgorithm = DistanceCalculationAlgorithm.BinarySearch;
-    //DistanceCalculationAlgorithm distanceCalculationAlgorithm = DistanceCalculationAlgorithm.VoxelGrid;
-
-    SquaredDistanceAlgorithm squaredDistanceAlgorithm;
-    BinarySearchAlgorithm binarySearchAlgorithm;
-    VoxelGridAlgorithm voxelGridAlgorithm;
+    NearestNodeAlgorithm nearestNodeAlgorithm;
 
     private float treeHeight;
     public float GetTreeHeight() {
@@ -57,25 +46,10 @@ public class SpaceColonization {
         growerThread.Join();
     }
 
-    private void InsertToAlgorithm(Node node) {
-        if (distanceCalculationAlgorithm == DistanceCalculationAlgorithm.Standard) {
-            squaredDistanceAlgorithm.Add(node);
-        } else if (distanceCalculationAlgorithm == DistanceCalculationAlgorithm.BinarySearch) {
-            binarySearchAlgorithm.Add(node);
-        } else {
-            voxelGridAlgorithm.Add(node);
-        }
-    }
-
     public void Grow(Tree tree) {
-        if (distanceCalculationAlgorithm == DistanceCalculationAlgorithm.Standard) {
-            squaredDistanceAlgorithm = new SquaredDistanceAlgorithm(growthProperties.GetAttractionPoints());
-        } else if (distanceCalculationAlgorithm == DistanceCalculationAlgorithm.BinarySearch) {
-            binarySearchAlgorithm = new BinarySearchAlgorithm();
-        } else { //if(voxelGrid_algorithm)
-            voxelGridAlgorithm = new VoxelGridAlgorithm(growthProperties.GetAttractionPoints(), growthProperties.GetInfluenceDistance());
-        }
-
+        //nearestNodeAlgorithm = new SquaredDistanceAlgorithm(growthProperties.GetAttractionPoints());
+        //nearestNodeAlgorithm = new BinarySearchAlgorithm(); //little bug somewhere
+        nearestNodeAlgorithm = new VoxelGridAlgorithm(growthProperties.GetAttractionPoints(), growthProperties.GetInfluenceDistance());
 
         //if (growerThread == null) {
         growerThread = new Thread(() => {
@@ -162,7 +136,7 @@ public class SpaceColonization {
             }
         }
 
-        InsertToAlgorithm(tree.CrownRoot);
+        nearestNodeAlgorithm.Add(tree.CrownRoot);
         growthProperties.GetAttractionPoints().UpdatePosition(tree.CrownRoot.GetPosition());
     }
 
@@ -183,7 +157,7 @@ public class SpaceColonization {
                 Vector3 direction = Quaternion.AngleAxis(angle, axis) * tree.CrownRoot.GetDirection(true);
                 crownStemTip = crownStemTip.Add(crownStemTip.GetPosition() + direction * growthProperties.GetGrowthDistance());
 
-                InsertToAlgorithm(crownStemTip);
+                nearestNodeAlgorithm.Add(crownStemTip);
             }
 
             float rest = growthProperties.StemLength % growthProperties.GetGrowthDistance();
@@ -195,7 +169,7 @@ public class SpaceColonization {
                 Vector3 direction = Quaternion.AngleAxis(angle, axis) * tree.CrownRoot.GetDirection(true);
                 crownStemTip = crownStemTip.Add(crownStemTip.GetPosition() + direction * growthProperties.GetGrowthDistance());
 
-                InsertToAlgorithm(crownStemTip);
+                nearestNodeAlgorithm.Add(crownStemTip);
             }
         }
     }
@@ -226,22 +200,14 @@ public class SpaceColonization {
                 Vector3 attractionPoint = growthProperties.GetAttractionPoints()[j];
 
                 //and find the closest Node respectively
-                Node closest;// = FindClosestNode(attractionPoint);
-                if (distanceCalculationAlgorithm == DistanceCalculationAlgorithm.Standard) {
-                    closest = squaredDistanceAlgorithm.GetNearestWithinSquaredDistance(attractionPoint, growthProperties.GetSquaredInfluenceDistance(), growthProperties.GetPerceptionAngle());
-                } else if (distanceCalculationAlgorithm == DistanceCalculationAlgorithm.BinarySearch) {
-                    closest = binarySearchAlgorithm.GetNearestWithinSquaredDistance(attractionPoint, growthProperties.GetSquaredInfluenceDistance(), growthProperties.GetPerceptionAngle());
-                } else {
-                    closest = voxelGridAlgorithm.GetNearestWithinSquaredDistance(attractionPoint, growthProperties.GetSquaredInfluenceDistance(), growthProperties.GetPerceptionAngle());
-
-                    // Rudis ultimate plan to make the removal in the next iteration
-                    if (i > 0) {
-                        if (closest != null) {
-                            if (SquaredDistance(attractionPoint, closest.GetPosition()) < growthProperties.GetSquaredClearDistance(i)) {
-                                j--;
-                                growthProperties.GetAttractionPoints().Remove(attractionPoint);
-                                continue;
-                            }
+                Node closest = nearestNodeAlgorithm.GetNearestWithinSquaredDistance(attractionPoint, growthProperties.GetSquaredInfluenceDistance(), growthProperties.GetPerceptionAngle());
+                // Rudis ultimate plan to make the removal in the next iteration
+                if (i > 0) {
+                    if (closest != null) {
+                        if (SquaredDistance(attractionPoint, closest.GetPosition()) < growthProperties.GetSquaredClearDistance(i)) {
+                            j--;
+                            growthProperties.GetAttractionPoints().Remove(attractionPoint);
+                            continue;
                         }
                     }
                 }
@@ -321,7 +287,7 @@ public class SpaceColonization {
                     newNode.AddLeaves(growthProperties.GetLeavesPerNode());
 
                     //add to the nodeList
-                    InsertToAlgorithm(newNode);
+                    nearestNodeAlgorithm.Add(newNode);
 
                     //and to the newPositions list
                     newPositions.Add(happyNodePosition);
