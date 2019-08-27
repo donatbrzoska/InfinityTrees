@@ -85,7 +85,6 @@ public class Core : MonoBehaviour, GrowerListener {
         growthProperties.SetTropismsWeights(new Vector3(1, 1f, 1));
         growthProperties.UpTropismsDampRatio = 0.36f;
         growthProperties.UpTropismsWhenDamped = 0.3f;
-        growthProperties.SetHangingBranchesIntensity(0);
 
         growthProperties.UpTropismWeight_min = 0;
         growthProperties.UpTropismWeight_max = 5;
@@ -155,7 +154,6 @@ public class Core : MonoBehaviour, GrowerListener {
         growthProperties.SetTropismsWeights(new Vector3(1, 1f, 1));
         growthProperties.UpTropismsDampRatio = 0.36f;
         growthProperties.UpTropismsWhenDamped = 0.3f;
-        growthProperties.SetHangingBranchesIntensity(0);
 
         growthProperties.UpTropismWeight_min = 0;
         growthProperties.UpTropismWeight_max = 5;
@@ -225,7 +223,6 @@ public class Core : MonoBehaviour, GrowerListener {
         growthProperties.SetTropismsWeights(new Vector3(1, 1f, 1));
         growthProperties.UpTropismsDampRatio = 0.36f;
         growthProperties.UpTropismsWhenDamped = 0.3f;
-        growthProperties.SetHangingBranchesIntensity(0);
 
         growthProperties.UpTropismWeight_min = 0;
         growthProperties.UpTropismWeight_max = 5;
@@ -296,7 +293,6 @@ public class Core : MonoBehaviour, GrowerListener {
         growthProperties.SetTropismsWeights(new Vector3(1, 0.3f, 1)); //adjusted by hand
         growthProperties.UpTropismsDampRatio = 0.36f;
         growthProperties.UpTropismsWhenDamped = 0.3f;
-        growthProperties.SetHangingBranchesIntensity(0);
 
         growthProperties.UpTropismWeight_min = 0;
         growthProperties.UpTropismWeight_max = 5;
@@ -367,7 +363,6 @@ public class Core : MonoBehaviour, GrowerListener {
         growthProperties.SetTropismsWeights(new Vector3(1, 1f, 1));
         growthProperties.UpTropismsDampRatio = 0.36f;
         growthProperties.UpTropismsWhenDamped = 0.3f;
-        growthProperties.SetHangingBranchesIntensity(0);
 
         growthProperties.UpTropismWeight_min = 0;
         growthProperties.UpTropismWeight_max = 5;
@@ -404,7 +399,6 @@ public class Core : MonoBehaviour, GrowerListener {
         growthProperties.SetTropismsWeights(new Vector3(1, 1f, 1));
         growthProperties.UpTropismsDampRatio = 0.36f;
         growthProperties.UpTropismsWhenDamped = 0.3f;
-        growthProperties.SetHangingBranchesIntensity(0);
 
         growthProperties.UpTropismWeight_min = 0;
         growthProperties.UpTropismWeight_max = 5;
@@ -785,20 +779,6 @@ public class Core : MonoBehaviour, GrowerListener {
 
 
 
-    // TODO WHAT IF Y DAMPED
-    public void OnHangingBranches(float value) {
-        grower.Stop();
-
-        grower.GetGrowthProperties().SetHangingBranchesIntensity(value);
-        grower.GetGrowthProperties().GetAttractionPoints().Reset();
-
-        tree.Reset();
-
-        grower.Grow(tree);
-    }
-
-
-
     // SPACE COLONIZATION
 
     public void OnDensity(float value) {
@@ -1013,7 +993,6 @@ public class Core : MonoBehaviour, GrowerListener {
         growthProperties.SetTropismsWeights(new Vector3(1, 1f, 1));
         growthProperties.UpTropismsDampRatio = 0.5f;
         growthProperties.UpTropismsWhenDamped = 0.3f;
-        growthProperties.SetHangingBranchesIntensity(0);
 
         growthProperties.UpTropismWeight_min = 0;
         growthProperties.UpTropismWeight_max = 5;
@@ -1049,7 +1028,6 @@ public class Core : MonoBehaviour, GrowerListener {
         growthProperties.SetTropismsWeights(new Vector3(1, 1f, 1));
         growthProperties.UpTropismsDampRatio = 0.5f;
         growthProperties.UpTropismsWhenDamped = 0.3f;
-        growthProperties.SetHangingBranchesIntensity(0);
 
         growthProperties.UpTropismWeight_min = 0;
         growthProperties.UpTropismWeight_max = 5;
@@ -1084,7 +1062,6 @@ public class Core : MonoBehaviour, GrowerListener {
         growthProperties.SetTropismsWeights(new Vector3(1, 1f, 1));
         growthProperties.UpTropismsDampRatio = 0;
         growthProperties.UpTropismsWhenDamped = 0.3f;
-        growthProperties.SetHangingBranchesIntensity(0);
 
         growthProperties.UpTropismWeight_min = 0;
         growthProperties.UpTropismWeight_max = 5;
@@ -1118,7 +1095,6 @@ public class Core : MonoBehaviour, GrowerListener {
         growthProperties.SetTropismsWeights(new Vector3(1, 1f, 1));
         growthProperties.UpTropismsDampRatio = 0.2f;
         growthProperties.UpTropismsWhenDamped = 0.3f;
-        growthProperties.SetHangingBranchesIntensity(0);
 
         growthProperties.UpTropismWeight_min = 0;
         growthProperties.UpTropismWeight_max = 5;
@@ -1151,7 +1127,6 @@ public class Core : MonoBehaviour, GrowerListener {
         growthProperties.SetTropismsWeights(new Vector3(1, 1f, 1));
         growthProperties.UpTropismsDampRatio = 0.2f;
         growthProperties.UpTropismsWhenDamped = 0.3f;
-        growthProperties.SetHangingBranchesIntensity(0);
 
         growthProperties.UpTropismWeight_min = 0;
         growthProperties.UpTropismWeight_max = 5;
@@ -1184,7 +1159,6 @@ public class Core : MonoBehaviour, GrowerListener {
         growthProperties.SetTropismsWeights(new Vector3(1, 1f, 1));
         growthProperties.UpTropismsDampRatio = 0.2f;
         growthProperties.UpTropismsWhenDamped = 0.3f;
-        growthProperties.SetHangingBranchesIntensity(0);
 
         growthProperties.UpTropismWeight_min = 0;
         growthProperties.UpTropismWeight_max = 5;

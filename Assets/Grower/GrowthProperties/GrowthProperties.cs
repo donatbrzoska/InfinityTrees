@@ -18,28 +18,18 @@ public class GrowthProperties {
     private float clearDistance_end; //DEPENDS
     private float squaredClearDistance_end; //DEPENDS
 
-    //private Vector3 tropismsBackup;
     private Vector3 tropisms;
     private Vector3 tropismsWeights;
-    //private bool hangingBranchesEnabled;
     private float hangingBranchesIntensity;
 
     private float growthDistance; //SET
 
     private int leavesPerNode;
 
-    //private List<Vector3> attractionPointsBackup;
     private PseudoEllipsoid attractionPoints;
 
     private int iterations;
 
-    //GrowthPropertiesListener growthPropertiesListener;
-
-    //public void SetGrowthPropertiesListener(GrowthPropertiesListener growthPropertiesListener) {
-    //    this.growthPropertiesListener = growthPropertiesListener;
-    //}
-
-    //THIS OR clearDistance
     public void SetInfluenceDistance(float influenceDistance) {
         this.influenceDistance = influenceDistance;
         this.squaredInfluenceDistance = influenceDistance * influenceDistance;
@@ -81,19 +71,11 @@ public class GrowthProperties {
     }
 
     public void SetClearDistance(float begin, float end) {
-        //if (begin < minClearDistance | end < minClearDistance) {
-        //    throw new Exception("Keep the minClearDistance in mind!");
-        //}
-
         this.clearDistance_begin = begin * begin;
         this.clearDistance_end = end * end;
     }
 
     public void SetClearDistanceBegin(float begin) {
-        //Debug.Log("clear distance begin: " + begin);
-        //if (begin < minClearDistance) {
-        //    throw new Exception("Keep the minClearDistance in mind!");
-        //}
         this.clearDistance_begin = begin;
         this.squaredClearDistance_begin = begin * begin;
     }
@@ -103,10 +85,6 @@ public class GrowthProperties {
     }
 
     public void SetClearDistanceEnd(float end) {
-        //Debug.Log("clear distance end: " + end);
-        //if (end < minClearDistance) {
-        //    throw new Exception("Keep the minClearDistance in mind!");
-        //}
         this.clearDistance_end = end;
         this.squaredClearDistance_end = end * end;
     }
@@ -116,20 +94,6 @@ public class GrowthProperties {
     }
 
 
-    //enum ClearDistanceFunction {
-    //    linear,
-    //    exponential
-    //}
-
-
-    //THIS OR influenceDistance
-    //public void SetClearDistance_2(float clearDistance_2) {
-    //    this.clearDistance_2 = clearDistance_2 * clearDistance_2;
-    //}
-
-    //public float GetClearDistance() {
-    //    return clearDistance;
-    //}
 
     // represents how much of the tree is begin
     // 1-stemCrownRatio is the end part
@@ -182,7 +146,6 @@ public class GrowthProperties {
 
     private float branchDensityBegin;
     public void SetBranchDensityBegin(float value) {
-        //Debug.Log("branch density begin: " + value);
         this.branchDensityBegin = value;
 
         float range = maxClearDistance - minClearDistance;
@@ -195,7 +158,6 @@ public class GrowthProperties {
 
     private float branchDensityEnd;
     public void SetBranchDensityEnd(float value) {
-        //Debug.Log("branch density end: " + value);
         this.branchDensityEnd = value;
 
         float range = maxClearDistance - minClearDistance;
@@ -227,11 +189,9 @@ public class GrowthProperties {
     // TODO: make independant from class attributes
     private float SigmoidInterpolation(int iteration) {
         float d = squaredClearDistance_begin - squaredClearDistance_end;
-        //float d = squaredClearDistance_end - squaredClearDistance_begin;
 
         float range = 0;
         return (float)(squaredClearDistance_begin - Sigmoid(MapIteration(iteration, GetSigmoidStartValue(range), GetSigmoidEndValue(range))) * d);
-        //return (float)(squaredClearDistance_begin - Sigmoid(MapIteration(iteration, -4, 4)) * d);
     }
 
     private float LinearInterpolation(int iteration) {
@@ -258,11 +218,8 @@ public class GrowthProperties {
 
     public float UpTropismsWhenDamped { get; set; }
 
-    public void SetTropisms(Vector3 tropisms/*, bool temporary=false*/) {
+    public void SetTropisms(Vector3 tropisms) {
         this.tropisms = tropisms.normalized;
-        //if (!temporary) {
-        //    this.tropismsBackup = new Vector3(tropisms.x, tropisms.y, tropisms.z);
-        //}
     }
 
     public Vector3 GetTropisms(int iteration) {
@@ -297,28 +254,6 @@ public class GrowthProperties {
     public Vector3 GetTropismsWeights() {
         return tropismsWeights;
     }
-
-
-
-
-    //public void SetHangingBranchesEnabled(bool hangingBranchesEnabled) {
-    //    this.hangingBranchesEnabled = hangingBranchesEnabled;
-    //}
-
-    //public bool GetHangingBranchesEnabled() {
-    //    return hangingBranchesEnabled;
-    //}
-
-
-
-    public void SetHangingBranchesIntensity(float value) {
-        this.hangingBranchesIntensity = value;
-    }
-
-    public float GetHangingBranchesIntensity() {
-        return hangingBranchesIntensity;
-    }
-
 
 
 
@@ -362,13 +297,4 @@ public class GrowthProperties {
     public int GetIterations() {
         return iterations;
     }
-
-
-
-
-    //public void ResetTropisms() {
-    //    this.tropisms.x = tropismsBackup.x;
-    //    this.tropisms.y = tropismsBackup.y;
-    //    this.tropisms.z = tropismsBackup.z;
-    //}
 }
