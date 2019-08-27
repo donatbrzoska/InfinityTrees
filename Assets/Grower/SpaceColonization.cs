@@ -28,11 +28,6 @@ public class SpaceColonization {
     }
 
     DistanceCalculationAlgorithm distanceCalculationAlgorithm = DistanceCalculationAlgorithm.VoxelGrid;
-    //bool standard_algorithm = false;
-
-    //bool binarySearch_algorithm = false;
-
-    //bool voxelGrid_algorithm = true;
 
     List<Node> nodeList;
     BinarySearchAlgorithm binarySearchAlgorithm;
@@ -56,15 +51,9 @@ public class SpaceColonization {
     //interrupt thread nicely when growthProperties change
     private bool running;
 
-    //private object stopLock = new object();
     public void Stop() {
-        //lock (stopLock) {
-            //if (running) {
-                running = false;
-                growerThread.Join();
-            //growerThread = null;
-        //}
-        //}
+        running = false;
+        growerThread.Join();
     }
 
     private void InsertToAlgorithm(Node node) {
@@ -82,8 +71,6 @@ public class SpaceColonization {
             nodeList = new List<Node>();// { tree.StemRoot };
         } else if (distanceCalculationAlgorithm == DistanceCalculationAlgorithm.BinarySearch) {
             binarySearchAlgorithm = new BinarySearchAlgorithm();
-            //binarySearchAlgorithm.Add(tree.StemRoot);
-            //binarySearchAlgorithm.Add(initialNode);
         } else { //if(voxelGrid_algorithm)
             voxelGridAlgorithm = new VoxelGridAlgorithm(growthProperties.GetAttractionPoints(), growthProperties.GetInfluenceDistance());
         }
@@ -136,7 +123,6 @@ public class SpaceColonization {
     private void GrowStem(Tree tree) {
         if (Util.AlmostEqual(growthProperties.StemLength, 0)) {
             tree.CrownRoot = tree.StemRoot;
-            //tree.StemTip = tree.StemRoot;
         } else {
             stemRandom = new AdvancedRandom(growthProperties.GetAttractionPoints().Seed);
 
@@ -149,17 +135,11 @@ public class SpaceColonization {
                 if (tree.StemRoot.HasSubnodes()) {
                     Vector3 direction = Quaternion.AngleAxis(angle, axis) * tree.CrownRoot.GetDirection(true);
                     Node newNode = tree.CrownRoot.Add(tree.CrownRoot.GetPosition() + direction * growthProperties.GetGrowthDistance());
-                    //binarySearchAlgorithm.Add(newNode);
-                    //nodeList.Add(newNode);
                     tree.CrownRoot = newNode;
-                    //tree.StemTip = newNode;
                 } else {
                     Vector3 direction = Quaternion.AngleAxis(angle, axis) * tree.StemRoot.GetDirection(true);
                     Node newNode = tree.StemRoot.Add(tree.StemRoot.GetPosition() + direction * growthProperties.GetGrowthDistance());
-                    //binarySearchAlgorithm.Add(newNode);
-                    //nodeList.Add(newNode);
                     tree.CrownRoot = newNode;
-                    //tree.StemTip = newNode;
                 }
             }
 
@@ -172,23 +152,16 @@ public class SpaceColonization {
                 if (tree.StemRoot.HasSubnodes()) {
                     Vector3 direction = Quaternion.AngleAxis(angle, axis) * tree.CrownRoot.GetDirection(true);
                     Node newNode = tree.CrownRoot.Add(tree.CrownRoot.GetPosition() + direction * rest);
-                    //binarySearchAlgorithm.Add(newNode);
-                    //nodeList.Add(newNode);
                     tree.CrownRoot = newNode;
-                    //tree.StemTip = newNode;
                 } else {
                     Vector3 direction = Quaternion.AngleAxis(angle, axis) * tree.StemRoot.GetDirection(true);
                     Node newNode = tree.StemRoot.Add(tree.StemRoot.GetPosition() + direction * rest);
-                    //binarySearchAlgorithm.Add(newNode);
-                    //nodeList.Add(newNode);
                     tree.CrownRoot = newNode;
-                    //tree.StemTip = newNode;
                 }
             }
         }
 
         InsertToAlgorithm(tree.CrownRoot);
-        //nodeList.Add(newNode);
         growthProperties.GetAttractionPoints().UpdatePosition(tree.CrownRoot.GetPosition());
     }
 
@@ -244,8 +217,6 @@ public class SpaceColonization {
             }
 
             Dictionary<Node, List<Vector3>> nodesAttractionPoints = new Dictionary<Node, List<Vector3>>();
-            //List<Node> nodeList = root.GetNodeList();
-            //debug("n nodes: " + nodeList.Count);
 
             findClosePointStopwatch.Start();
             //iterate through all attractionPoints
@@ -272,7 +243,6 @@ public class SpaceColonization {
                             }
                         }
                     }
-                    //closest = voxelGridAlgorithm.GetNearestWithinSquaredDistance(j, growthProperties.GetSquaredInfluenceDistance(), growthProperties.GetPerceptionAngle());
                 }
 
 
@@ -449,32 +419,6 @@ public class SpaceColonization {
     //	}
     //}
 
-
-    //private int minBranching = 2; //how often in perNodes the tree as to branch
-    //private int perNodes = 8;
-
-    //private void Prune(Tree tree) {
-    //    PruneHelper(tree.CrownRoot, 0, perNodes);
-    //}
-
-    //private void PruneHelper(Node currentNode, int branches, int nodesLeft) {
-    //    if (nodesLeft == 0) {
-    //        if (branches < minBranching) {
-    //            currentNode.Active = false;
-    //        } else {
-    //            foreach (Node sn in currentNode.GetSubnodes()) {
-    //                PruneHelper(sn, 0, perNodes);
-    //            }
-    //        }
-    //    } else {
-    //        if (currentNode.HasSubnodes()) {
-    //            foreach (Node sn in currentNode.GetSubnodes()) {
-    //                PruneHelper(sn, branches+currentNode.GetSubnodes().Count, nodesLeft - 1);
-    //            }
-    //        }
-    //    }
-    //}
-
     //returns null if there is no closest node
     private Node FindClosestNode(Vector3 attractionPoint) {
         Node closest = null;
@@ -507,15 +451,9 @@ public class SpaceColonization {
         foreach (Vector3 newPosition in newPositions) {
             List<Vector3> closePoints;
 
-            //debug("squared cleardistance is " + growthProperties.GetSquaredClearDistance(iteration));
             closePoints = DetermineAttractionPointsWithinQuadraticDistance(newPosition, growthProperties.GetSquaredClearDistance(iteration));
-            //closePoints = DetermineAttractionPointsWithinQuadraticDistance(newPosition, growthProperties.GetSquaredClearDistance()); //near the envelope test
-            //debug("removing " + closePoints.Count + " close points");
             foreach (Vector3 closePoint in closePoints) {
                 growthProperties.GetAttractionPoints().Remove(closePoint);
-                //if (voxelGridAlgorithm != null) {
-                //    voxelGridAlgorithm.RemoveAttractionPoint(closePoint);
-                //}
             }
         }
     }
@@ -565,135 +503,4 @@ public class SpaceColonization {
     public GrowthProperties GetGrowthProperties() {
         return growthProperties;
     }
-
-    //#######################################################################################
-    //##########        INTERFACE IMPLEMENTATION : GrowthPropertiesListener        ##########
-    //#######################################################################################
-
-    //public void OnAttractionPointsChanged() {
-    //    growerListener.OnAttractionPointsChanged();
-    //}
-
-    //public void OnAgeChanged() {
-    //    growerListener.OnAgeChanged();
-    //}
 }
-
-
-
-//List<Thread> threads = new List<Thread>();
-
-//int rangeSize = attractionPoints.Count / threadsLeft;
-//int fromIndex = 0;
-//int toIndex = rangeSize;
-//for (int i = 0; i < threadsLeft; i++) {
-//    Thread t = new Thread(() => {
-//        for (int j = fromIndex; j < toIndex; j++) {
-//            Node closest = FindClosestNode(attractionPoints[j], nodeList);
-
-//            //if there is a close Node
-//            if (closest != null) {
-//                lock (nodesAttractionPoints) { //make sure, multiple threads don't access the dictionary while modifying it
-//                    //add it to the nodesAttractionPoints
-//                    if (nodesAttractionPoints.ContainsKey(closest)) {
-//                        nodesAttractionPoints[closest].Add(attractionPoints[j]);
-//                    } else {
-//                        nodesAttractionPoints[closest] = new List<Vector3> { attractionPoints[j] };
-//                    }
-//                }
-//            }
-//        }
-//    });
-//    threads.Add(t);
-//    t.Start();
-
-//    fromIndex += rangeSize;
-//    toIndex += rangeSize;
-
-//    if (i == threadsLeft - 1) {
-//        toIndex = attractionPoints.Count;
-//    }
-//}
-
-//foreach (Thread t in threads) {
-//    t.Join();
-//}
-
-
-
-
-//    float quadraticDistanceToCurrent = GetQuadraticDistance(current.GetPosition(), attractionPoint);
-
-//    if (quadraticDistanceToCurrent <= smallestDistance) {
-//        smallestDistance = quadraticDistanceToCurrent;
-//        closest = current;
-//    }
-
-
-//float quadraticDistanceToCurrent = 0;
-
-//float dx = current.GetPosition().x - attractionPoint.x;
-//quadraticDistanceToCurrent += dx * dx;
-//if (quadraticDistanceToCurrent > smallestDistance) {
-//    continue;
-//}
-
-//float dy = current.GetPosition().y - attractionPoint.y;
-//quadraticDistanceToCurrent += dy * dy;
-//if (quadraticDistanceToCurrent > smallestDistance) {
-//    continue;
-//}
-
-//float dz = current.GetPosition().z - attractionPoint.z;
-//quadraticDistanceToCurrent += dz * dz;
-//if (quadraticDistanceToCurrent > smallestDistance) {
-//    continue;
-//}
-
-//smallestDistance = quadraticDistanceToCurrent;
-//closest = current;
-
-
-
-
-//float distance = GetQuadraticDistance(position, attractionPoint);
-//if (distance <= maxDistance) {
-//    result.Add(attractionPoint);
-//}
-
-
-//float quadraticDistance = 0;
-
-//float dx = position.x - attractionPoint.x;
-//quadraticDistance += dx * dx;
-//if (quadraticDistance > maxDistance) {
-//    continue;
-//}
-
-//float dy = position.y - attractionPoint.y;
-//quadraticDistance += dy * dy;
-//if (quadraticDistance > maxDistance) {
-//    continue;
-//}
-
-//float dz = position.z - attractionPoint.z;
-//quadraticDistance += dz * dz;
-//if (quadraticDistance > maxDistance) {
-//    continue;
-//}
-
-//result.Add(attractionPoint);
-
-
-
-
-
-
-
-////https://stackoverflow.com/questions/1901139/closest-point-to-a-given-point
-//float GetQuadraticDistance(Vector3 a, Vector3 b) {
-//    float dx = a.x - b.x;
-//    float dy = a.y - b.y;
-//    float dz = a.z - b.z;
-//    return dx * dx + dy * dy + dz * dz;
-//}

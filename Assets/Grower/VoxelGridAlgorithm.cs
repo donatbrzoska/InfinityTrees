@@ -93,25 +93,6 @@ public class VoxelGridAlgorithm {
         return closest;
     }
 
-    //public void RemoveClosePoints(List<Vector3> newPositions, float squaredClearDistance) {
-    //    foreach (Vector3 newPosition in newPositions) {
-    //        List<Vector3> closePoints;
-
-    //        //PositionToGridPosition
-
-    //        //debug("squared cleardistance is " + growthProperties.GetSquaredClearDistance(iteration));
-    //        closePoints = DetermineAttractionPointsWithinQuadraticDistance(newPosition, growthProperties.GetSquaredClearDistance(iteration));
-    //        //closePoints = DetermineAttractionPointsWithinQuadraticDistance(newPosition, growthProperties.GetSquaredClearDistance()); //near the envelope test
-    //        //debug("removing " + closePoints.Count + " close points");
-    //        foreach (Vector3 closePoint in closePoints) {
-    //            growthProperties.GetAttractionPoints().Remove(closePoint);
-    //            //if (voxelGridAlgorithm != null) {
-    //            //    voxelGridAlgorithm.RemoveAttractionPoint(closePoint);
-    //            //}
-    //        }
-    //    }
-    //}
-
     private bool AttractionPointInPerceptionAngle(Node node, Vector3 attractionPoint, float nodePerceptionAngle) {
         float angle = Vector3.Angle(node.GetDirection(), attractionPoint - node.GetPosition());
         bool isInPerceptionAngle = angle <= nodePerceptionAngle / 2f;
@@ -122,15 +103,15 @@ public class VoxelGridAlgorithm {
         if (v < lo) {
             return lo;
         }
+
         if (v > hi) {
             return hi;
-        } else {
-            return v;
         }
-        //return Math.Max(Math.Min(v, hi), lo);
+
+        return v;
     }
 
-    private Vector3Int PositionToGridPosition(Vector3 pos/*, float gridWidth, float gridDepth, float gridHeight*/) {
+    private Vector3Int PositionToGridPosition(Vector3 pos) {
         int i = Crop((int)((attractionPoints.GetWidth() / 2 + pos.x) / voxelSize), 0, n_is-1);
         int j = Crop((int)(pos.y / voxelSize), 0, n_js-1);
         int k = Crop((int)((attractionPoints.GetDepth() / 2 + pos.z) / voxelSize), 0, n_ks-1);
@@ -159,26 +140,4 @@ public class VoxelGridAlgorithm {
 
         return result;
     }
-
-    //private List<Vector3> PositionsAroundVoxel(Vector3Int voxel) {
-    //    List<Vector3> result = new List<Vector3>();
-
-    //    for (int i = -1; i <= 1; i++) {
-    //        for (int j = -1; j <= 1; j++) {
-    //            for (int k = -1; k <= 1; k++) {
-    //                Vector3Int pos = voxel + new Vector3Int(i, j, k);
-    //                if (pos.x > -1 && pos.x < n_is
-    //                    && pos.y > -1 && pos.y < n_js
-    //                    && pos.z > -1 && pos.z < n_ks) {
-
-    //                    foreach (Node n in voxelGrid[pos.x, pos.y, pos.z]) {
-    //                        result.Add(n);
-    //                    }
-    //                }
-    //            }
-    //        }
-    //    }
-
-    //    return result;
-    //}
 }

@@ -33,13 +33,6 @@ public class Node : IEquatable<Node> {
 
 
 
-    //public Node(Vector3 position, Vector3 normal, float radius, GeometryProperties geometryProperties) {
-    //    this.position = new Vector3(position.x, position.y, position.z);
-    //    this.normal = new Vector3(normal.x, normal.y, normal.z);
-    //    this.radius = radius;
-    //    this.geometryProperties = geometryProperties;
-    //}
-
     public Node(Vector3 position, GeometryProperties geometryProperties) : this(position, null, geometryProperties) { }
 
     private Node(Vector3 position, Node supernode, GeometryProperties geometryProperties) {
@@ -76,15 +69,6 @@ public class Node : IEquatable<Node> {
 
 
 
-
-    //private void UpdateLeaves() {
-    //    if (leaves.Count < geometryProperties.GetLeavesPerNode()) {
-    //        AddLeaves(geometryProperties.GetLeavesPerNode() - leaves.Count);
-    //    } else if (leaves.Count > geometryProperties.GetLeavesPerNode()) {
-    //        RemoveLeaves(leaves.Count - geometryProperties.GetLeavesPerNode());
-    //    }
-    //}
-
     //adds leavesPerNode leaves
     public void AddLeaves(float leavesPerNode) {
         int integer_part = (int)leavesPerNode;
@@ -100,20 +84,6 @@ public class Node : IEquatable<Node> {
         }
     }
 
-    //removes leavesPerNode leaves
-    //private void RemoveLeaves(float leavesPerNode) {
-    //    int integer_part = (int)leavesPerNode;
-    //    float floating_part = leavesPerNode - integer_part;
-
-    //    float r = Util.RandomInRange(0, 1);
-    //    if (r <= floating_part) {
-    //        integer_part++;
-    //    }
-
-    //    for (int i = 0; i < integer_part; i++) {
-    //        leaves.RemoveAt(leaves.Count-1);
-    //    }
-    //}
 
     public Node Add(Vector3 position) {
         Node completeNode = new Node(position, this, geometryProperties);
@@ -202,15 +172,6 @@ public class Node : IEquatable<Node> {
 
                 normal = Vector3.up;
             } else { //many subnodes
-
-                //normal = Vector3.zero;
-                //foreach (Node subnode in subnodes) {
-                //    normal = normal + subnode.GetPosition() - position;
-                //}
-
-                //normal = Vector3.up;
-
-                //normal = Vector3.up * this.radius;
                 normal = Vector3.zero;
                 foreach (Node subnode in subnodes) {
                     normal = normal + (subnode.GetPosition() - position) * subnode.GetRadius();
@@ -224,22 +185,8 @@ public class Node : IEquatable<Node> {
                 //find tangent between(vector pointing from super to this, vector pointing from this to sub)
                 Vector3 superToThis = position - supernode.GetPosition();
                 Vector3 thisToSub = subnodes[0].GetPosition() - position;
-                //normal = thisToSub.normalized + superToThis.normalized;
                 normal = thisToSub + superToThis;
             } else { //many subnodes
-
-                //normal = supernode.GetNormal();
-
-                //normal = Vector3.zero;
-
-                //normal = subnodes[0].GetPosition() - position;
-                //foreach (Node subnode in subnodes) {
-                //    normal = normal + subnode.GetPosition() - position;
-                //}
-
-                //normal = position - supernode.GetPosition();
-
-                //normal = (position - supernode.GetPosition()) * this.radius;
                 normal = Vector3.zero;
                 foreach (Node subnode in subnodes) {
                     normal = normal + (subnode.GetPosition() - position) * subnode.GetRadius() * subnode.GetRadius();
@@ -278,14 +225,9 @@ public class Node : IEquatable<Node> {
     }
 
     public void GetCircleVertices(List<Vector3> verticesResult) {
-        //if (!HasSubnodes()) {
-        //    verticesResult.Add(position);
-        //    debug("adding one vertex");
-        //} else {
-            lock (this) {
-                TreeUtil.CalculateAndStoreCircleVertices(verticesResult, position, normal, radius, geometryProperties.GetCircleResolution());
-            }
-        //}
+        lock (this) {
+            TreeUtil.CalculateAndStoreCircleVertices(verticesResult, position, normal, radius, geometryProperties.GetCircleResolution());
+        }
     }
 
     public void CalculateAndStoreLeafData(List<Vector3> verticesResult, List<Vector2> uvsResult, List<int> trianglesResult) {
@@ -315,25 +257,5 @@ public class Node : IEquatable<Node> {
 
     public bool Equals(Node other) {
         return (other!=null) && this.position.Equals(other.position);
-    }
-
-    //#######################################################################################
-    //##########                     GEOMETRY PROPERTIES OBSERVER                  ##########
-    //#######################################################################################
-
-    public void OnLeafTypeChanged() {
-        // do nothing
-    }
-
-    public void OnLeavesPerNodeChanged() {
-        //UpdateLeaves();
-    }
-
-    public void OnLeavesEnabledChanged() {
-        // do nothing
-    }
-
-    public void OnLeafSizeChanged() {
-        // do nothing
     }
 }
