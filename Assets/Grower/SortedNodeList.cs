@@ -18,14 +18,15 @@ public class SortedNodeList : List<Node> {
     public void InsertSorted(Node e) {
         if (base.Count == 0) {
             base.Add(e);
-        }
+        } else {
 
-        int i = GetNearestIndex(e);
+            int i = GetNearestIndex(e);
 
-        if (LessThan(e, base[i]) || Equal(e, base[i])) { // if e is less or equal to the found index, the new element can be placed at that index
-            base.Insert(i, e);
-        } else { // otherwise e is greater, so the new element is placed right next to it
-            base.Insert(i + 1, e);
+            if (LessThan(e, base[i]) || Equal(e, base[i])) { // if e is less or equal to the found index, the new element can be placed at that index
+                base.Insert(i, e);
+            } else { // otherwise e is greater, so the new element is placed right next to it
+                base.Insert(i + 1, e);
+            }
         }
     }
 
@@ -135,11 +136,11 @@ public class SortedNodeList : List<Node> {
     private bool Equal(Node a, Node b) {
         switch (coordinateType) {
             case CoordinateType.x:
-                return Util.AlmostEqual(a.GetPosition().x, b.GetPosition().x, 0.0001f);
+                return Util.AlmostEqual(a.GetPosition().x, b.GetPosition().x, 0.00000001f);
             case CoordinateType.y:
-                return Util.AlmostEqual(a.GetPosition().y, b.GetPosition().y, 0.0001f);
+                return Util.AlmostEqual(a.GetPosition().y, b.GetPosition().y, 0.00000001f);
             case CoordinateType.z:
-                return Util.AlmostEqual(a.GetPosition().z, b.GetPosition().z, 0.0001f);
+                return Util.AlmostEqual(a.GetPosition().z, b.GetPosition().z, 0.00000001f);
             default:
                 return false;
         }
@@ -187,14 +188,15 @@ public class SortedCandidateNodeList : List<CandidateNode> {
     public void InsertSorted(CandidateNode e) {
         if (base.Count == 0) {
             base.Add(e);
-        }
+        } else {
 
-        int i = GetNearestIndex(e);
+            int i = GetNearestIndex(e);
 
-        if (LessThan(e, base[i]) || Equal(e, base[i])) { // if e is less or equal to the found index, the new element can be placed at that index
-            base.Insert(i, e);
-        } else { // otherwise e is greater, so the new element is placed right next to it
-            base.Insert(i + 1, e);
+            if (LessThan(e, base[i]) || Equal(e, base[i])) { // if e is less or equal to the found index, the new element can be placed at that index
+                base.Insert(i, e);
+            } else { // otherwise e is greater, so the new element is placed right next to it
+                base.Insert(i + 1, e);
+            }
         }
     }
 
@@ -301,7 +303,7 @@ public class SortedCandidateNodeList : List<CandidateNode> {
     }
 
     private bool Equal(CandidateNode a, CandidateNode b) {
-        return Util.AlmostEqual(a.distance, b.distance, 0.0001f);
+        return Util.AlmostEqual(a.distance, b.distance, 0.00000001f);
     }
 
     private bool LessThan(CandidateNode a, CandidateNode b) {

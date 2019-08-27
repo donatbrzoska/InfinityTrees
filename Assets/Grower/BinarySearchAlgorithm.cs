@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class BinarySearchAlgorithm : NearestNodeAlgorithm{
@@ -15,10 +16,34 @@ public class BinarySearchAlgorithm : NearestNodeAlgorithm{
         this.perceptionAngle = perceptionAngle;
     }
 
+    //private void CheckOrder() {
+    //    for (int i=0; i<x.Count-1; i++) {
+    //        if (x[i].GetPosition().x > x[i + 1].GetPosition().x) {
+    //            for (int j = 0; j<x.Count; j++) {
+    //                Debug.Log(j + ": " + x[j].GetPosition().x);
+    //            }
+    //            throw new Exception("x sorting function is buggy at " + i);
+    //        }
+    //        if (y[i].GetPosition().y > y[i + 1].GetPosition().y) {
+    //            for (int j = 0; j < y.Count; j++) {
+    //                Debug.Log(j + ": " + y[j].GetPosition().y);
+    //            }
+    //            throw new Exception("y sorting function is buggy at " + i);
+    //        }
+    //        if (z[i].GetPosition().z > z[i + 1].GetPosition().z) {
+    //            for (int j = 0; j < z.Count; j++) {
+    //                Debug.Log(j + ": " + z[j].GetPosition().z);
+    //            }
+    //            throw new Exception("z sorting function is buggy at " + i);
+    //        }
+    //    }
+    //}
+
     public void Add(Node node) {
         x.InsertSorted(node);
         y.InsertSorted(node);
         z.InsertSorted(node);
+        //CheckOrder();
     }
 
     public Node GetNearestWithinSquaredDistance(Vector3 position) {
