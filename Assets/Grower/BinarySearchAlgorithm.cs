@@ -7,13 +7,21 @@ public class BinarySearchAlgorithm : NearestNodeAlgorithm{
     SortedNodeList y = new SortedNodeList(CoordinateType.y);
     SortedNodeList z = new SortedNodeList(CoordinateType.z);
 
+    float squaredInfluenceDistance;
+    float perceptionAngle;
+
+    public BinarySearchAlgorithm(float squaredInfluenceDistance, float perceptionAngle) {
+        this.squaredInfluenceDistance = squaredInfluenceDistance;
+        this.perceptionAngle = perceptionAngle;
+    }
+
     public void Add(Node node) {
         x.InsertSorted(node);
         y.InsertSorted(node);
         z.InsertSorted(node);
     }
 
-    public Node GetNearestWithinSquaredDistance(Vector3 position, float maxSquaredDistance, float nodePerceptionAngle) {
+    public Node GetNearestWithinSquaredDistance(Vector3 position) {
         SortedCandidateNodeList candidates = new SortedCandidateNodeList();
 
         //find index of nearest Node concerning the x coordinate
@@ -28,9 +36,9 @@ public class BinarySearchAlgorithm : NearestNodeAlgorithm{
 
             //find out whether we are still in the x range
             float dx = d.x * d.x;
-            if (dx <= maxSquaredDistance) {
+            if (dx <= squaredInfluenceDistance) {
                 float distance = dx + d.y * d.y + d.z * d.z;
-                if (distance <= maxSquaredDistance) {
+                if (distance <= squaredInfluenceDistance) {
                     candidates.InsertSorted(new CandidateNode(x[i], distance));
                 }
             } else {
@@ -44,9 +52,9 @@ public class BinarySearchAlgorithm : NearestNodeAlgorithm{
 
             //find out whether we are still in the x range
             float dx = d.x * d.x; 
-            if (dx <= maxSquaredDistance) {
+            if (dx <= squaredInfluenceDistance) {
                 float distance = dx + d.y * d.y + d.z * d.z;
-                if (distance <= maxSquaredDistance) {
+                if (distance <= squaredInfluenceDistance) {
                     candidates.InsertSorted(new CandidateNode(x[i], distance));
                 }
             } else {
@@ -61,9 +69,9 @@ public class BinarySearchAlgorithm : NearestNodeAlgorithm{
             Vector3 d = currentPosition - position;
 
             float dy = d.y * d.y;
-            if (dy <= maxSquaredDistance) { //find out whether we are still in the y range
+            if (dy <= squaredInfluenceDistance) { //find out whether we are still in the y range
                 float distance = d.x * d.x + dy + d.z * d.z;
-                if (distance <= maxSquaredDistance) {
+                if (distance <= squaredInfluenceDistance) {
                     candidates.InsertSorted(new CandidateNode(y[i], distance));
                 }
             } else {
@@ -75,9 +83,9 @@ public class BinarySearchAlgorithm : NearestNodeAlgorithm{
             Vector3 d = currentPosition - position;
 
             float dy = d.y * d.y;
-            if (dy <= maxSquaredDistance) { //find out whether we are still in the y range
+            if (dy <= squaredInfluenceDistance) { //find out whether we are still in the y range
                 float distance = d.x * d.x + dy + d.z * d.z;
-                if (distance <= maxSquaredDistance) {
+                if (distance <= squaredInfluenceDistance) {
                     candidates.InsertSorted(new CandidateNode(y[i], distance));
                 }
             } else {
@@ -92,9 +100,9 @@ public class BinarySearchAlgorithm : NearestNodeAlgorithm{
             Vector3 d = currentPosition - position;
 
             float dz = d.z * d.z;
-            if (dz <= maxSquaredDistance) { //find out whether we are still in the z range
+            if (dz <= squaredInfluenceDistance) { //find out whether we are still in the z range
                 float distance = d.x * d.x + d.y * d.y + dz;
-                if (distance <= maxSquaredDistance) {
+                if (distance <= squaredInfluenceDistance) {
                     candidates.InsertSorted(new CandidateNode(z[i], distance));
                 }
             } else {
@@ -106,9 +114,9 @@ public class BinarySearchAlgorithm : NearestNodeAlgorithm{
             Vector3 d = currentPosition - position;
 
             float dz = d.z * d.z;
-            if (dz <= maxSquaredDistance) { //find out whether we are still in the z range
+            if (dz <= squaredInfluenceDistance) { //find out whether we are still in the z range
                 float distance = d.x * d.x + d.y * d.y + dz;
-                if (distance <= maxSquaredDistance) {
+                if (distance <= squaredInfluenceDistance) {
                     candidates.InsertSorted(new CandidateNode(z[i], distance));
                 }
             } else {
@@ -120,7 +128,7 @@ public class BinarySearchAlgorithm : NearestNodeAlgorithm{
         if (candidates.Count > 0) {
             for (int i = 0; i < candidates.Count; i++) {
                 CandidateNode current = candidates[i];
-                if (AttractionPointInPerceptionAngle(current.node, position, nodePerceptionAngle)) {
+                if (AttractionPointInPerceptionAngle(current.node, position)) {
                     return current.node;
                 }
             }
@@ -130,9 +138,9 @@ public class BinarySearchAlgorithm : NearestNodeAlgorithm{
         }
     }
 
-    private bool AttractionPointInPerceptionAngle(Node node, Vector3 attractionPoint, float nodePerceptionAngle) {
+    private bool AttractionPointInPerceptionAngle(Node node, Vector3 attractionPoint) {
         float angle = Vector3.Angle(node.GetDirection(), attractionPoint - node.GetPosition());
-        bool isInPerceptionAngle = angle <= nodePerceptionAngle / 2f;
+        bool isInPerceptionAngle = angle <= perceptionAngle / 2f;
         return isInPerceptionAngle;
     }
 }

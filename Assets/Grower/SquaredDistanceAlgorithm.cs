@@ -5,11 +5,13 @@ using UnityEngine;
 public class SquaredDistanceAlgorithm : NearestNodeAlgorithm{
 
     List<Node> nodeList;
-    PseudoEllipsoid attractionPoints;
+    float squaredInfluenceDistance;
+    float perceptionAngle;
 
-    public SquaredDistanceAlgorithm(PseudoEllipsoid attractionPoints) {
+    public SquaredDistanceAlgorithm(float squaredInfluenceDistance, float perceptionAngle) {
         nodeList = new List<Node>();
-        this.attractionPoints = attractionPoints;
+        this.squaredInfluenceDistance = squaredInfluenceDistance;
+        this.perceptionAngle = perceptionAngle;
     }
 
     public void Add(Node node) {
@@ -18,9 +20,9 @@ public class SquaredDistanceAlgorithm : NearestNodeAlgorithm{
 
 
     //returns null if there is no closest node
-    public Node GetNearestWithinSquaredDistance(Vector3 attractionPoint, float maxSquaredDistance, float nodePerceptionAngle) {
+    public Node GetNearestWithinSquaredDistance(Vector3 attractionPoint) {
 
-        float currentSmallestDistance = maxSquaredDistance;
+        float currentSmallestDistance = squaredInfluenceDistance;
         Node closest = null;
 
         foreach (Node current in nodeList) {
@@ -28,7 +30,7 @@ public class SquaredDistanceAlgorithm : NearestNodeAlgorithm{
             float quadraticDistanceToCurrent = GetQuadraticDistanceWithMaxValue(current.GetPosition(), attractionPoint, currentSmallestDistance);
 
             if (quadraticDistanceToCurrent!=-1) { //check if the distance is smaller than required
-                if (AttractionPointInPerceptionAngle(current, attractionPoint, nodePerceptionAngle)) { //angle calculation is a lot slower than one distance calculation
+                if (AttractionPointInPerceptionAngle(current, attractionPoint, perceptionAngle)) { //angle calculation is a lot slower than one distance calculation
                     currentSmallestDistance = quadraticDistanceToCurrent;
                     closest = current;
                 }
@@ -42,19 +44,6 @@ public class SquaredDistanceAlgorithm : NearestNodeAlgorithm{
         float angle = Vector3.Angle(node.GetDirection(), attractionPoint - node.GetPosition());
         bool isInPerceptionAngle = angle <= nodePerceptionAngle / 2f;
         return isInPerceptionAngle;
-    }
-
-    //for every node position, stores the distance to every attraction point
-    private List<Vector3> DetermineAttractionPointsWithinQuadraticDistance(Vector3 position, float maxDistance) {
-        List<Vector3> result = new List<Vector3>();
-        foreach (Vector3 attractionPoint in attractionPoints) {
-
-            float distance = GetQuadraticDistanceWithMaxValue(position, attractionPoint, maxDistance);
-            if (distance > -1) {
-                result.Add(attractionPoint);
-            }
-        }
-        return result;
     }
 
     //https://stackoverflow.com/questions/1901139/closest-point-to-a-given-point

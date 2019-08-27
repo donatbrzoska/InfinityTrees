@@ -21,8 +21,8 @@ public class SpaceColonization {
         }
     }
 
-    //NearestNodeAlgorithm nearestNodeAlgorithm;
-    VoxelGridAlgorithm nearestNodeAlgorithm;
+    NearestNodeAlgorithm nearestNodeAlgorithm;
+    //VoxelGridAlgorithm nearestNodeAlgorithm;
 
     private float treeHeight;
     public float GetTreeHeight() {
@@ -50,9 +50,9 @@ public class SpaceColonization {
     Node crownRoot;
 
     public void Grow(Tree tree) {
-        //nearestNodeAlgorithm = new SquaredDistanceAlgorithm(growthProperties.GetAttractionPoints());
+        nearestNodeAlgorithm = new SquaredDistanceAlgorithm(growthProperties.GetSquaredInfluenceDistance(), growthProperties.GetPerceptionAngle());
         //nearestNodeAlgorithm = new BinarySearchAlgorithm(); //little bug somewhere
-        nearestNodeAlgorithm = new VoxelGridAlgorithm(growthProperties.GetAttractionPoints(), growthProperties.GetInfluenceDistance());
+        nearestNodeAlgorithm = new VoxelGridAlgorithm(growthProperties.GetAttractionPoints(), growthProperties.GetSquaredInfluenceDistance(), growthProperties.GetPerceptionAngle());
 
         //if (growerThread == null) {
         growerThread = new Thread(() => {
@@ -67,8 +67,8 @@ public class SpaceColonization {
 
             growingStopwatch.Stop();
             debug(new FormatString("grew {0} times in {1}", growthProperties.GetIterations(), growingStopwatch.Elapsed));
-            debug(new FormatString("finding voxels around took {0}", nearestNodeAlgorithm.voxelsAround.Elapsed));
-            debug(new FormatString("finding nodes in voxels took {0}", nearestNodeAlgorithm.nodesAround.Elapsed));
+            //debug(new FormatString("finding voxels around took {0}", nearestNodeAlgorithm.voxelsAround.Elapsed));
+            //debug(new FormatString("finding nodes in voxels took {0}", nearestNodeAlgorithm.nodesAround.Elapsed));
         });
         growerThread.IsBackground = true;
         growerThread.Start();
@@ -205,7 +205,7 @@ public class SpaceColonization {
                 Vector3 attractionPoint = growthProperties.GetAttractionPoints()[j];
 
                 //and find the closest Node respectively
-                Node closest = nearestNodeAlgorithm.GetNearestWithinSquaredDistance(attractionPoint, growthProperties.GetSquaredInfluenceDistance(), growthProperties.GetPerceptionAngle());
+                Node closest = nearestNodeAlgorithm.GetNearestWithinSquaredDistance(attractionPoint);
                 // Rudis ultimate plan to make the removal in the next iteration
                 findClosePointStopwatch.Stop();
                 removeClosePointsStopwatch.Start();

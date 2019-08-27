@@ -8,7 +8,6 @@ public class StandardAlgorithm : NearestNodeAlgorithm {
     float influenceDistance;
     float perceptionAngle;
 
-
     public StandardAlgorithm(float influenceDistance, float perceptionAngle) {
         nodeList = new List<Node>();
         this.influenceDistance = influenceDistance;
@@ -20,7 +19,7 @@ public class StandardAlgorithm : NearestNodeAlgorithm {
     }
 
     //returns null if there is no closest node
-    public Node GetNearestWithinSquaredDistance(Vector3 attractionPoint, float maxSquaredDistance, float nodePerceptionAngle) {
+    public Node GetNearestWithinSquaredDistance(Vector3 attractionPoint) {
 
         float currentSmallestDistance = influenceDistance;
         Node closest = null;

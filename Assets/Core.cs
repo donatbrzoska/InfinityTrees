@@ -31,8 +31,8 @@ public class Core : MonoBehaviour, GrowerListener {
         LoadDefaultGeometry();
 
         //1764, 1658 || 884, 1218
-        LoadYoungGrowth();
-        LoadYoungGeometry();
+        //LoadYoungGrowth();
+        //LoadYoungGeometry();
 
         //9152, 8334 || 4352, 5934
         //LoadExcurrentGrowth();

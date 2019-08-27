@@ -19,6 +19,9 @@ public class VoxelGridAlgorithm : NearestNodeAlgorithm {
         }
     }
 
+    float squaredInfluenceDistance;
+    float perceptionAngle;
+
     List<Node>[,,] voxelGrid;
     int n_is;
     int n_js;
@@ -29,9 +32,12 @@ public class VoxelGridAlgorithm : NearestNodeAlgorithm {
 
     //Dictionary<Vector3, Vector3Int> attractionPoints_to_voxelCoordinates;
 
-    public VoxelGridAlgorithm(PseudoEllipsoid attractionPoints, float voxelSize) {
+    public VoxelGridAlgorithm(PseudoEllipsoid attractionPoints, float squaredInfluenceDistance, float perceptionAngle) {
         this.attractionPoints = attractionPoints;
-        this.voxelSize = voxelSize;
+
+        this.squaredInfluenceDistance = squaredInfluenceDistance;
+        this.perceptionAngle = perceptionAngle;
+        this.voxelSize = (float)Math.Sqrt(squaredInfluenceDistance);
 
         //for every attraction point, cache its voxel
         //attractionPoints_to_voxelCoordinates = new Dictionary<Vector3, Vector3Int>();
@@ -72,7 +78,7 @@ public class VoxelGridAlgorithm : NearestNodeAlgorithm {
     }
 
 
-    public Node GetNearestWithinSquaredDistance(Vector3 position, float maxSquaredDistance, float nodePerceptionAngle) {
+    public Node GetNearestWithinSquaredDistance(Vector3 position) {
         Vector3Int gridPosition = PositionToGridPosition(position);
         List<Node> candidates = NodesAroundVoxel(gridPosition);
         //if (candidates.Count > 0) {
@@ -85,8 +91,8 @@ public class VoxelGridAlgorithm : NearestNodeAlgorithm {
         foreach (Node n in candidates) {
             Vector3 d = n.GetPosition() - position;
             float squaredDistance = d.x * d.x + d.y * d.y + d.z * d.z;
-            if (squaredDistance < closestDistance && squaredDistance < maxSquaredDistance) {
-                if (AttractionPointInPerceptionAngle(n, position, nodePerceptionAngle)) {
+            if (squaredDistance < closestDistance && squaredDistance < squaredInfluenceDistance) {
+                if (AttractionPointInPerceptionAngle(n, position)) {
                     closest = n;
                     closestDistance = squaredDistance;
                 }
@@ -96,9 +102,9 @@ public class VoxelGridAlgorithm : NearestNodeAlgorithm {
         return closest;
     }
 
-    private bool AttractionPointInPerceptionAngle(Node node, Vector3 attractionPoint, float nodePerceptionAngle) {
+    private bool AttractionPointInPerceptionAngle(Node node, Vector3 attractionPoint) {
         float angle = Vector3.Angle(node.GetDirection(), attractionPoint - node.GetPosition());
-        bool isInPerceptionAngle = angle <= nodePerceptionAngle / 2f;
+        bool isInPerceptionAngle = angle <= perceptionAngle / 2f;
         return isInPerceptionAngle;
     }
 
