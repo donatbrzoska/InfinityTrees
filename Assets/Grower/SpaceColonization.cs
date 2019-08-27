@@ -26,10 +26,11 @@ public class SpaceColonization {
         BinarySearch,
         VoxelGrid
     }
+    DistanceCalculationAlgorithm distanceCalculationAlgorithm = DistanceCalculationAlgorithm.Standard;
+    //DistanceCalculationAlgorithm distanceCalculationAlgorithm = DistanceCalculationAlgorithm.BinarySearch;
+    //DistanceCalculationAlgorithm distanceCalculationAlgorithm = DistanceCalculationAlgorithm.VoxelGrid;
 
-    DistanceCalculationAlgorithm distanceCalculationAlgorithm = DistanceCalculationAlgorithm.VoxelGrid;
-
-    List<Node> nodeList;
+    SquaredDistanceAlgorithm squaredDistanceAlgorithm;
     BinarySearchAlgorithm binarySearchAlgorithm;
     VoxelGridAlgorithm voxelGridAlgorithm;
 
@@ -58,7 +59,7 @@ public class SpaceColonization {
 
     private void InsertToAlgorithm(Node node) {
         if (distanceCalculationAlgorithm == DistanceCalculationAlgorithm.Standard) {
-            nodeList.Add(node);
+            squaredDistanceAlgorithm.Add(node);
         } else if (distanceCalculationAlgorithm == DistanceCalculationAlgorithm.BinarySearch) {
             binarySearchAlgorithm.Add(node);
         } else {
@@ -68,7 +69,7 @@ public class SpaceColonization {
 
     public void Grow(Tree tree) {
         if (distanceCalculationAlgorithm == DistanceCalculationAlgorithm.Standard) {
-            nodeList = new List<Node>();// { tree.StemRoot };
+            squaredDistanceAlgorithm = new SquaredDistanceAlgorithm(growthProperties.GetAttractionPoints());
         } else if (distanceCalculationAlgorithm == DistanceCalculationAlgorithm.BinarySearch) {
             binarySearchAlgorithm = new BinarySearchAlgorithm();
         } else { //if(voxelGrid_algorithm)
@@ -227,7 +228,7 @@ public class SpaceColonization {
                 //and find the closest Node respectively
                 Node closest;// = FindClosestNode(attractionPoint);
                 if (distanceCalculationAlgorithm == DistanceCalculationAlgorithm.Standard) {
-                    closest = FindClosestNode(attractionPoint);
+                    closest = squaredDistanceAlgorithm.GetNearestWithinSquaredDistance(attractionPoint, growthProperties.GetSquaredInfluenceDistance(), growthProperties.GetPerceptionAngle());
                 } else if (distanceCalculationAlgorithm == DistanceCalculationAlgorithm.BinarySearch) {
                     closest = binarySearchAlgorithm.GetNearestWithinSquaredDistance(attractionPoint, growthProperties.GetSquaredInfluenceDistance(), growthProperties.GetPerceptionAngle());
                 } else {
@@ -419,82 +420,6 @@ public class SpaceColonization {
     //	}
     //}
 
-    //returns null if there is no closest node
-    private Node FindClosestNode(Vector3 attractionPoint) {
-        Node closest = null;
-
-        float currentSmallestDistance = growthProperties.GetSquaredInfluenceDistance();
-
-        foreach (Node current in nodeList) {
-
-            float quadraticDistanceToCurrent = GetQuadraticDistanceWithMaxValue(current.GetPosition(), attractionPoint, currentSmallestDistance);
-
-
-            if (!Util.AlmostEqual(quadraticDistanceToCurrent, -1, 0.0001f)) {
-                if (AttractionPointInPerceptionAngle(current, attractionPoint)) { //angle calculation is a lot slower than one distance calculation
-                    currentSmallestDistance = quadraticDistanceToCurrent;
-                    closest = current;
-                }
-            }
-        }
-
-        return closest;
-    }
-
-    private bool AttractionPointInPerceptionAngle(Node node, Vector3 attractionPoint) {
-        float angle = Vector3.Angle(node.GetDirection(), attractionPoint - node.GetPosition());
-        bool isInPerceptionAngle = angle <= growthProperties.GetPerceptionAngle() / 2f;
-        return isInPerceptionAngle;
-    }
-
-    private void RemoveClosePoints(List<Vector3> newPositions, int iteration) {
-        foreach (Vector3 newPosition in newPositions) {
-            List<Vector3> closePoints;
-
-            closePoints = DetermineAttractionPointsWithinQuadraticDistance(newPosition, growthProperties.GetSquaredClearDistance(iteration));
-            foreach (Vector3 closePoint in closePoints) {
-                growthProperties.GetAttractionPoints().Remove(closePoint);
-            }
-        }
-    }
-
-    //for every node position, stores the distance to every attraction point
-    private List<Vector3> DetermineAttractionPointsWithinQuadraticDistance(Vector3 position, float maxDistance) {
-        List<Vector3> result = new List<Vector3>();
-        foreach (Vector3 attractionPoint in growthProperties.GetAttractionPoints()) {
-
-            float distance = GetQuadraticDistanceWithMaxValue(position, attractionPoint, maxDistance);
-            if (distance > -1) {
-                result.Add(attractionPoint);
-            }
-        }
-        return result;
-    }
-
-    //https://stackoverflow.com/questions/1901139/closest-point-to-a-given-point
-    float GetQuadraticDistanceWithMaxValue(Vector3 a, Vector3 b, float maxValue) {
-        float distance = 0;
-
-        float dx = a.x - b.x;
-        distance += dx * dx;
-        if (distance > maxValue) {
-            return -1;
-        }
-
-        float dy = a.y - b.y;
-        distance += dy * dy;
-        if (distance > maxValue) {
-            return -1;
-        }
-
-        float dz = a.z - b.z;
-        distance += dz * dz;
-        if (distance > maxValue) {
-            return -1;
-        }
-
-        return distance;
-    }
 
     //#######################################################################################
     //##########                 INTERFACE IMPLEMENTIATION : Grower                ##########
