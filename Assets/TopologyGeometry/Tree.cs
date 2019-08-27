@@ -23,7 +23,6 @@ public class Tree {
         return geometryProperties;
     }
 
-    public Node CrownRoot { get; set; }
     public Node StemRoot { get; set; }
 
     public Tree(GeometryProperties geometryProperties) {

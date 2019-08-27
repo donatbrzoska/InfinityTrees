@@ -46,6 +46,8 @@ public class SpaceColonization {
         growerThread.Join();
     }
 
+    Node crownRoot;
+
     public void Grow(Tree tree) {
         //nearestNodeAlgorithm = new SquaredDistanceAlgorithm(growthProperties.GetAttractionPoints());
         //nearestNodeAlgorithm = new BinarySearchAlgorithm(); //little bug somewhere
@@ -76,7 +78,7 @@ public class SpaceColonization {
 
     public void RegrowStem(Tree tree) {
         //save the current crown structure
-        Node CurrentCrownRoot = tree.CrownRoot;
+        Node CurrentCrownRoot = crownRoot;
 
         //delete everything from the tree
         tree.Reset();
@@ -85,10 +87,10 @@ public class SpaceColonization {
         GrowStem(tree);
 
         //put the current crown structure to the new stem
-        Vector3 pos_diff = tree.CrownRoot.GetPosition() - CurrentCrownRoot.GetPosition();
+        Vector3 pos_diff = crownRoot.GetPosition() - CurrentCrownRoot.GetPosition();
         CurrentCrownRoot.UpdatePosition(pos_diff);
         foreach (Node n in CurrentCrownRoot.GetSubnodes()) {
-            tree.CrownRoot.Add(n);
+            crownRoot.Add(n);
             //have a look at the Add method again, if you want the move the attraction points towards the stem too
         }
 
@@ -97,7 +99,7 @@ public class SpaceColonization {
 
     private void GrowStem(Tree tree) {
         if (Util.AlmostEqual(growthProperties.StemLength, 0)) {
-            tree.CrownRoot = tree.StemRoot;
+            crownRoot = tree.StemRoot;
         } else {
             stemRandom = new AdvancedRandom(growthProperties.GetAttractionPoints().Seed);
 
@@ -108,13 +110,13 @@ public class SpaceColonization {
                 axis.y = 0;
 
                 if (tree.StemRoot.HasSubnodes()) {
-                    Vector3 direction = Quaternion.AngleAxis(angle, axis) * tree.CrownRoot.GetDirection(true);
-                    Node newNode = tree.CrownRoot.Add(tree.CrownRoot.GetPosition() + direction * growthProperties.GetGrowthDistance());
-                    tree.CrownRoot = newNode;
+                    Vector3 direction = Quaternion.AngleAxis(angle, axis) * crownRoot.GetDirection(true);
+                    Node newNode = crownRoot.Add(crownRoot.GetPosition() + direction * growthProperties.GetGrowthDistance());
+                    crownRoot = newNode;
                 } else {
                     Vector3 direction = Quaternion.AngleAxis(angle, axis) * tree.StemRoot.GetDirection(true);
                     Node newNode = tree.StemRoot.Add(tree.StemRoot.GetPosition() + direction * growthProperties.GetGrowthDistance());
-                    tree.CrownRoot = newNode;
+                    crownRoot = newNode;
                 }
             }
 
@@ -125,26 +127,26 @@ public class SpaceColonization {
                 axis.y = 0;
 
                 if (tree.StemRoot.HasSubnodes()) {
-                    Vector3 direction = Quaternion.AngleAxis(angle, axis) * tree.CrownRoot.GetDirection(true);
-                    Node newNode = tree.CrownRoot.Add(tree.CrownRoot.GetPosition() + direction * rest);
-                    tree.CrownRoot = newNode;
+                    Vector3 direction = Quaternion.AngleAxis(angle, axis) * crownRoot.GetDirection(true);
+                    Node newNode = crownRoot.Add(crownRoot.GetPosition() + direction * rest);
+                    crownRoot = newNode;
                 } else {
                     Vector3 direction = Quaternion.AngleAxis(angle, axis) * tree.StemRoot.GetDirection(true);
                     Node newNode = tree.StemRoot.Add(tree.StemRoot.GetPosition() + direction * rest);
-                    tree.CrownRoot = newNode;
+                    crownRoot = newNode;
                 }
             }
         }
 
-        nearestNodeAlgorithm.Add(tree.CrownRoot);
-        growthProperties.GetAttractionPoints().UpdatePosition(tree.CrownRoot.GetPosition());
+        nearestNodeAlgorithm.Add(crownRoot);
+        growthProperties.GetAttractionPoints().UpdatePosition(crownRoot.GetPosition());
     }
 
 
 
     private void GrowCrownStem(Tree tree) {
         if (!Util.AlmostEqual(growthProperties.CrownStemLengthRatio, 0)) {
-            Node crownStemTip = tree.CrownRoot;
+            Node crownStemTip = crownRoot;
 
             stemRandom = new AdvancedRandom(growthProperties.GetAttractionPoints().Seed);
 
@@ -154,7 +156,7 @@ public class SpaceColonization {
                 Vector3 axis = stemRandom.RandomVector3();
                 axis.y = 0;
 
-                Vector3 direction = Quaternion.AngleAxis(angle, axis) * tree.CrownRoot.GetDirection(true);
+                Vector3 direction = Quaternion.AngleAxis(angle, axis) * crownRoot.GetDirection(true);
                 crownStemTip = crownStemTip.Add(crownStemTip.GetPosition() + direction * growthProperties.GetGrowthDistance());
 
                 nearestNodeAlgorithm.Add(crownStemTip);
@@ -166,7 +168,7 @@ public class SpaceColonization {
                 Vector3 axis = stemRandom.RandomVector3();
                 axis.y = 0;
 
-                Vector3 direction = Quaternion.AngleAxis(angle, axis) * tree.CrownRoot.GetDirection(true);
+                Vector3 direction = Quaternion.AngleAxis(angle, axis) * crownRoot.GetDirection(true);
                 crownStemTip = crownStemTip.Add(crownStemTip.GetPosition() + direction * growthProperties.GetGrowthDistance());
 
                 nearestNodeAlgorithm.Add(crownStemTip);
