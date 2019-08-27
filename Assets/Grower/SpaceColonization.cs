@@ -236,7 +236,6 @@ public class SpaceColonization {
                 return;
             }
 
-            List<Vector3> newPositions = new List<Vector3>();
             //iterate through all Nodes with attractionPoints associated
             foreach (Node currentNode in nodesAttractionPoints.Keys) {
                 List<Vector3> associatedAttractionPoints = nodesAttractionPoints[currentNode];
@@ -290,9 +289,6 @@ public class SpaceColonization {
 
                     //add to the nodeList
                     nearestNodeAlgorithm.Add(newNode);
-
-                    //and to the newPositions list
-                    newPositions.Add(happyNodePosition);
 
                     // used by Core -> CameraMovement
                     if (treeHeight < happyNodePosition.y) {
