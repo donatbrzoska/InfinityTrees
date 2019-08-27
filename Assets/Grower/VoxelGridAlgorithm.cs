@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using UnityEngine;
 
@@ -66,6 +67,8 @@ public class VoxelGridAlgorithm : NearestNodeAlgorithm {
         Vector3Int gridPos = PositionToGridPosition(node.GetPosition());
         //debug("acessing: " + gridPos);
         voxelGrid[gridPos.x, gridPos.y, gridPos.z].Add(node);
+
+        voxels_to_nodesAround.Clear();
     }
 
 
@@ -115,28 +118,65 @@ public class VoxelGridAlgorithm : NearestNodeAlgorithm {
         int i = Crop((int)((attractionPoints.GetWidth() / 2 + pos.x) / voxelSize), 0, n_is-1);
         int j = Crop((int)(pos.y / voxelSize), 0, n_js-1);
         int k = Crop((int)((attractionPoints.GetDepth() / 2 + pos.z) / voxelSize), 0, n_ks-1);
-
         return new Vector3Int(i, j, k);
     }
 
-    private List<Node> NodesAroundVoxel(Vector3Int voxel) {
-        List<Node> result = new List<Node>();
+    public Stopwatch voxelsAround = new Stopwatch();
 
-        for (int i = -1; i <= 1; i++) {
-            for (int j = -1; j <= 1; j++) {
-                for (int k = -1; k <= 1; k++) {
-                    Vector3Int pos = voxel + new Vector3Int(i, j, k);
-                    if (pos.x > -1 && pos.x < n_is
-                        && pos.y > -1 && pos.y < n_js
-                        && pos.z > -1 && pos.z < n_ks) {
+    //cache
+    private Dictionary<Vector3Int, List<Vector3Int>> voxels_to_voxelsAround = new Dictionary<Vector3Int, List<Vector3Int>>();
+    private List<Vector3Int> VoxelsAroundVoxel(Vector3Int voxel) {
+        voxelsAround.Start();
+        List<Vector3Int> result = new List<Vector3Int>();
 
-                        foreach (Node n in voxelGrid[pos.x, pos.y, pos.z]) {
-                            result.Add(n);
+        if (voxels_to_voxelsAround.ContainsKey(voxel)) {
+            result = voxels_to_voxelsAround[voxel];
+        } else {
+            for (int i = -1; i <= 1; i++) {
+                for (int j = -1; j <= 1; j++) {
+                    for (int k = -1; k <= 1; k++) {
+                        Vector3Int pos = voxel + new Vector3Int(i, j, k);
+                        if (pos.x > -1 && pos.x < n_is
+                            && pos.y > -1 && pos.y < n_js
+                            && pos.z > -1 && pos.z < n_ks) {
+
+                            result.Add(pos);
                         }
                     }
                 }
             }
+
+            voxels_to_voxelsAround[voxel] = result;
         }
+        voxelsAround.Stop();
+
+        return result;
+    }
+
+    public Stopwatch nodesAround = new Stopwatch();
+
+    //cache, needs to be reset in every iteration though because then new nodes are present in the tree,
+    // .. the latter is done in the Add() method
+    private Dictionary<Vector3Int, List<Node>> voxels_to_nodesAround = new Dictionary<Vector3Int, List<Node>>();
+    private List<Node> NodesAroundVoxel(Vector3Int voxel) {
+        List<Vector3Int> voxelsAroundVoxel = VoxelsAroundVoxel(voxel);
+
+        nodesAround.Start();
+        List<Node> result = new List<Node>();
+
+        if (voxels_to_nodesAround.ContainsKey(voxel)) {
+            result = voxels_to_nodesAround[voxel];
+        } else {
+            foreach (Vector3Int v in voxelsAroundVoxel) {
+                foreach (Node n in voxelGrid[v.x, v.y, v.z]) {
+                    result.Add(n);
+                }
+            }
+
+            voxels_to_nodesAround[voxel] = result;
+        }
+
+        nodesAround.Stop();
 
         return result;
     }

@@ -21,7 +21,8 @@ public class SpaceColonization {
         }
     }
 
-    NearestNodeAlgorithm nearestNodeAlgorithm;
+    //NearestNodeAlgorithm nearestNodeAlgorithm;
+    VoxelGridAlgorithm nearestNodeAlgorithm;
 
     private float treeHeight;
     public float GetTreeHeight() {
@@ -55,22 +56,24 @@ public class SpaceColonization {
 
         //if (growerThread == null) {
         growerThread = new Thread(() => {
-                running = true;
+            running = true;
 
-                Stopwatch growingStopwatch = new Stopwatch();
-                growingStopwatch.Start();
+            Stopwatch growingStopwatch = new Stopwatch();
+            growingStopwatch.Start();
 
-                GrowStem(tree);
-                GrowCrownStem(tree);
-                GrowCrown(tree);
+            GrowStem(tree);
+            GrowCrownStem(tree);
+            GrowCrown(tree);
 
-                growingStopwatch.Stop();
-                debug(new FormatString("grew {0} times in {1}", growthProperties.GetIterations(), growingStopwatch.Elapsed));
-            });
-            growerThread.IsBackground = true;
-            growerThread.Start();
+            growingStopwatch.Stop();
+            debug(new FormatString("grew {0} times in {1}", growthProperties.GetIterations(), growingStopwatch.Elapsed));
+            debug(new FormatString("finding voxels around took {0}", nearestNodeAlgorithm.voxelsAround.Elapsed));
+            debug(new FormatString("finding nodes in voxels took {0}", nearestNodeAlgorithm.nodesAround.Elapsed));
+        });
+        growerThread.IsBackground = true;
+        growerThread.Start();
         //} else {
-            //throw new Exception("attempted to loose reference to runnning thread");
+        //throw new Exception("attempted to loose reference to runnning thread");
         //}
     }
 
@@ -204,6 +207,8 @@ public class SpaceColonization {
                 //and find the closest Node respectively
                 Node closest = nearestNodeAlgorithm.GetNearestWithinSquaredDistance(attractionPoint, growthProperties.GetSquaredInfluenceDistance(), growthProperties.GetPerceptionAngle());
                 // Rudis ultimate plan to make the removal in the next iteration
+                findClosePointStopwatch.Stop();
+                removeClosePointsStopwatch.Start();
                 if (i > 0) {
                     if (closest != null) {
                         if (SquaredDistance(attractionPoint, closest.GetPosition()) < growthProperties.GetSquaredClearDistance(i)) {
@@ -213,7 +218,8 @@ public class SpaceColonization {
                         }
                     }
                 }
-
+                removeClosePointsStopwatch.Stop();
+                findClosePointStopwatch.Start();
 
                 //if there is a close Node
                 if (closest != null) {
