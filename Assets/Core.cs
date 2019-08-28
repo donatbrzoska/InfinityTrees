@@ -51,8 +51,8 @@ public class Core : MonoBehaviour, GrowerListener {
         //LoadMediumBigGrowth();
         //LoadDefaultGeometry();
 
-        //LoadBigGrowth();
-        //LoadDefaultGeometry2();
+        LoadBigGrowth();
+        LoadBigGrowthGeometry();
 
         //LoadExactLimitedGrowth();
         //LoadExactLimitedGeometry();
@@ -208,8 +208,13 @@ public class Core : MonoBehaviour, GrowerListener {
         GrowthProperties growthProperties = grower.GetGrowthProperties();
 
         growthProperties.SetAttractionPoints(new PseudoEllipsoid(new Vector3(0, 0f, 0), 10, 10, 10, 15, 0.15f, 0.05f));
+        debug(growthProperties.GetAttractionPoints().Count + " attraction points");
 
         growthProperties.SetIterations(50);
+    }
+
+    void LoadBigGrowthGeometry() {
+        tree.GetGeometryProperties().SetDisplayedLeavesPerNode(Leaf.LeafType.ParticleCrossFoil, 0);
     }
 
     void LoadExactLimitedGrowth() {

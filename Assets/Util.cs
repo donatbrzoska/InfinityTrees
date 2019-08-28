@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public static class Util {
@@ -39,5 +40,10 @@ public static class Util {
 
     public static bool AlmostEqual(float a, float b, float precision=0.00001f) {
         return Math.Abs(a - b) <= precision;
+    }
+
+    public static float SquaredDistance(Vector3 a, Vector3 b) {
+        Vector3 d = a - b;
+        return d.x * d.x + d.y * d.y + d.z * d.z;
     }
 }
