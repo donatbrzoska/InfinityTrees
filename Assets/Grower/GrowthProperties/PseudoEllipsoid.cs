@@ -185,8 +185,10 @@ public sealed class PseudoEllipsoid : List<Vector3> {
 
                 Vector3 point = new Vector3(x, y, z);
 
-                float distance = (point - Vector3.zero).magnitude;
-                if (distance <= radius) {
+                //float distance = (point - Vector3.zero).magnitude;
+                //if (distance <= radius) {
+                float squaredDistance = Util.SquaredDistance(point, Vector3.zero);
+                if (squaredDistance <= radius) {
                     //float ran = Util.RandomInRange(0, 1);
                     //if (ran < distance*distance) {
 
