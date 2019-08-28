@@ -98,6 +98,11 @@ public class BasicsController : MonoBehaviour {
         GameObject.Find("Core").GetComponent<Core>().OnFoliageLobeSize(value);
     }
 
+    public void OnValueChanged_CircleResolution() {
+        int value = (int) GetComponent<Slider>().value;
+        GameObject.Find("Core").GetComponent<Core>().OnCircleResolution(value);
+    }
+
 
 
 

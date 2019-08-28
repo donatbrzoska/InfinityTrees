@@ -234,6 +234,7 @@ public class GrowthProperties {
 
 
 
+    // DELETE THIS OR INTEGRATE?
     public float UpTropismWeight_min { private get; set; }
     public float UpTropismWeight_max { private get; set; }
     public float UpTropismWeightRatio { //0..1

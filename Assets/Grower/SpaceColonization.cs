@@ -21,10 +21,10 @@ public class SpaceColonization {
         }
     }
 
-    NearestNodeAlgorithm nearestNodeAlgorithm;
-    //VoxelGridAlgorithm nearestNodeAlgorithm;
+	NearestNodeAlgorithm nearestNodeAlgorithm;
+	//VoxelGridAlgorithm nearestNodeAlgorithm;
 
-    private float treeHeight;
+	private float treeHeight;
     public float GetTreeHeight() {
         return treeHeight;
     }
@@ -50,10 +50,10 @@ public class SpaceColonization {
     Node crownRoot;
 
     public void Grow(Tree tree) {
-        nearestNodeAlgorithm = new StandardAlgorithm(growthProperties.GetInfluenceDistance(), growthProperties.GetPerceptionAngle());
-        nearestNodeAlgorithm = new SquaredDistanceAlgorithm(growthProperties.GetSquaredInfluenceDistance(), growthProperties.GetPerceptionAngle());
-        nearestNodeAlgorithm = new BinarySearchAlgorithm(growthProperties.GetSquaredInfluenceDistance(), growthProperties.GetPerceptionAngle()); //little bug somewhere
-        //nearestNodeAlgorithm = new VoxelGridAlgorithm(growthProperties.GetAttractionPoints(), growthProperties.GetSquaredInfluenceDistance(), growthProperties.GetPerceptionAngle());
+        //nearestNodeAlgorithm = new StandardAlgorithm(growthProperties.GetInfluenceDistance(), growthProperties.GetPerceptionAngle());
+        //nearestNodeAlgorithm = new SquaredDistanceAlgorithm(growthProperties.GetSquaredInfluenceDistance(), growthProperties.GetPerceptionAngle());
+        //nearestNodeAlgorithm = new BinarySearchAlgorithm(growthProperties.GetSquaredInfluenceDistance(), growthProperties.GetPerceptionAngle()); //little bug somewhere
+        nearestNodeAlgorithm = new VoxelGridAlgorithm(growthProperties.GetAttractionPoints(), growthProperties.GetSquaredInfluenceDistance(), growthProperties.GetPerceptionAngle());
 
         //if (growerThread == null) {
         growerThread = new Thread(() => {
