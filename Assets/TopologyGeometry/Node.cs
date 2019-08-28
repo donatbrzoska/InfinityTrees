@@ -44,6 +44,7 @@ public class Node : IEquatable<Node> {
         Active = true;
 
         CalculateNormal();
+        AddLeaves();
     }
 
 
@@ -70,17 +71,16 @@ public class Node : IEquatable<Node> {
 
 
     //adds leavesPerNode leaves
-    public void AddLeaves(float leavesPerNode) {
-        int integer_part = (int)leavesPerNode;
-        float floating_part = leavesPerNode - integer_part;
-
-        float r = Util.RandomInRange(0, 1);
-        if (r <= floating_part) {
-            integer_part++;
-        }
-
-        for (int i = 0; i < integer_part; i++) {
-            leaves.Add(new Leaf(position, geometryProperties));
+    private void AddLeaves() {
+        for (int i = 0; i < geometryProperties.DisplayedLeafesPerNodeMaximum; i++) {
+            Vector3 leafPosition;
+            if (supernode == null) {
+                leafPosition = position;
+            } else {
+                Vector3 d = this.position - supernode.GetPosition();
+                leafPosition = supernode.GetPosition() + Util.RandomInRange(0, 1) * d;
+            }
+            leaves.Add(new Leaf(leafPosition, geometryProperties));
         }
     }
 

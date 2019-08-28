@@ -24,8 +24,6 @@ public class GrowthProperties {
 
     private float growthDistance; //SET
 
-    private int leavesPerNode;
-
     private PseudoEllipsoid attractionPoints;
 
     private int iterations;
@@ -269,15 +267,6 @@ public class GrowthProperties {
         return growthDistance;
     }
 
-
-
-    public void SetLeavesPerNode(int leavesPerNode) {
-        this.leavesPerNode = leavesPerNode;
-    }
-
-    public int GetLeavesPerNode() {
-        return leavesPerNode;
-    }
 
 
 

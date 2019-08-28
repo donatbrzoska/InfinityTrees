@@ -79,6 +79,7 @@ public class GeometryProperties {
     private Dictionary<Leaf.LeafType, float> leafSizes = new Dictionary<Leaf.LeafType, float>();
     private Leaf.LeafType leafType;
     private Dictionary<Leaf.LeafType, float> displayedLeavesPerNode = new Dictionary<Leaf.LeafType, float>();
+    public int DisplayedLeafesPerNodeMaximum;
     //private bool leavesEnabled;
 
 

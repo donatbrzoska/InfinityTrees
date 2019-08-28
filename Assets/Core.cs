@@ -107,7 +107,6 @@ public class Core : MonoBehaviour, GrowerListener {
         growthProperties.CrownStemLengthRatio = 0f;
 
         growthProperties.SetGrowthDistance(0.25f);
-        growthProperties.SetLeavesPerNode(10);
         growthProperties.SetAttractionPoints(attractionPoints);
         growthProperties.SetIterations(30);
 
@@ -127,13 +126,14 @@ public class Core : MonoBehaviour, GrowerListener {
         //geometryProperties.SetCircleResolution(6);
         geometryProperties.SetMinRadiusRatioForNormalConnection(0.49f);
 
-        geometryProperties.SetMaxTwigRadiusForLeaves(0.0071f);
+        geometryProperties.SetMaxTwigRadiusForLeaves(0.009f);
         geometryProperties.SetLeafSize(Leaf.LeafType.Triangle, 0.4f);
         geometryProperties.SetLeafSize(Leaf.LeafType.ParticleSquare, 1f);
         geometryProperties.SetLeafSize(Leaf.LeafType.ParticleCrossFoil, 1f);
         geometryProperties.SetDisplayedLeavesPerNode(Leaf.LeafType.Triangle, 2f);
         geometryProperties.SetDisplayedLeavesPerNode(Leaf.LeafType.ParticleSquare, 0.5f);
         geometryProperties.SetDisplayedLeavesPerNode(Leaf.LeafType.ParticleCrossFoil, 0.5f);
+        geometryProperties.DisplayedLeafesPerNodeMaximum = 5;
         //geometryProperties.SetLeafSize(0.5f);
         geometryProperties.SetLeafType(Leaf.LeafType.ParticleCrossFoil);
 
@@ -176,7 +176,6 @@ public class Core : MonoBehaviour, GrowerListener {
         growthProperties.CrownStemLengthRatio = 0f;
 
         growthProperties.SetGrowthDistance(0.25f);
-        growthProperties.SetLeavesPerNode(10);
         growthProperties.SetAttractionPoints(attractionPoints);
         growthProperties.SetIterations(20);
 
@@ -203,6 +202,7 @@ public class Core : MonoBehaviour, GrowerListener {
         geometryProperties.SetDisplayedLeavesPerNode(Leaf.LeafType.Triangle, 2f);
         geometryProperties.SetDisplayedLeavesPerNode(Leaf.LeafType.ParticleSquare, 0.5f);
         geometryProperties.SetDisplayedLeavesPerNode(Leaf.LeafType.ParticleCrossFoil, 0.5f);
+                 geometryProperties.DisplayedLeafesPerNodeMaximum = 5;
         //geometryProperties.SetLeafSize(0.5f);
         geometryProperties.SetLeafType(Leaf.LeafType.ParticleCrossFoil);
 
@@ -245,7 +245,6 @@ public class Core : MonoBehaviour, GrowerListener {
         growthProperties.CrownStemLengthRatio = 1f;
 
         growthProperties.SetGrowthDistance(0.25f);
-        growthProperties.SetLeavesPerNode(10);
         growthProperties.SetAttractionPoints(attractionPoints);
         growthProperties.SetIterations(30);
 
@@ -272,6 +271,7 @@ public class Core : MonoBehaviour, GrowerListener {
         geometryProperties.SetDisplayedLeavesPerNode(Leaf.LeafType.Triangle, 2f);
         geometryProperties.SetDisplayedLeavesPerNode(Leaf.LeafType.ParticleSquare, 0.5f);
         geometryProperties.SetDisplayedLeavesPerNode(Leaf.LeafType.ParticleCrossFoil, 0.5f);
+                 geometryProperties.DisplayedLeafesPerNodeMaximum = 5;
         //geometryProperties.SetLeafSize(0.5f);
         geometryProperties.SetLeafType(Leaf.LeafType.ParticleCrossFoil);
 
@@ -315,7 +315,6 @@ public class Core : MonoBehaviour, GrowerListener {
         growthProperties.CrownStemLengthRatio = 0f;
 
         growthProperties.SetGrowthDistance(0.25f);
-        growthProperties.SetLeavesPerNode(10);
         growthProperties.SetAttractionPoints(attractionPoints);
         growthProperties.SetIterations(20);
 
@@ -343,6 +342,7 @@ public class Core : MonoBehaviour, GrowerListener {
         geometryProperties.SetDisplayedLeavesPerNode(Leaf.LeafType.ParticleSquare, 0.5f);
         geometryProperties.SetDisplayedLeavesPerNode(Leaf.LeafType.ParticleCrossFoil, 0.5f);
         geometryProperties.SetDisplayedLeavesPerNode(Leaf.LeafType.ParticleCrossFoil, 0.2f);
+                 geometryProperties.DisplayedLeafesPerNodeMaximum = 5;
         //geometryProperties.SetLeafSize(0.5f);
         geometryProperties.SetLeafType(Leaf.LeafType.ParticleCrossFoil);
 
@@ -385,7 +385,6 @@ public class Core : MonoBehaviour, GrowerListener {
         growthProperties.CrownStemLengthRatio = 0f;
 
         growthProperties.SetGrowthDistance(0.25f);
-        growthProperties.SetLeavesPerNode(10);
         growthProperties.SetAttractionPoints(attractionPoints);
         growthProperties.SetIterations(40);
 
@@ -420,7 +419,6 @@ public class Core : MonoBehaviour, GrowerListener {
         growthProperties.CrownStemLengthRatio = 0f;
 
         growthProperties.SetGrowthDistance(0.25f);
-        growthProperties.SetLeavesPerNode(10);
         growthProperties.SetAttractionPoints(attractionPoints);
         growthProperties.SetIterations(35);
 
@@ -454,7 +452,6 @@ public class Core : MonoBehaviour, GrowerListener {
         growthProperties.CrownStemLengthRatio = 0f;
 
         growthProperties.SetGrowthDistance(0.25f);
-        growthProperties.SetLeavesPerNode(10);
         growthProperties.SetAttractionPoints(attractionPoints);
         growthProperties.SetIterations(50);
 
@@ -481,6 +478,7 @@ public class Core : MonoBehaviour, GrowerListener {
         geometryProperties.SetDisplayedLeavesPerNode(Leaf.LeafType.Triangle, 2f);
         geometryProperties.SetDisplayedLeavesPerNode(Leaf.LeafType.ParticleSquare, 0.5f);
         geometryProperties.SetDisplayedLeavesPerNode(Leaf.LeafType.ParticleCrossFoil, 0.5f);
+                 geometryProperties.DisplayedLeafesPerNodeMaximum = 5;
         //geometryProperties.SetLeafSize(0.5f);
         geometryProperties.SetLeafType(Leaf.LeafType.ParticleCrossFoil);
 
@@ -523,7 +521,6 @@ public class Core : MonoBehaviour, GrowerListener {
         growthProperties.CrownStemLengthRatio = 0f;
 
         growthProperties.SetGrowthDistance(0.25f);
-        growthProperties.SetLeavesPerNode(10);
         growthProperties.SetAttractionPoints(attractionPoints);
         growthProperties.SetIterations(45);
 
@@ -550,6 +547,7 @@ public class Core : MonoBehaviour, GrowerListener {
         geometryProperties.SetDisplayedLeavesPerNode(Leaf.LeafType.Triangle, 2f);
         geometryProperties.SetDisplayedLeavesPerNode(Leaf.LeafType.ParticleSquare, 0.5f);
         geometryProperties.SetDisplayedLeavesPerNode(Leaf.LeafType.ParticleCrossFoil, 0.3f);
+                 geometryProperties.DisplayedLeafesPerNodeMaximum = 5;
         //geometryProperties.SetLeafSize(0.5f);
         geometryProperties.SetLeafType(Leaf.LeafType.ParticleCrossFoil);
 
@@ -592,7 +590,6 @@ public class Core : MonoBehaviour, GrowerListener {
         growthProperties.CrownStemLengthRatio = 0f;
 
         growthProperties.SetGrowthDistance(0.25f);
-        growthProperties.SetLeavesPerNode(10);
         growthProperties.SetAttractionPoints(attractionPoints);
         growthProperties.SetIterations(33);
 
@@ -619,6 +616,7 @@ public class Core : MonoBehaviour, GrowerListener {
         geometryProperties.SetDisplayedLeavesPerNode(Leaf.LeafType.Triangle, 2f);
         geometryProperties.SetDisplayedLeavesPerNode(Leaf.LeafType.ParticleSquare, 0.5f);
         geometryProperties.SetDisplayedLeavesPerNode(Leaf.LeafType.ParticleCrossFoil, 0f);
+                 geometryProperties.DisplayedLeafesPerNodeMaximum = 5;
         //geometryProperties.SetLeafSize(0.5f);
         geometryProperties.SetLeafType(Leaf.LeafType.ParticleCrossFoil);
 
@@ -661,7 +659,6 @@ public class Core : MonoBehaviour, GrowerListener {
         growthProperties.CrownStemLengthRatio = 0f;
 
         growthProperties.SetGrowthDistance(0.25f);
-        growthProperties.SetLeavesPerNode(10);
         growthProperties.SetAttractionPoints(attractionPoints);
         growthProperties.SetIterations(50);
 
@@ -688,6 +685,7 @@ public class Core : MonoBehaviour, GrowerListener {
         geometryProperties.SetDisplayedLeavesPerNode(Leaf.LeafType.Triangle, 2f);
         geometryProperties.SetDisplayedLeavesPerNode(Leaf.LeafType.ParticleSquare, 0.5f);
         geometryProperties.SetDisplayedLeavesPerNode(Leaf.LeafType.ParticleCrossFoil, 0f);
+                 geometryProperties.DisplayedLeafesPerNodeMaximum = 5;
         //geometryProperties.SetLeafSize(0.5f);
         geometryProperties.SetLeafType(Leaf.LeafType.ParticleCrossFoil);
 
@@ -775,6 +773,8 @@ public class Core : MonoBehaviour, GrowerListener {
         GameObject.Find("Leaf Type Dropdown").GetComponent<Dropdown>().SetValueWithoutNotify(tree.GetGeometryProperties().CurrentLeafTypeStringsIndex);
         GameObject.Find("Leaf Type Dropdown").GetComponent<Dropdown>().RefreshShownValue();
 
+        GameObject.Find("Foliage Density Slider").GetComponent<Slider>().minValue = 0;
+        GameObject.Find("Foliage Density Slider").GetComponent<Slider>().maxValue = tree.GetGeometryProperties().DisplayedLeafesPerNodeMaximum;
         GameObject.Find("Foliage Density Slider").GetComponent<Slider>().SetValueWithoutNotify(tree.GetGeometryProperties().GetDisplayedLeavesPerNode());
         GameObject.Find("Foliage Lobe Size Slider").GetComponent<Slider>().SetValueWithoutNotify(tree.GetGeometryProperties().GetLeafSize());
 
@@ -1338,7 +1338,6 @@ public class Core : MonoBehaviour, GrowerListener {
         growthProperties.CrownStemLengthRatio = 0.2f;
 
         growthProperties.SetGrowthDistance(0.25f);
-        growthProperties.SetLeavesPerNode(10);
         growthProperties.SetAttractionPoints(attractionPoints);
         growthProperties.SetIterations(30);
 
@@ -1373,7 +1372,6 @@ public class Core : MonoBehaviour, GrowerListener {
         growthProperties.StemAngleRange = 5;
 
         growthProperties.SetGrowthDistance(0.25f);
-        growthProperties.SetLeavesPerNode(10);
         growthProperties.SetAttractionPoints(attractionPoints);
         growthProperties.SetIterations(30);
 
@@ -1406,7 +1404,6 @@ public class Core : MonoBehaviour, GrowerListener {
         growthProperties.StemAngleRange = 5;
 
         growthProperties.SetGrowthDistance(0.25f);
-        growthProperties.SetLeavesPerNode(10);
         growthProperties.SetAttractionPoints(attractionPoints);
         growthProperties.SetIterations(30);
 
@@ -1438,7 +1435,6 @@ public class Core : MonoBehaviour, GrowerListener {
         growthProperties.StemLength = 2;
 
         growthProperties.SetGrowthDistance(0.25f);
-        growthProperties.SetLeavesPerNode(2);
         growthProperties.SetAttractionPoints(attractionPoints);
         growthProperties.SetIterations(40);
 
@@ -1470,7 +1466,6 @@ public class Core : MonoBehaviour, GrowerListener {
         growthProperties.StemLength = 2;
 
         growthProperties.SetGrowthDistance(0.125f);
-        growthProperties.SetLeavesPerNode(2);
         growthProperties.SetAttractionPoints(attractionPoints);
         growthProperties.SetIterations(30);
 
@@ -1502,7 +1497,6 @@ public class Core : MonoBehaviour, GrowerListener {
         growthProperties.StemLength = 2;
 
         growthProperties.SetGrowthDistance(0.25f);
-        growthProperties.SetLeavesPerNode(2);
         growthProperties.SetAttractionPoints(attractionPoints);
         growthProperties.SetIterations(30);
 

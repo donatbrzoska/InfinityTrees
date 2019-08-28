@@ -294,7 +294,6 @@ public class SpaceColonization {
                 if (!IsDuplicateNode(happyNodePosition, currentNode)) {
                     //add new node to currentNode
                     Node newNode = currentNode.Add(happyNodePosition);
-                    newNode.AddLeaves(growthProperties.GetLeavesPerNode());
                     n_newNodes++;
 
                     //add to the nodeList
