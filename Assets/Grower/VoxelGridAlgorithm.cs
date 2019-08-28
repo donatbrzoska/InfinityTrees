@@ -30,22 +30,12 @@ public class VoxelGridAlgorithm : NearestNodeAlgorithm {
     PseudoEllipsoid attractionPoints;
     float voxelSize;
 
-    //Dictionary<Vector3, Vector3Int> attractionPoints_to_voxelCoordinates;
-
     public VoxelGridAlgorithm(PseudoEllipsoid attractionPoints, float squaredInfluenceDistance, float perceptionAngle) {
         this.attractionPoints = attractionPoints;
 
         this.squaredInfluenceDistance = squaredInfluenceDistance;
         this.perceptionAngle = perceptionAngle;
         this.voxelSize = (float)Math.Sqrt(squaredInfluenceDistance);
-
-        //for every attraction point, cache its voxel
-        //attractionPoints_to_voxelCoordinates = new Dictionary<Vector3, Vector3Int>();
-        //foreach (Vector3 a in attractionPoints) {
-        //    Vector3Int gridPos = PositionToGridPosition(a);
-        //    attractionPoints_to_voxelCoordinates.Add(a, gridPos);
-        //}
-
 
         //x direction
         n_is = (int)Math.Ceiling(attractionPoints.GetWidth() / voxelSize);
