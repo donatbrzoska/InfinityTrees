@@ -23,6 +23,8 @@ public class Core : MonoBehaviour, GrowerListener {
         LoadDefaultGrowth();
         LoadDefaultGeometry();
 
+        LoadDefaultGrowth2();
+
 
         //LoadBaobabGrowth();
 
@@ -109,6 +111,39 @@ public class Core : MonoBehaviour, GrowerListener {
         grower = new SpaceColonization(growthProperties, this);
     }
 
+    void LoadDefaultGrowth2() {
+        PseudoEllipsoid attractionPoints = new PseudoEllipsoid(new Vector3(0, 0f, 0), 3, 5, 3.5f, 30, 0.15f, 0.05f);
+
+
+        GrowthProperties growthProperties = new GrowthProperties();
+        growthProperties.SetInfluenceDistance(0.5f);
+        growthProperties.SetPerceptionAngle(160);
+        growthProperties.SetClearDistance(0.05f, 0.4f);
+
+        growthProperties.SetBranchDensityBegin(0f);
+        growthProperties.SetBranchDensityEnd(0.8f);
+
+        growthProperties.SetTropisms(new Vector3(0f, 1f, 0));
+        growthProperties.SetTropismsWeights(new Vector3(1, 1f, 1));
+        growthProperties.UpTropismsDampRatio = 0.36f;
+        growthProperties.UpTropismsWhenDamped = 0.3f;
+
+        growthProperties.UpTropismWeight_min = 0;
+        growthProperties.UpTropismWeight_max = 5;
+        growthProperties.UpTropismWeightRatio = 0.2f;
+
+        growthProperties.StemLength = 2f;
+        growthProperties.StemAngleRange = 2;
+        growthProperties.CrownStemLengthRatio = 0f;
+
+        growthProperties.SetGrowthDistance(0.25f);
+        growthProperties.SetAttractionPoints(attractionPoints);
+        growthProperties.SetIterations(30);
+
+
+        grower = new SpaceColonization(growthProperties, this);
+    }
+
     void LoadDefaultGeometry() {
         GeometryProperties geometryProperties = new GeometryProperties();
 
@@ -128,7 +163,7 @@ public class Core : MonoBehaviour, GrowerListener {
         geometryProperties.SetDisplayedLeavesPerNode(Leaf.LeafType.Triangle, 2f);
         geometryProperties.SetDisplayedLeavesPerNode(Leaf.LeafType.ParticleSquare, 0.5f);
         geometryProperties.SetDisplayedLeavesPerNode(Leaf.LeafType.ParticleCrossFoil, 0.5f);
-        geometryProperties.DisplayedLeafesPerNodeMaximum = 5;
+        geometryProperties.DisplayedLeafesPerNodeMaximum = 3;
         //geometryProperties.SetLeafSize(0.5f);
         geometryProperties.SetLeafType(Leaf.LeafType.ParticleCrossFoil);
 
