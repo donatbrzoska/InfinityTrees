@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class MessageReceiver : MonoBehaviour
+public class NotificationReceiver : MonoBehaviour
 {
     // Update is called once per frame
     void Update()

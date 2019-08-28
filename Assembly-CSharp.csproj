@@ -84,7 +84,7 @@
     <Compile Include="Assets\TopologyGeometry\TreeUtil.cs" />
     <Compile Include="Assets\UI\BasicsController.cs" />
     <Compile Include="Assets\UI\CameraMovementController.cs" />
-    <Compile Include="Assets\UI\MessageReceiver.cs" />
+    <Compile Include="Assets\UI\NotificationReceiver.cs" />
     <Compile Include="Assets\UI\PointCloudRenderer.cs" />
     <Compile Include="Assets\UI\SaveController.cs" />
     <Compile Include="Assets\UI\TreeRenderer.cs" />
