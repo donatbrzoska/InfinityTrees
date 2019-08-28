@@ -180,11 +180,6 @@ public class SpaceColonization {
         }
     }
 
-    private float SquaredDistance(Vector3 a, Vector3 b) {
-        Vector3 d = a - b;
-        return d.x * d.x + d.y * d.y + d.z * d.z;
-    }
-
     private void GrowCrown(Tree tree) {
         treeHeight = 0;
 
@@ -197,12 +192,15 @@ public class SpaceColonization {
                 return;
             }
 
+            float squaredClearDistance = growthProperties.GetSquaredClearDistance(i);
+
             Dictionary<Node, List<Vector3>> nodesAttractionPoints = new Dictionary<Node, List<Vector3>>();
 
             findClosePointStopwatch.Start();
             //iterate through all attractionPoints
             //foreach (Vector3 attractionPoint in growthProperties.GetAttractionPoints()) { //there is some threading problem with the enumeration foreach loop, usual for should fix it
             for (int j = 0; j < growthProperties.GetAttractionPoints().Count; j++) {
+
                 Vector3 attractionPoint = growthProperties.GetAttractionPoints()[j];
 
                 //and find the closest Node respectively
@@ -212,7 +210,7 @@ public class SpaceColonization {
                 removeClosePointsStopwatch.Start();
                 if (i > 0) {
                     if (closest != null) {
-                        if (SquaredDistance(attractionPoint, closest.GetPosition()) < growthProperties.GetSquaredClearDistance(i)) {
+                        if (Util.SquaredDistance(attractionPoint, closest.GetPosition()) < squaredClearDistance) {
                             j--;
                             growthProperties.GetAttractionPoints().Remove(attractionPoint);
                             continue;
@@ -311,7 +309,7 @@ public class SpaceColonization {
             //removeClosePointsStopwatch.Stop();
 
             growerListener.OnIterationFinished();
-            debug("finished iteration " + i);
+            //debug("finished iteration " + i);
 
             if (n_newNodes==0) {
                 growerListener.OnGrowthStopped();

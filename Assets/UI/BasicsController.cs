@@ -141,10 +141,10 @@ public class BasicsController : MonoBehaviour {
 
 
 
-    public void OnValueChanged_ClearDistanceBegin_clearDistanceEnd_Ratio() {
-        float value = GetComponent<Slider>().value;
-        GameObject.Find("Core").GetComponent<Core>().OnClearDistanceBegin_clearDistanceEnd_Ratio(value);
-    }
+    //public void OnValueChanged_ClearDistanceBegin_clearDistanceEnd_Ratio() {
+    //    float value = GetComponent<Slider>().value;
+    //    GameObject.Find("Core").GetComponent<Core>().OnClearDistanceBegin_clearDistanceEnd_Ratio(value);
+    //}
 
     public void OnValueChanged_BranchDensityBegin() {
         float value = GetComponent<Slider>().value;

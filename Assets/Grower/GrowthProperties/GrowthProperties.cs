@@ -7,22 +7,30 @@ public class GrowthProperties {
     public float CrownStemLengthRatio { get; set; } //how much of the crown is filled with an initial stem?
     public float StemAngleRange { get; set; }
 
-    private float influenceDistance; //FREE
-    private float squaredInfluenceDistance; //FREE
-    private float perceptionAngle; //SET
+    private float influenceDistance;
+    private float squaredInfluenceDistance;
+    private float perceptionAngle;
 
-    private float clearDistance;
+
+    //private float clearDistance;
     private float squaredClearDistance;
-    private float clearDistance_begin; //DEPENDS
-    private float squaredClearDistance_begin; //DEPENDS
-    private float clearDistance_end; //DEPENDS
-    private float squaredClearDistance_end; //DEPENDS
+    private float clearDistance_min;
+    private float squaredClearDistance_min;
+    private float clearDistance_max;
+    private float squaredClearDistance_max;
+
+    private float squaredClearDistance_range;
+
+    private float squaredClearDistance_begin;
+    private float squaredClearDistance_end;
+
+
 
     private Vector3 tropisms;
     private Vector3 tropismsWeights;
     private float hangingBranchesIntensity;
 
-    private float growthDistance; //SET
+    private float growthDistance;
 
     private PseudoEllipsoid attractionPoints;
 
@@ -31,12 +39,6 @@ public class GrowthProperties {
     public void SetInfluenceDistance(float influenceDistance) {
         this.influenceDistance = influenceDistance;
         this.squaredInfluenceDistance = influenceDistance * influenceDistance;
-
-        minClearDistance = influenceDistance * minClearDistanceRatio; //refresh
-        maxClearDistance = influenceDistance * maxClearDistanceRatio; 
-
-        SetBranchDensityBegin(branchDensityBegin); //refresh
-        SetBranchDensityEnd(branchDensityEnd);
     }
 
     public float GetInfluenceDistance() {
@@ -63,91 +65,28 @@ public class GrowthProperties {
 
 
 
-    public void SetClearDistance(float clearDistance) {
-        this.clearDistance = clearDistance;
-        this.squaredClearDistance = clearDistance* clearDistance;
+    //only set once
+    public void SetClearDistance(float min, float max) {
+        this.clearDistance_min = min;
+        this.clearDistance_max = max;
+
+        this.squaredClearDistance_min = min * min;
+        this.squaredClearDistance_max = max * max;
+
+        this.squaredClearDistance_range = squaredClearDistance_max - squaredClearDistance_min;
     }
 
-    public void SetClearDistance(float begin, float end) {
-        this.clearDistance_begin = begin * begin;
-        this.clearDistance_end = end * end;
-    }
-
-    public void SetClearDistanceBegin(float begin) {
-        this.clearDistance_begin = begin;
-        this.squaredClearDistance_begin = begin * begin;
-    }
-
-    public float GetClearDistanceBegin() {
-        return clearDistance_begin;
-    }
-
-    public void SetClearDistanceEnd(float end) {
-        this.clearDistance_end = end;
-        this.squaredClearDistance_end = end * end;
-    }
-
-    public float GetClearDistanceEnd() {
-        return clearDistance_end;
-    }
-
-
-
-    // represents how much of the tree is begin
-    // 1-stemCrownRatio is the end part
-    private float clearDistanceBegin_clearDistanceEnd_Ratio;
-
-    public void SetClearDistanceBegin_clearDistanceEnd_Ratio(float value) {
-        this.clearDistanceBegin_clearDistanceEnd_Ratio = value;
-    }
-
-    public float GetClearDistanceBegin_clearDistanceEnd_Ratio() {
-        return clearDistanceBegin_clearDistanceEnd_Ratio;
-    }
-
-    //this is based on a sigmoid funcion and basically returns the lower bound of the looked at part of the sigmoid function within a given range
-    private float GetSigmoidStartValue(float range) {
-        //return -4 - clearDistanceBegin_clearDistanceEnd_Ratio * range; 
-        return - 8 - clearDistanceBegin_clearDistanceEnd_Ratio * range; // earlier version
-    }
-
-    //this is based on a sigmoid funcion and basically returns the lower bound of the looked at part of the sigmoid function within a given range
-    private float GetSigmoidEndValue(float range) {
-        //return 4 + (1 - clearDistanceBegin_clearDistanceEnd_Ratio) * range;
-        return 4 + (1 - clearDistanceBegin_clearDistanceEnd_Ratio) * range; // earlier version
-    }
-
-
-    //InfluenceDistance -> max/minClearDistance -> branchDensityBegin/End
-
-
-    private float minClearDistanceRatio; //0..1
-    private float minClearDistance;
-    public void SetMinClearDistanceRatio(float value) {
-        minClearDistanceRatio = value;
-        minClearDistance = influenceDistance * minClearDistanceRatio;
-
-        SetBranchDensityBegin(branchDensityBegin); //refresh
-        SetBranchDensityBegin(branchDensityEnd);
-    }
-
-    //private float minDelta_ClearDistance_to_InfluenceDistance = 0.1f;
-    private float maxClearDistanceRatio; //0..1
-    private float maxClearDistance;// = 0.075f;
-    public void SetMaxClearDistanceRatio(float value) {
-        maxClearDistanceRatio = value;
-        maxClearDistance = influenceDistance * maxClearDistanceRatio;
-
-        SetBranchDensityBegin(branchDensityBegin); //refresh
-        SetBranchDensityBegin(branchDensityEnd);
-    }
 
     private float branchDensityBegin;
     public void SetBranchDensityBegin(float value) {
         this.branchDensityBegin = value;
 
-        float range = maxClearDistance - minClearDistance;
-        SetClearDistanceBegin(minClearDistance + (1-value) * range);
+        //the density says how much of the squaredClearDistanceRange should be subtracted from the squaredClearDistance_max
+        //-> typically the density is low in the beginning
+        //-> this should result in a high squaredClearDistance_begin
+        //-> therefore density * squaredClearDistanceRange has to be subtracted from the squaredClearDistance_max
+        this.squaredClearDistance_begin = squaredClearDistance_max - value * squaredClearDistance_range;
+        //this.squaredClearDistance_begin = squaredClearDistance_min + value * squaredClearDistanceRange; //also possible
     }
 
     public float GetBranchDensityBegin() {
@@ -158,8 +97,12 @@ public class GrowthProperties {
     public void SetBranchDensityEnd(float value) {
         this.branchDensityEnd = value;
 
-        float range = maxClearDistance - minClearDistance;
-        SetClearDistanceEnd(minClearDistance + (1-value) * range);
+        //the density says how much of the squaredClearDistanceRange should be subtracted from the squaredClearDistance_max
+        //-> typically the density is high in the end
+        //-> this should result in a low squaredClearDistance_end
+        //-> therefore density * squaredClearDistanceRange has to be subtracted from the squaredClearDistance_max
+        this.squaredClearDistance_end = squaredClearDistance_max - value * squaredClearDistance_range;
+        //this.squaredClearDistance_end = squaredClearDistance_min + value * squaredClearDistanceRange; //also possible
     }
 
     public float GetBranchDensityEnd() {
@@ -174,11 +117,11 @@ public class GrowthProperties {
         return begin + step * iteration;
     }
 
-    private float ExponentialInterpolation(int iteration) {
-        float d = squaredClearDistance_begin - squaredClearDistance_end;
+    //private float ExponentialInterpolation(int iteration) {
+    //    float d = squaredClearDistance_begin - squaredClearDistance_end;
 
-        return (float)(squaredClearDistance_begin - Math.Exp(MapIteration(iteration, -4, 0)) * d);
-    }
+    //    return (float)(squaredClearDistance_begin - Math.Exp(MapIteration(iteration, -4, 0)) * d);
+    //}
 
     private float Sigmoid(float x) {
         return (float) (Math.Exp(x) / (1 + Math.Exp(x)));
@@ -188,21 +131,17 @@ public class GrowthProperties {
     private float SigmoidInterpolation(int iteration) {
         float d = squaredClearDistance_begin - squaredClearDistance_end;
 
-        float range = 0;
-        return (float)(squaredClearDistance_begin - Sigmoid(MapIteration(iteration, GetSigmoidStartValue(range), GetSigmoidEndValue(range))) * d);
+        return squaredClearDistance_begin - Sigmoid(MapIteration(iteration, -8, 4)) * d;
     }
 
-    private float LinearInterpolation(int iteration) {
-        float d = squaredClearDistance_end - squaredClearDistance_begin;
-        float step = d / iterations;
-        return squaredClearDistance_begin + step * (iteration+1);
-    }
+    //private float LinearInterpolation(int iteration) {
+    //    float d = squaredClearDistance_end - squaredClearDistance_begin;
+    //    float step = d / iterations;
+    //    return squaredClearDistance_begin + step * (iteration+1);
+    //}
 
     public float GetSquaredClearDistance(int iteration) {
-
         return SigmoidInterpolation(iteration);
-
-        //return LinearInterpolation(iteration);
     }
 
     public float GetSquaredClearDistance() {

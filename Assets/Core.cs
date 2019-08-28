@@ -51,8 +51,8 @@ public class Core : MonoBehaviour, GrowerListener {
         //LoadMediumBigGrowth();
         //LoadDefaultGeometry();
 
-        LoadBigGrowth();
-        LoadBigGrowthGeometry();
+        //LoadBigGrowth();
+        //LoadBigGrowthGeometry();
 
         //LoadExactLimitedGrowth();
         //LoadExactLimitedGeometry();
@@ -70,7 +70,6 @@ public class Core : MonoBehaviour, GrowerListener {
     //initialize UI at the beginning
     bool initialized;
     void Update() {
-        //debug("sqcd: " + growthProperties.GetSquaredClearDistance(1));
         if (!initialized) {
             InitializeUI();
             initialized = true;
@@ -84,11 +83,11 @@ public class Core : MonoBehaviour, GrowerListener {
         GrowthProperties growthProperties = new GrowthProperties();
         growthProperties.SetInfluenceDistance(1f);
         growthProperties.SetPerceptionAngle(160);
-        growthProperties.SetMinClearDistanceRatio(0.1f);
-        growthProperties.SetMaxClearDistanceRatio(0.95f);
+        growthProperties.SetClearDistance(0.1f, 0.95f);
+
         growthProperties.SetBranchDensityBegin(0f);
         growthProperties.SetBranchDensityEnd(0.8f);
-        growthProperties.SetClearDistanceBegin_clearDistanceEnd_Ratio(0.5f);
+
         growthProperties.SetTropisms(new Vector3(0f, 1f, 0));
         growthProperties.SetTropismsWeights(new Vector3(1, 1f, 1));
         growthProperties.UpTropismsDampRatio = 0.36f;
@@ -98,7 +97,7 @@ public class Core : MonoBehaviour, GrowerListener {
         growthProperties.UpTropismWeight_max = 5;
         growthProperties.UpTropismWeightRatio = 0.2f;
 
-        growthProperties.StemLength = 1.5f;
+        growthProperties.StemLength = 2f;
         growthProperties.StemAngleRange = 2;
         growthProperties.CrownStemLengthRatio = 0f;
 
@@ -612,16 +611,16 @@ public class Core : MonoBehaviour, GrowerListener {
 
 
 
-    public void OnClearDistanceBegin_clearDistanceEnd_Ratio(float value) {
-        grower.Stop();
+    //public void OnClearDistanceBegin_clearDistanceEnd_Ratio(float value) {
+    //    grower.Stop();
 
-        grower.GetGrowthProperties().SetClearDistanceBegin_clearDistanceEnd_Ratio(value);
-        grower.GetGrowthProperties().GetAttractionPoints().Reset();
+    //    grower.GetGrowthProperties().SetClearDistanceBegin_clearDistanceEnd_Ratio(value);
+    //    grower.GetGrowthProperties().GetAttractionPoints().Reset();
 
-        tree.Reset();
+    //    tree.Reset();
 
-        grower.Grow(tree);
-    }
+    //    grower.Grow(tree);
+    //}
 
 
     public void OnBranchDensityBegin(float value) {
