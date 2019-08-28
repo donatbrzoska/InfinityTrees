@@ -830,7 +830,7 @@ public class Core : MonoBehaviour, GrowerListener {
     }
 
     public void OnGrowthStopped() {
-        SetMessage("Growth stopped unexpectedly, maybe you need to use a bigger point cloud?");
+        SetMessage("Growth stopped unexpectedly, maybe you need to define wider crown shape bounds?");
     }
 
 
