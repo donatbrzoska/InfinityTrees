@@ -3,6 +3,7 @@ using System.Runtime.CompilerServices;
 using UnityEngine;
 using UnityEngine.UI;
 using System.IO;
+using System.Threading;
 
 public class Core : MonoBehaviour, GrowerListener {
     private static void debug(string message, [CallerMemberName]string callerName = "") {
@@ -828,6 +829,10 @@ public class Core : MonoBehaviour, GrowerListener {
         recalculateMesh = true;
     }
 
+    public void OnGrowthStopped() {
+        SetMessage("Growth stopped unexpectedly, maybe you need to use a bigger point cloud?");
+    }
+
 
     //#######################################################################################
     //##########                           POINT CLOUD AGENT                       ##########
@@ -925,6 +930,7 @@ public class Core : MonoBehaviour, GrowerListener {
     }
 
     public void OnCrownStemLength(float value) {
+        SetMessage("");
         grower.Stop();
 
         grower.GetGrowthProperties().CrownStemLengthRatio = value;
@@ -955,6 +961,7 @@ public class Core : MonoBehaviour, GrowerListener {
     }
 
     public void OnCrownWidth(float value) {
+        SetMessage("");
         cameraMode = CameraMode.AttractionPoints;
 
         grower.Stop();
@@ -969,6 +976,7 @@ public class Core : MonoBehaviour, GrowerListener {
     }
 
     public void OnCrownHeight(float value) {
+        SetMessage("");
         cameraMode = CameraMode.AttractionPoints;
 
         grower.Stop();
@@ -983,6 +991,7 @@ public class Core : MonoBehaviour, GrowerListener {
     }
 
     public void OnCrownDepth(float value) {
+        SetMessage("");
         cameraMode = CameraMode.AttractionPoints;
 
         grower.Stop();
@@ -997,6 +1006,7 @@ public class Core : MonoBehaviour, GrowerListener {
     }
 
     public void OnCrownTopCutoff(float value) {
+        SetMessage("");
         cameraMode = CameraMode.AttractionPoints;
 
         grower.Stop();
@@ -1011,6 +1021,7 @@ public class Core : MonoBehaviour, GrowerListener {
     }
 
     public void OnCrownBottomCutoff(float value) {
+        SetMessage("");
         cameraMode = CameraMode.AttractionPoints;
 
         grower.Stop();
@@ -1193,8 +1204,32 @@ public class Core : MonoBehaviour, GrowerListener {
 
     //    grower.Grow(tree);
     //}
+    string message = "";
+    //bool messageLeft;
+    int displayTime = 5000;
+    int displayingThreads; //this is needed, otherwise new arrived messaged would be deleted too early
+
+    private void SetMessage(string msg) {
+        message = msg;
+        //messageLeft = false;
+        Thread resetThread = new Thread(() => {
+            displayingThreads++;
+            Thread.Sleep(displayTime);
+            displayingThreads--;
+            if (displayingThreads == 0) {
+                message = "";
+            }
+        });
+        resetThread.Start();
+    }
+
+    public string GetMessage() {
+        return message;
+    }
 
     public void OnAge(int value) {
+        SetMessage("");
+
         grower.Stop();
 
         grower.GetGrowthProperties().SetIterations(value);

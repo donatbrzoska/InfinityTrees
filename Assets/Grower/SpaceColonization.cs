@@ -243,6 +243,8 @@ public class SpaceColonization {
                 return;
             }
 
+            int n_newNodes = 0;
+
             //iterate through all Nodes with attractionPoints associated
             foreach (Node currentNode in nodesAttractionPoints.Keys) {
                 List<Vector3> associatedAttractionPoints = nodesAttractionPoints[currentNode];
@@ -293,6 +295,7 @@ public class SpaceColonization {
                     //add new node to currentNode
                     Node newNode = currentNode.Add(happyNodePosition);
                     newNode.AddLeaves(growthProperties.GetLeavesPerNode());
+                    n_newNodes++;
 
                     //add to the nodeList
                     nearestNodeAlgorithm.Add(newNode);
@@ -304,13 +307,17 @@ public class SpaceColonization {
                 }
             }
 
-            removeClosePointsStopwatch.Start();
+            //removeClosePointsStopwatch.Start();
             //RemoveClosePoints(newPositions, i);
-            removeClosePointsStopwatch.Stop();
+            //removeClosePointsStopwatch.Stop();
 
             growerListener.OnIterationFinished();
             debug("finished iteration " + i);
 
+            if (n_newNodes==0) {
+                growerListener.OnGrowthStopped();
+                break;
+            }
         }
 
         debug(new FormatString("finding close points took {0}", findClosePointStopwatch.Elapsed));
