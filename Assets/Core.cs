@@ -89,7 +89,7 @@ public class Core : MonoBehaviour, GrowerListener {
         growthProperties.SetInfluenceDistance(1f);
         growthProperties.SetPerceptionAngle(160);
         growthProperties.SetMinClearDistanceRatio(0.1f);
-        growthProperties.SetMaxClearDistanceRatio(0.925f);
+        growthProperties.SetMaxClearDistanceRatio(0.95f);
         growthProperties.SetBranchDensityBegin(0f);
         growthProperties.SetBranchDensityEnd(0.8f);
         growthProperties.SetClearDistanceBegin_clearDistanceEnd_Ratio(0.5f);
@@ -830,7 +830,11 @@ public class Core : MonoBehaviour, GrowerListener {
     }
 
     public void OnGrowthStopped() {
-        SetMessage("Growth stopped unexpectedly, maybe you need to define wider crown shape bounds?");
+        if (grower.GetGrowthProperties().GetAttractionPoints().Count > 0.75*grower.GetGrowthProperties().GetAttractionPoints().Backup.Count) {
+            SetMessage("You discovered some unfortunate randomness, try a different seed");
+        } else {
+            SetMessage("Growth stopped unexpectedly, try defining wider crown shape bounds or use less iterations (Age Slider)");
+        }
     }
 
 
@@ -1205,9 +1209,8 @@ public class Core : MonoBehaviour, GrowerListener {
     //    grower.Grow(tree);
     //}
     string message = "";
-    //bool messageLeft;
     int displayTime = 5000;
-    int displayingThreads; //this is needed, otherwise new arrived messaged would be deleted too early
+    int displayingThreads; //this is needed, otherwise newly arrived messaged would be deleted too early
 
     private void SetMessage(string msg) {
         message = msg;
@@ -1241,7 +1244,7 @@ public class Core : MonoBehaviour, GrowerListener {
     }
 
     public void OnResetToDefaults() {
-
+        SetMessage("");
         grower.Stop();
 
         LoadDefaultGrowth();
@@ -1254,6 +1257,7 @@ public class Core : MonoBehaviour, GrowerListener {
     }
 
     public void OnNewSeed() {
+        SetMessage("");
         grower.Stop();
 
         grower.GetGrowthProperties().GetAttractionPoints().NewSeed();
