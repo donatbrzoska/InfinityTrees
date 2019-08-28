@@ -159,43 +159,43 @@ public class BasicsController : MonoBehaviour {
 
 
 
-    public void OnValueChanged_GrowTowardsLight() {
-        float value = GetComponent<Slider>().value;
-        GameObject.Find("Core").GetComponent<Core>().OnGrowTowardsLight(value);
-    }
+    //public void OnValueChanged_GrowTowardsLight() {
+    //    float value = GetComponent<Slider>().value;
+    //    GameObject.Find("Core").GetComponent<Core>().OnGrowTowardsLight(value);
+    //}
 
 
 
 
-    public void OnValueChanged_Density() {
-        float value = GetComponent<Slider>().value;
-        GameObject.Find("Core").GetComponent<Core>().OnDensity(value);
-    }
+    //public void OnValueChanged_Density() {
+    //    float value = GetComponent<Slider>().value;
+    //    GameObject.Find("Core").GetComponent<Core>().OnDensity(value);
+    //}
 
-    public void OnValueChanged_ClearDistanceBegin() {
-        float value = GetComponent<Slider>().value;
-        GameObject.Find("Core").GetComponent<Core>().OnClearDistanceBegin(value);
-    }
+    //public void OnValueChanged_ClearDistanceBegin() {
+    //    float value = GetComponent<Slider>().value;
+    //    GameObject.Find("Core").GetComponent<Core>().OnClearDistanceBegin(value);
+    //}
 
-    public void OnValueChanged_ClearDistanceEnd() {
-        float value = GetComponent<Slider>().value;
-        GameObject.Find("Core").GetComponent<Core>().OnClearDistanceEnd(value);
-    }
+    //public void OnValueChanged_ClearDistanceEnd() {
+    //    float value = GetComponent<Slider>().value;
+    //    GameObject.Find("Core").GetComponent<Core>().OnClearDistanceEnd(value);
+    //}
 
-    public void OnValueChanged_InfluenceDistance() {
-        float value = GetComponent<Slider>().value;
-        GameObject.Find("Core").GetComponent<Core>().OnInfluenceDistance(value);
-    }
+    //public void OnValueChanged_InfluenceDistance() {
+    //    float value = GetComponent<Slider>().value;
+    //    GameObject.Find("Core").GetComponent<Core>().OnInfluenceDistance(value);
+    //}
 
-    public void OnValueChanged_GrowthDistance() {
-        float value = GetComponent<Slider>().value;
-        GameObject.Find("Core").GetComponent<Core>().OnGrowthDistance(value);
-    }
+    //public void OnValueChanged_GrowthDistance() {
+    //    float value = GetComponent<Slider>().value;
+    //    GameObject.Find("Core").GetComponent<Core>().OnGrowthDistance(value);
+    //}
 
-    public void OnValueChanged_PerceptionAngle() {
-        float value = GetComponent<Slider>().value;
-        GameObject.Find("Core").GetComponent<Core>().OnPerceptionAngle(value);
-    }
+    //public void OnValueChanged_PerceptionAngle() {
+    //    float value = GetComponent<Slider>().value;
+    //    GameObject.Find("Core").GetComponent<Core>().OnPerceptionAngle(value);
+    //}
 
     // BUTTONS
 

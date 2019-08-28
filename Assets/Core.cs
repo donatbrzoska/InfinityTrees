@@ -1069,73 +1069,73 @@ public class Core : MonoBehaviour, GrowerListener {
 
     // SPACE COLONIZATION
 
-    public void OnDensity(float value) {
-        cameraMode = CameraMode.AttractionPoints;
+    //public void OnDensity(float value) {
+    //    cameraMode = CameraMode.AttractionPoints;
 
-        grower.Stop();
+    //    grower.Stop();
 
-        grower.GetGrowthProperties().GetAttractionPoints().UpdateDensity(value);
-        pointCloudReady = true;
+    //    grower.GetGrowthProperties().GetAttractionPoints().UpdateDensity(value);
+    //    pointCloudReady = true;
 
-        tree.Reset();
+    //    tree.Reset();
 
-        grower.Grow(tree);
-    }
+    //    grower.Grow(tree);
+    //}
 
-    public void OnClearDistanceBegin(float value) {
-        grower.Stop();
+    //public void OnClearDistanceBegin(float value) {
+    //    grower.Stop();
 
-        grower.GetGrowthProperties().SetClearDistanceBegin(value);
-        grower.GetGrowthProperties().GetAttractionPoints().Reset();
+    //    grower.GetGrowthProperties().SetClearDistanceBegin(value);
+    //    grower.GetGrowthProperties().GetAttractionPoints().Reset();
 
-        tree.Reset();
+    //    tree.Reset();
 
-        grower.Grow(tree);
-    }
+    //    grower.Grow(tree);
+    //}
 
-    public void OnClearDistanceEnd(float value) {
-        grower.Stop();
+    //public void OnClearDistanceEnd(float value) {
+    //    grower.Stop();
 
-        grower.GetGrowthProperties().SetClearDistanceEnd(value);
-        grower.GetGrowthProperties().GetAttractionPoints().Reset();
+    //    grower.GetGrowthProperties().SetClearDistanceEnd(value);
+    //    grower.GetGrowthProperties().GetAttractionPoints().Reset();
 
-        tree.Reset();
+    //    tree.Reset();
 
-        grower.Grow(tree);
-    }
+    //    grower.Grow(tree);
+    //}
 
-    public void OnInfluenceDistance(float value) {
-        grower.Stop();
+    //public void OnInfluenceDistance(float value) {
+    //    grower.Stop();
 
-        grower.GetGrowthProperties().SetInfluenceDistance(value);
-        grower.GetGrowthProperties().GetAttractionPoints().Reset();
+    //    grower.GetGrowthProperties().SetInfluenceDistance(value);
+    //    grower.GetGrowthProperties().GetAttractionPoints().Reset();
 
-        tree.Reset();
+    //    tree.Reset();
 
-        grower.Grow(tree);
-    }
+    //    grower.Grow(tree);
+    //}
 
-    public void OnGrowthDistance(float value) {
-        grower.Stop();
+    //public void OnGrowthDistance(float value) {
+    //    grower.Stop();
 
-        grower.GetGrowthProperties().SetGrowthDistance(value);
-        grower.GetGrowthProperties().GetAttractionPoints().Reset();
+    //    grower.GetGrowthProperties().SetGrowthDistance(value);
+    //    grower.GetGrowthProperties().GetAttractionPoints().Reset();
 
-        tree.Reset();
+    //    tree.Reset();
 
-        grower.Grow(tree);
-    }
+    //    grower.Grow(tree);
+    //}
 
-    public void OnPerceptionAngle(float value) {
-        grower.Stop();
+    //public void OnPerceptionAngle(float value) {
+    //    grower.Stop();
 
-        grower.GetGrowthProperties().SetPerceptionAngle(value);
-        grower.GetGrowthProperties().GetAttractionPoints().Reset();
+    //    grower.GetGrowthProperties().SetPerceptionAngle(value);
+    //    grower.GetGrowthProperties().GetAttractionPoints().Reset();
 
-        tree.Reset();
+    //    tree.Reset();
 
-        grower.Grow(tree);
-    }
+    //    grower.Grow(tree);
+    //}
 
     //#######################################################################################
     //##########                           STEM AND LEAVES                         ##########
@@ -1183,16 +1183,16 @@ public class Core : MonoBehaviour, GrowerListener {
     //##########                                  MISC                             ##########
     //#######################################################################################
 
-    public void OnGrowTowardsLight(float value) {
-        grower.Stop();
+    //public void OnGrowTowardsLight(float value) {
+    //    grower.Stop();
 
-        grower.GetGrowthProperties().UpTropismWeightRatio = value;
-        grower.GetGrowthProperties().GetAttractionPoints().Reset();
+    //    grower.GetGrowthProperties().UpTropismWeightRatio = value;
+    //    grower.GetGrowthProperties().GetAttractionPoints().Reset();
 
-        tree.Reset();
+    //    tree.Reset();
 
-        grower.Grow(tree);
-    }
+    //    grower.Grow(tree);
+    //}
 
     public void OnAge(int value) {
         grower.Stop();
