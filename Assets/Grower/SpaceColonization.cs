@@ -186,6 +186,7 @@ public class SpaceColonization {
         Stopwatch findClosePointStopwatch = new Stopwatch();
         Stopwatch removeClosePointsStopwatch = new Stopwatch();
 
+
         for (int i = 0; i < growthProperties.GetIterations(); i++) {
 
             if (!running) {
@@ -205,6 +206,9 @@ public class SpaceColonization {
 
                 //and find the closest Node respectively
                 Node closest = nearestNodeAlgorithm.GetNearestWithinSquaredDistance(attractionPoint);
+                //if (i > 0) {
+                //    debug("closest: " + ((closest != null) ? closest.GetPosition().ToString() : "__"));
+                //}
                 // Rudis ultimate plan to make the removal in the next iteration
                 findClosePointStopwatch.Stop();
                 removeClosePointsStopwatch.Start();
@@ -292,6 +296,9 @@ public class SpaceColonization {
                 if (!IsDuplicateNode(happyNodePosition, currentNode)) {
                     //add new node to currentNode
                     Node newNode = currentNode.Add(happyNodePosition);
+                    if (i == 0) {
+                        debug("new node at: " + newNode.GetPosition());
+                    }
                     n_newNodes++;
 
                     //add to the nodeList

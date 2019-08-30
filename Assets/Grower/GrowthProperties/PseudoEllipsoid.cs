@@ -88,6 +88,11 @@ public sealed class PseudoEllipsoid : List<Vector3> {
     //    }
     //}
 
+    //public float radius_x { get; private set; }
+    //public float radius_y { get; private set; }
+    //public float radius_z { get; private set; }
+    //public float cutoffRatio_bottom { get; private set; } //how many "percent" of the sphere in y direction are cut off at the bottom
+    //public float cutoffRatio_top { get; private set; } //how many "percent" of the sphere in y direction are cut off at the top
     float radius_x;
     float radius_y;
     float radius_z;
@@ -101,7 +106,7 @@ public sealed class PseudoEllipsoid : List<Vector3> {
     //density says: how many points per 1x1x1 voxel
     public PseudoEllipsoid(/*Vector3 position, */float radius_x, float radius_y, float radius_z, float density, float cutoffRatio_bottom, float cutoffRatio_top) {
         //seed = (int)(new System.Random()).NextDouble() * 65335;
-        Seed = 0;// (int)Util.RandomInRange(0, 65335);
+        Seed = 0;// (int)Util.RandomInRange(0, 65335); //when deleting this seed, also hand the old seed over at LoadGnarlyBranches!
         random = new System.Random(Seed);
 
         //this.position = position;
@@ -118,7 +123,7 @@ public sealed class PseudoEllipsoid : List<Vector3> {
     //density says: how many points per 1x1x1 voxel
     public PseudoEllipsoid(Vector3 position, float radius_x, float radius_y, float radius_z, float density, float cutoffRatio_bottom, float cutoffRatio_top) {
         //seed = (int)(new System.Random()).NextDouble() * 65335;
-        Seed = 0;// (int)Util.RandomInRange(0, 65335);
+        Seed = 0;// (int)Util.RandomInRange(0, 65335); //when deleting this seed, also hand the old seed over at LoadGnarlyBranches!
         random = new System.Random(Seed);
 
         this.Position = position;

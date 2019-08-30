@@ -110,12 +110,12 @@ public class GrowthProperties {
     //    return squaredClearDistance_begin + step * (iteration+1);
     //}
 
-    private Dictionary<int, float> squaredClearDistanceCache = new Dictionary<int, float>();
+    //private Dictionary<int, float> squaredClearDistanceCache = new Dictionary<int, float>();
 
     public float GetSquaredClearDistance(int iteration) {
-        if (squaredClearDistanceCache.ContainsKey(iteration)) {
-            return squaredClearDistanceCache[iteration];
-        } else {
+        //if (squaredClearDistanceCache.ContainsKey(iteration)) {
+        //    return squaredClearDistanceCache[iteration];
+        //} else {
             float squaredClearDistance_max = clearDistance_max * clearDistance_max;
             float squaredClearDistance_min = clearDistance_min * clearDistance_min;
             float squaredClearDistance_range = squaredClearDistance_max - squaredClearDistance_min;
@@ -133,9 +133,9 @@ public class GrowthProperties {
             float squaredClearDistance_end = squaredClearDistance_max - branchDensityEnd * squaredClearDistance_range;
 
             float result = SigmoidInterpolation(squaredClearDistance_begin, squaredClearDistance_end, iteration);
-            squaredClearDistanceCache[iteration] = result;
+            //squaredClearDistanceCache[iteration] = result;
             return result;
-        }
+        //}
     }
 
     //0..1

@@ -24,8 +24,9 @@ public class Core : MonoBehaviour, GrowerListener {
         LoadDefaultGrowth();
         LoadDefaultGeometry();
 
+        //LoadGnarlyGrowth();
+
         //LoadLowGnarlyGrowth();
-        //LoadGnarrlyGrowth();
 
         //LoadHangingGeometry();
 
@@ -57,8 +58,8 @@ public class Core : MonoBehaviour, GrowerListener {
         //LoadMediumBigGrowth();
         //LoadDefaultGeometry();
 
-        LoadBigGrowth();
-        LoadBigGrowthGeometry();
+        //LoadBigGrowth();
+        //LoadBigGrowthGeometry();
 
         //LoadExactLimitedGrowth();
         //LoadExactLimitedGeometry();
@@ -87,9 +88,9 @@ public class Core : MonoBehaviour, GrowerListener {
 
 
         GrowthProperties growthProperties = new GrowthProperties();
-        growthProperties.SetInfluenceDistance(1f);
+        growthProperties.SetInfluenceDistance(1f); //always also change this in UnloadGnarlyGrowth()
         growthProperties.SetPerceptionAngle(160);
-        growthProperties.SetClearDistance(0.1f, 0.95f);
+        growthProperties.SetClearDistance(0.1f, 0.95f); //always also change this in UnloadGnarlyGrowth()
 
         growthProperties.SetBranchDensityBegin(0f);
         growthProperties.SetBranchDensityEnd(0.8f);
@@ -118,19 +119,24 @@ public class Core : MonoBehaviour, GrowerListener {
     void LoadLowGnarlyGrowth() {
         grower.GetGrowthProperties().SetInfluenceDistance(1.3f);
         grower.GetGrowthProperties().SetClearDistance(0.1f, 1.25f);
-
-        grower.GetGrowthProperties().SetBranchDensityBegin(0f); //this needs to be called after every SetClearDistance() -> refresh method later?
-        grower.GetGrowthProperties().SetBranchDensityEnd(0.8f);
     }
 
-    void LoadGnarrlyGrowth() {
-        PseudoEllipsoid attractionPoints = new PseudoEllipsoid(new Vector3(0, 0f, 0), 3, 5, 3.5f, 30, 0.15f, 0.05f);
+    void LoadGnarlyGrowth() {
+        PseudoEllipsoid o = grower.GetGrowthProperties().GetAttractionPoints();
+
+        PseudoEllipsoid attractionPoints = new PseudoEllipsoid(new Vector3(0, 0f, 0), o.GetRadius_x(), o.GetRadius_y(), o.GetRadius_z(), 30, o.GetCutoffRatio_bottom(), o.GetCutoffRatio_top());
         grower.GetGrowthProperties().SetAttractionPoints(attractionPoints);
         grower.GetGrowthProperties().SetInfluenceDistance(0.5f);
         grower.GetGrowthProperties().SetClearDistance(0.05f, 0.425f);
+    }
 
-        grower.GetGrowthProperties().SetBranchDensityBegin(0f); //this needs to be called after every SetClearDistance() -> refresh method later?
-        grower.GetGrowthProperties().SetBranchDensityEnd(0.8f);
+    void UnLoadGnarlyGrowth() {
+        PseudoEllipsoid o = grower.GetGrowthProperties().GetAttractionPoints();
+
+        PseudoEllipsoid attractionPoints = new PseudoEllipsoid(new Vector3(0, 0f, 0), o.GetRadius_x(), o.GetRadius_y(), o.GetRadius_z(), 15, o.GetCutoffRatio_bottom(), o.GetCutoffRatio_top());
+        grower.GetGrowthProperties().SetAttractionPoints(attractionPoints);
+        grower.GetGrowthProperties().SetInfluenceDistance(1f);
+        grower.GetGrowthProperties().SetClearDistance(0.1f, 0.95f);
     }
 
     void LoadDefaultGeometry() {
@@ -356,6 +362,8 @@ public class Core : MonoBehaviour, GrowerListener {
         //GameObject.Find("Stem / Crown Ratio Slider").GetComponent<Slider>().SetValueWithoutNotify(grower.GetGrowthProperties().GetClearDistanceBegin_clearDistanceEnd_Ratio());
         GameObject.Find("Branch Density Begin Slider").GetComponent<Slider>().SetValueWithoutNotify(grower.GetGrowthProperties().GetBranchDensityBegin());
         GameObject.Find("Branch Density End Slider").GetComponent<Slider>().SetValueWithoutNotify(grower.GetGrowthProperties().GetBranchDensityEnd());
+
+        GameObject.Find("Gnarly Branches Toggle").GetComponent<Toggle>().SetIsOnWithoutNotify(false);
 
         //GameObject.Find("Hanging Branches Slider").GetComponent<Slider>().SetValueWithoutNotify(growthProperties.GetHangingBranchesIntensity());
 
@@ -695,17 +703,33 @@ public class Core : MonoBehaviour, GrowerListener {
     }
 
 
-    public void OnGnarlyness(float value) {
+
+    public void OnGnarlyBranches(bool value) {
         grower.Stop();
 
-        //grower.GetGrowthProperties().Gnarlyness = value;
-
-        grower.GetGrowthProperties().GetAttractionPoints().Reset();
+        if (value) {
+            LoadGnarlyGrowth();
+        } else {
+            UnLoadGnarlyGrowth();
+        }
 
         tree.Reset();
 
         grower.Grow(tree);
     }
+
+
+    //public void OnGnarlyness(float value) {
+    //    grower.Stop();
+
+    //    //grower.GetGrowthProperties().Gnarlyness = value;
+
+    //    grower.GetGrowthProperties().GetAttractionPoints().Reset();
+
+    //    tree.Reset();
+
+    //    grower.Grow(tree);
+    //}
 
 
     // SPACE COLONIZATION
@@ -838,6 +862,7 @@ public class Core : MonoBehaviour, GrowerListener {
     int displayTime = 5000;
     int displayingThreads; //this is needed, otherwise newly arrived messaged would be deleted too early
 
+    //should always get set to "" when changing a parameter that caused the message before
     private void SetMessage(string msg) {
         message = msg;
         //messageLeft = false;
