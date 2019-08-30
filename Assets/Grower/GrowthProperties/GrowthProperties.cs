@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class GrowthProperties {
@@ -111,7 +110,7 @@ public class GrowthProperties {
 
     private float MapIteration(int iteration, float begin, float end) {
         float d = end - begin;
-        float step = d / (iterations-1);
+        float step = d / (iterations - 1);
 
         return begin + step * iteration;
     }
@@ -123,7 +122,7 @@ public class GrowthProperties {
     //}
 
     private float Sigmoid(float x) {
-        return (float) (Math.Exp(x) / (1 + Math.Exp(x)));
+        return (float)(Math.Exp(x) / (1 + Math.Exp(x)));
     }
 
     // TODO: make independant from class attributes
@@ -159,7 +158,7 @@ public class GrowthProperties {
     }
 
     public Vector3 GetTropisms(int iteration) {
-        bool hanging = iteration > (1-hangingBranchesIntensity) * iterations;
+        bool hanging = iteration > (1 - hangingBranchesIntensity) * iterations;
 
         if (hanging) {
             return Util.Hadamard(tropisms, new Vector3(1, -1, 1));
@@ -256,8 +255,10 @@ public class GrowthProperties {
 
 //    public float Gnarlyness_di_min { private get; set; } //what is the smallest value for the influence distance
 //    public float Gnarlyness_di_max { private get; set; } //what is the biggest value for the influence distance
-//    public float Gnarlyness_dc_min { private get; set; } //what is the smallest value for the clear distance
-//    public float Gnarlyness_dc_max { private get; set; } //what is the biggest value for the clear distance
+//    public float Gnarlyness_dc_min_min { private get; set; } //what is the smallest value for the clear distance
+//    public float Gnarlyness_dc_min_max { private get; set; } //what is the smallest value for the clear distance
+//    public float Gnarlyness_dc_max_min { private get; set; } //what is the biggest value for the clear distance
+//    public float Gnarlyness_dc_max_max { private get; set; } //what is the biggest value for the clear distance
 //    public int Gnarlyness_pointCloudDensity_min { private get; set; }
 //    public int Gnarlyness_pointCloudDensity_max { private get; set; }
 //    public float Gnarlyness { get; set; } //0..1

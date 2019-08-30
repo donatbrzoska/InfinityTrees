@@ -118,6 +118,19 @@ public class Core : MonoBehaviour, GrowerListener {
     void LoadLowGnarlyGrowth() {
         grower.GetGrowthProperties().SetInfluenceDistance(1.3f);
         grower.GetGrowthProperties().SetClearDistance(0.1f, 1.25f);
+
+        grower.GetGrowthProperties().SetBranchDensityBegin(0f); //this needs to be called after every SetClearDistance() -> refresh method later?
+        grower.GetGrowthProperties().SetBranchDensityEnd(0.8f);
+    }
+
+    void LoadGnarrlyGrowth() {
+        PseudoEllipsoid attractionPoints = new PseudoEllipsoid(new Vector3(0, 0f, 0), 3, 5, 3.5f, 30, 0.15f, 0.05f);
+        grower.GetGrowthProperties().SetAttractionPoints(attractionPoints);
+        grower.GetGrowthProperties().SetInfluenceDistance(0.5f);
+        grower.GetGrowthProperties().SetClearDistance(0.05f, 0.425f);
+
+        grower.GetGrowthProperties().SetBranchDensityBegin(0f); //this needs to be called after every SetClearDistance() -> refresh method later?
+        grower.GetGrowthProperties().SetBranchDensityEnd(0.8f);
     }
 
     void LoadDefaultGeometry() {
@@ -276,16 +289,6 @@ public class Core : MonoBehaviour, GrowerListener {
     void LoadExtremeLimitedGeometry() {
         GeometryProperties geometryProperties = tree.GetGeometryProperties();
         geometryProperties.SetDisplayedLeavesPerNode(Leaf.LeafType.ParticleCrossFoil, 0f);
-    }
-
-    void LoadGnarrlyGrowth() {
-        PseudoEllipsoid attractionPoints = new PseudoEllipsoid(new Vector3(0, 0f, 0), 3, 5, 3.5f, 30, 0.15f, 0.05f);
-        grower.GetGrowthProperties().SetAttractionPoints(attractionPoints);
-        grower.GetGrowthProperties().SetInfluenceDistance(0.5f);
-        grower.GetGrowthProperties().SetClearDistance(0.05f, 0.425f);
-
-        grower.GetGrowthProperties().SetBranchDensityBegin(0f); //this needs to be called after every SetClearDistance() -> refresh method later?
-        grower.GetGrowthProperties().SetBranchDensityEnd(0.8f);
     }
 
     void LoadHangingGeometry() {
@@ -695,7 +698,7 @@ public class Core : MonoBehaviour, GrowerListener {
     public void OnGnarlyness(float value) {
         grower.Stop();
 
-        //grower.GetGrowthProperties().Gnarlyness=value;
+        //grower.GetGrowthProperties().Gnarlyness = value;
 
         grower.GetGrowthProperties().GetAttractionPoints().Reset();
 
