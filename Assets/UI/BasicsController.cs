@@ -87,6 +87,16 @@ public class BasicsController : MonoBehaviour {
 
 
 
+    public void OnValueChanged_HangingBranchesIntensity() {
+        float value = GetComponent<Slider>().value;
+        GameObject.Find("Core").GetComponent<Core>().OnHangingBranchesIntensity(value);
+    }
+    public void OnValueChanged_HangingBranchesBeginDepth() {
+        float value = GetComponent<Slider>().value;
+        GameObject.Find("Core").GetComponent<Core>().OnHangingBranchesBeginDepth(value);
+    }
+
+
 
     public void OnValueChanged_FoliageDensity() {
         float value = GetComponent<Slider>().value;

@@ -37,12 +37,33 @@ public class Tree {
         Initialize();
     }
 
-	private int twigVertices;
+    private void Hang(Node node, int depth) {
+        foreach (Node subnode in node.GetSubnodes()) {
+            if (depth >= geometryProperties.BranchOrientationBeginDepth) {
+                Vector3 d_pos = subnode.GetPosition() - node.GetPosition();
+                float d_angle = Vector3.Angle(d_pos, Vector3.down);
+
+                //rotate d
+                // .. towards the (0, -1, 0) Vector3
+                // .. by da degrees
+                Quaternion rotation = Quaternion.AngleAxis(geometryProperties.HangingBranchesIntensity * d_angle, Vector3.Cross(d_pos, Vector3.down));
+
+                //rotate the subnodes inclusive all its subnodes
+                subnode.Rotate(node.GetPosition(), rotation);
+            }
+
+            Hang(subnode, ++depth);
+        }
+    }
+
+    private int twigVertices;
 	private int twigTriangles;
 	private int leafVertices;
 	private int leafTriangles;
 
+
 	public void GetMesh(ref Vector3[] vertices, ref Vector3[] normals, ref Vector2[] uvs, ref int[] triangles) {
+
         twigVertices = 0;
         twigTriangles = 0;
         leafVertices = 0;
@@ -55,7 +76,13 @@ public class Tree {
         List<Vector2> uvsTmp = new List<Vector2>();// uvsTmp.Capacity = 5000;
         List<int> trianglesTmp = new List<int>();// trianglesTmp.Capacity = 5000;
 
-        CalculateEverything(StemRoot, nodeVerticesPositions, 0, verticesTmp, uvsTmp, trianglesTmp);
+        //if (!true) {
+            Node copy = StemRoot.GetCopyWithSupernode(null);
+            Hang(copy, 0);
+            CalculateEverything(copy, nodeVerticesPositions, 0, verticesTmp, uvsTmp, trianglesTmp);
+        //} else {
+        //    CalculateEverything(StemRoot, nodeVerticesPositions, 0, verticesTmp, uvsTmp, trianglesTmp);
+        //}
 
 
         vertices = new Vector3[verticesTmp.Count];

@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.IO;
 
 public static class Util {
     private static System.Random random = new System.Random();
@@ -46,4 +48,15 @@ public static class Util {
         Vector3 d = a - b;
         return d.x * d.x + d.y * d.y + d.z * d.z;
     }
+
+    ////https://stackoverflow.com/a/129395
+    //public static T DeepCopy<T>(T obj) {
+    //    using (var ms = new MemoryStream()) {
+    //        var formatter = new BinaryFormatter();
+    //        formatter.Serialize(ms, obj);
+    //        ms.Position = 0;
+
+    //        return (T)formatter.Deserialize(ms);
+    //    }
+    //}
 }

@@ -11,7 +11,7 @@
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <RootNamespace></RootNamespace>
-    <ProjectGuid>{A1D43F00-B184-4564-F5BC-50E82DB94049}</ProjectGuid>
+    <ProjectGuid>{CDBDB539-9884-8A94-DB52-B837C842F3D8}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <AssemblyName>Assembly-CSharp</AssemblyName>
@@ -65,6 +65,12 @@
     <Compile Include="Assets\AdvancedRandom.cs" />
     <Compile Include="Assets\Core.cs" />
     <Compile Include="Assets\FormatString.cs" />
+    <Compile Include="Assets\Geometry\GeometryProperties.cs" />
+    <Compile Include="Assets\Geometry\Leaf.cs" />
+    <Compile Include="Assets\Geometry\Node.cs" />
+    <Compile Include="Assets\Geometry\ObjExporter.cs" />
+    <Compile Include="Assets\Geometry\Tree.cs" />
+    <Compile Include="Assets\Geometry\TreeUtil.cs" />
     <Compile Include="Assets\Grower\GrowerListener.cs" />
     <Compile Include="Assets\Grower\GrowthProperties\GrowthProperties.cs" />
     <Compile Include="Assets\Grower\GrowthProperties\PseudoEllipsoid.cs" />
@@ -76,12 +82,6 @@
     <Compile Include="Assets\Grower\NearestNodeAlgorithm\VoxelGridAlgorithm.cs" />
     <Compile Include="Assets\Grower\SpaceColonization.cs" />
     <Compile Include="Assets\Notes.cs" />
-    <Compile Include="Assets\TopologyGeometry\GeometryProperties.cs" />
-    <Compile Include="Assets\TopologyGeometry\Leaf.cs" />
-    <Compile Include="Assets\TopologyGeometry\Node.cs" />
-    <Compile Include="Assets\TopologyGeometry\ObjExporter.cs" />
-    <Compile Include="Assets\TopologyGeometry\Tree.cs" />
-    <Compile Include="Assets\TopologyGeometry\TreeUtil.cs" />
     <Compile Include="Assets\UI\BasicsController.cs" />
     <Compile Include="Assets\UI\CameraMovementController.cs" />
     <Compile Include="Assets\UI\NotificationReceiver.cs" />
@@ -90,22 +90,22 @@
     <Compile Include="Assets\UI\TreeRenderer.cs" />
     <Compile Include="Assets\Util.cs" />
     <Reference Include="Unity.Timeline.Editor">
-      <HintPath>/Users/donatdeva/Documents/Studium/6. Semester/Bachelorarbeit/Unity/TheTrees/Library/ScriptAssemblies/Unity.Timeline.Editor.dll</HintPath>
+      <HintPath>/Users/donatdeva/Documents/Studium/6. Semester/Bachelorarbeit/Unity/InfiniteTrees/Library/ScriptAssemblies/Unity.Timeline.Editor.dll</HintPath>
     </Reference>
     <Reference Include="Unity.TextMeshPro.Editor">
-      <HintPath>/Users/donatdeva/Documents/Studium/6. Semester/Bachelorarbeit/Unity/TheTrees/Library/ScriptAssemblies/Unity.TextMeshPro.Editor.dll</HintPath>
+      <HintPath>/Users/donatdeva/Documents/Studium/6. Semester/Bachelorarbeit/Unity/InfiniteTrees/Library/ScriptAssemblies/Unity.TextMeshPro.Editor.dll</HintPath>
     </Reference>
     <Reference Include="Unity.Timeline">
-      <HintPath>/Users/donatdeva/Documents/Studium/6. Semester/Bachelorarbeit/Unity/TheTrees/Library/ScriptAssemblies/Unity.Timeline.dll</HintPath>
+      <HintPath>/Users/donatdeva/Documents/Studium/6. Semester/Bachelorarbeit/Unity/InfiniteTrees/Library/ScriptAssemblies/Unity.Timeline.dll</HintPath>
     </Reference>
     <Reference Include="Unity.CollabProxy.Editor">
-      <HintPath>/Users/donatdeva/Documents/Studium/6. Semester/Bachelorarbeit/Unity/TheTrees/Library/ScriptAssemblies/Unity.CollabProxy.Editor.dll</HintPath>
+      <HintPath>/Users/donatdeva/Documents/Studium/6. Semester/Bachelorarbeit/Unity/InfiniteTrees/Library/ScriptAssemblies/Unity.CollabProxy.Editor.dll</HintPath>
     </Reference>
     <Reference Include="Unity.TextMeshPro">
-      <HintPath>/Users/donatdeva/Documents/Studium/6. Semester/Bachelorarbeit/Unity/TheTrees/Library/ScriptAssemblies/Unity.TextMeshPro.dll</HintPath>
+      <HintPath>/Users/donatdeva/Documents/Studium/6. Semester/Bachelorarbeit/Unity/InfiniteTrees/Library/ScriptAssemblies/Unity.TextMeshPro.dll</HintPath>
     </Reference>
     <Reference Include="Unity.Analytics.DataPrivacy">
-      <HintPath>/Users/donatdeva/Documents/Studium/6. Semester/Bachelorarbeit/Unity/TheTrees/Library/ScriptAssemblies/Unity.Analytics.DataPrivacy.dll</HintPath>
+      <HintPath>/Users/donatdeva/Documents/Studium/6. Semester/Bachelorarbeit/Unity/InfiniteTrees/Library/ScriptAssemblies/Unity.Analytics.DataPrivacy.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.AIModule">
       <HintPath>/Applications/Unity/Hub/Editor/2019.1.10f1/Unity.app/Contents/Managed/UnityEngine/UnityEngine.AIModule.dll</HintPath>
@@ -291,13 +291,13 @@
       <HintPath>/Applications/Unity/Hub/Editor/2019.1.10f1/Unity.app/Contents/UnityExtensions/Unity/TestRunner/net35/unity-custom/nunit.framework.dll</HintPath>
     </Reference>
     <Reference Include="Unity.Analytics.Tracker">
-      <HintPath>/Users/donatdeva/Documents/Studium/6. Semester/Bachelorarbeit/Unity/TheTrees/Library/PackageCache/com.unity.analytics@3.3.2/Unity.Analytics.Tracker.dll</HintPath>
+      <HintPath>/Users/donatdeva/Documents/Studium/6. Semester/Bachelorarbeit/Unity/InfiniteTrees/Library/PackageCache/com.unity.analytics@3.3.2/Unity.Analytics.Tracker.dll</HintPath>
     </Reference>
     <Reference Include="Unity.Analytics.Editor">
-      <HintPath>/Users/donatdeva/Documents/Studium/6. Semester/Bachelorarbeit/Unity/TheTrees/Library/PackageCache/com.unity.analytics@3.3.2/Unity.Analytics.Editor.dll</HintPath>
+      <HintPath>/Users/donatdeva/Documents/Studium/6. Semester/Bachelorarbeit/Unity/InfiniteTrees/Library/PackageCache/com.unity.analytics@3.3.2/Unity.Analytics.Editor.dll</HintPath>
     </Reference>
     <Reference Include="Unity.Analytics.StandardEvents">
-      <HintPath>/Users/donatdeva/Documents/Studium/6. Semester/Bachelorarbeit/Unity/TheTrees/Library/PackageCache/com.unity.analytics@3.3.2/Unity.Analytics.StandardEvents.dll</HintPath>
+      <HintPath>/Users/donatdeva/Documents/Studium/6. Semester/Bachelorarbeit/Unity/InfiniteTrees/Library/PackageCache/com.unity.analytics@3.3.2/Unity.Analytics.StandardEvents.dll</HintPath>
     </Reference>
     <Reference Include="netstandard">
       <HintPath>/Applications/Unity/Hub/Editor/2019.1.10f1/Unity.app/Contents/NetStandard/ref/2.0.0/netstandard.dll</HintPath>

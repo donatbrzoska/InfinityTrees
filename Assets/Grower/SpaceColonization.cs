@@ -336,6 +336,7 @@ public class SpaceColonization {
     }
 
 
+
     //PRUNING FOR ONCE IN THE END
     //private int maxConsecutiveNonBranchingNodes = 7;
 

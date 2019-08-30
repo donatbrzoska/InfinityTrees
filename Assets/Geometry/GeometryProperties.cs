@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class GeometryProperties {
@@ -69,6 +70,22 @@ public class GeometryProperties {
 
     public float GetMinRadiusRatioForNormalConnection() {
         return minRadiusRatioForNormalConnection;
+    }
+
+    public float HangingBranchesIntensityMin {private get; set; }
+    public float HangingBranchesIntensityMax { private get; set; }
+    public float HangingBranchesIntensityRatio { get; set; } //-1..1 positive values make the branches hang down, negative values point up
+    public float HangingBranchesIntensity {
+        get { return HangingBranchesIntensityRatio * (HangingBranchesIntensityMax - HangingBranchesIntensityMin); }
+    }
+
+    public int BranchOrientationBeginDepthMin {private get; set; } //should be set to 0 or n_initial_stem_segments
+    public int BranchOrientationBeginDepthMax {private get; set; } //should be set to n_initial_stem_segments + iterations
+    public float BranchOrientationBeginDepthRatio { get; set; } //0..1
+    public int BranchOrientationBeginDepth {
+        get {
+            return (int)(BranchOrientationBeginDepthRatio * (BranchOrientationBeginDepthMax - BranchOrientationBeginDepthMin));
+        }
     }
 
     //############################

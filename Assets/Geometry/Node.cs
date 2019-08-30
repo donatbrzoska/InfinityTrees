@@ -63,9 +63,56 @@ public class Node : IEquatable<Node> {
         this.radius = radius;
         this.geometryProperties = geometryProperties;
     }
-
+    //used for geometry data generation
     public Node GetGeometryCopyWithNormalAndRadius(Vector3 normal, float radius) {
         return new Node(this.position, normal, radius, geometryProperties);
+    }
+
+
+
+    //only gets used by the method below -> deep copy
+    private Node(Node supernode) {
+        this.supernode = supernode;
+    }
+    private void SetPosition(Vector3 position) {
+        this.position = position;
+    }
+    private void SetNormal(Vector3 normal) {
+        this.normal = normal;
+    }
+    private void SetRadius(float radius) {
+        this.radius = radius;
+    }
+    private void SetGeometryProperties(GeometryProperties geometryProperties) {
+        this.geometryProperties = geometryProperties;
+    }
+    private void SetSubnodes(List<Node> subnodes) {
+        this.subnodes = subnodes;
+    }
+    private void SetLeaves(List<Leaf> leaves) {
+        this.leaves = leaves;
+    }
+    //used for deep copy
+    public Node GetCopyWithSupernode(Node supernode) {
+        Node copy = new Node(supernode);
+        copy.SetPosition(position);
+        copy.SetNormal(normal);
+        copy.SetRadius(radius);
+        copy.SetGeometryProperties(geometryProperties);
+
+        List<Node> subnodes_ = new List<Node>();
+        foreach (Node subnode in subnodes) {
+            subnodes_.Add(subnode.GetCopyWithSupernode(copy));
+        }
+        copy.SetSubnodes(subnodes_);
+        
+        List<Leaf> leaves_ = new List<Leaf>();
+        foreach (Leaf leaf in leaves) {
+            leaves_.Add(leaf.GetCopy());
+        }
+        copy.SetLeaves(leaves_);
+
+        return copy;
     }
 
 
@@ -145,6 +192,21 @@ public class Node : IEquatable<Node> {
         }
     }
 
+    public void Rotate(Vector3 byPoint, Quaternion quaternion) {
+        Vector3 d = this.position - byPoint;
+        Vector3 direction = quaternion * d;
+        this.position = byPoint + direction;
+
+        foreach (Node subnode in subnodes) {
+            subnode.Rotate(byPoint, quaternion);
+            this.CalculateNormal();
+        }
+
+        foreach (Leaf l in leaves) {
+            l.Rotate(byPoint, quaternion);
+        }
+    }
+
     public Vector3 GetNormal() {
         return normal;
     }
@@ -168,9 +230,9 @@ public class Node : IEquatable<Node> {
                 normal = Vector3.up;
             } else if (subnodes.Count == 1) { //one subnode
                 //point to subnode
-                //normal = subnodes[0].position - position; //vector from this to subnode
+                normal = subnodes[0].position - position; //vector from this to subnode
 
-                normal = Vector3.up;
+                //normal = Vector3.up;
             } else { //many subnodes
                 normal = Vector3.zero;
                 foreach (Node subnode in subnodes) {
@@ -183,13 +245,14 @@ public class Node : IEquatable<Node> {
                 normal = position - supernode.GetPosition(); //vector from supernode to this
             } else if (subnodes.Count == 1) { //one subnode
                 //find tangent between(vector pointing from super to this, vector pointing from this to sub)
-                Vector3 superToThis = position - supernode.GetPosition();
-                Vector3 thisToSub = subnodes[0].GetPosition() - position;
-                normal = thisToSub + superToThis;
+                //Vector3 superToThis = position - supernode.GetPosition();
+                //Vector3 thisToSub = subnodes[0].GetPosition() - position;
+                //normal = thisToSub + superToThis;
+                normal = GetDirection() + subnodes[0].GetDirection();
             } else { //many subnodes
                 normal = Vector3.zero;
                 foreach (Node subnode in subnodes) {
-                    normal = normal + (subnode.GetPosition() - position) * subnode.GetRadius() * subnode.GetRadius();
+                    normal = normal + (subnode.GetPosition() - position) * subnode.GetRadius();// * subnode.GetRadius();
                 }
             }
         }

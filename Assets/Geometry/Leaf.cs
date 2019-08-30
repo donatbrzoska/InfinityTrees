@@ -39,10 +39,16 @@ public class Leaf {
         position = position + diff;
     }
 
-    //float size;
-    //public void UpdateSize() {
-    //    size = geometryProperties.GetLeafSize();
-    //}
+    public void Rotate(Vector3 byPoint, Quaternion quaternion) {
+        Vector3 d = this.position - byPoint;
+        Vector3 direction = quaternion * d;
+        this.position = byPoint + direction;
+    }
+
+        //float size;
+        //public void UpdateSize() {
+        //    size = geometryProperties.GetLeafSize();
+        //}
 
     GeometryProperties geometryProperties;
 
@@ -59,6 +65,20 @@ public class Leaf {
 
         //size = geometryProperties.GetLeafSize();
     }
+
+
+
+    //only used for deep copy
+    private Leaf(Vector3 position, GeometryProperties geometryProperties, Quaternion rotation) {
+        this.position = position;
+        this.geometryProperties = geometryProperties;
+        this.rotation = rotation;
+    }
+    public Leaf GetCopy() {
+        return new Leaf(position, geometryProperties, rotation);
+    }
+
+
 
     public void CalculateAndStoreGeometry(List<Vector3> verticesResult, List<Vector2> uvsResult, List<int> trianglesResult) {
 
