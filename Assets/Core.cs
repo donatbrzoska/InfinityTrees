@@ -686,6 +686,18 @@ public class Core : MonoBehaviour, GrowerListener {
     }
 
 
+    public void OnGnarlyness(float value) {
+        grower.Stop();
+
+        //grower.GetGrowthProperties().Gnarlyness=value;
+
+        grower.GetGrowthProperties().GetAttractionPoints().Reset();
+
+        tree.Reset();
+
+        grower.Grow(tree);
+    }
+
 
     // SPACE COLONIZATION
 

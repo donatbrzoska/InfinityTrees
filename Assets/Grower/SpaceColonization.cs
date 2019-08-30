@@ -208,7 +208,7 @@ public class SpaceColonization {
                 // Rudis ultimate plan to make the removal in the next iteration
                 findClosePointStopwatch.Stop();
                 removeClosePointsStopwatch.Start();
-                if (i > 0) {
+                if (i > 0) { //in the first iteration, the attraction points shall not get deleted
                     if (closest != null) {
                         if (Util.SquaredDistance(attractionPoint, closest.GetPosition()) < squaredClearDistance) {
                             j--;

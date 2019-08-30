@@ -72,7 +72,7 @@ public class GeometryProperties {
         return minRadiusRatioForNormalConnection;
     }
 
-    public float HangingBranchesIntensityMin {private get; set; }
+    public float HangingBranchesIntensityMin { private get; set; }
     public float HangingBranchesIntensityMax { private get; set; }
     public float HangingBranchesIntensityRatio { get; set; } //-1..1 positive values make the branches hang down, negative values point up
     public float HangingBranchesIntensity {

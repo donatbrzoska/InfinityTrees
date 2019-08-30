@@ -169,6 +169,14 @@ public class BasicsController : MonoBehaviour {
 
 
 
+
+    public void OnValueChanged_Gnarlyness() {
+        float value = GetComponent<Slider>().value;
+        GameObject.Find("Core").GetComponent<Core>().OnGnarlyness(value);
+    }
+
+
+
     //public void OnValueChanged_GrowTowardsLight() {
     //    float value = GetComponent<Slider>().value;
     //    GameObject.Find("Core").GetComponent<Core>().OnGrowTowardsLight(value);
@@ -228,7 +236,7 @@ public class BasicsController : MonoBehaviour {
 
     void Update() {
 
-        if (Input.GetMouseButtonDown(0) && GameObject.Find("EventSystem").GetComponent<EventSystem>().currentSelectedGameObject == gameObject) {
+        if (Input.GetMouseButtonDown(0) && GameObject.Find("EventSystem").GetComponent<EventSystem>().currentSelectedGameObject == gameObject && modifyingCrownShape) {
             GameObject.Find("Core").GetComponent<Core>().DisableCameraMovement();
             GameObject.Find("Core").GetComponent<Core>().EnablePointCloudRenderer();
         }

@@ -25,7 +25,6 @@ public class GrowthProperties {
     private float squaredClearDistance_end;
 
 
-
     private Vector3 tropisms;
     private Vector3 tropismsWeights;
     private float hangingBranchesIntensity;
