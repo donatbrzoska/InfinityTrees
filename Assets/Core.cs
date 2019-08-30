@@ -24,7 +24,7 @@ public class Core : MonoBehaviour, GrowerListener {
         LoadDefaultGrowth();
         LoadDefaultGeometry();
 
-        LoadLowGnarlyGrowth();
+        //LoadLowGnarlyGrowth();
         //LoadGnarrlyGrowth();
 
         //LoadHangingGeometry();
@@ -57,8 +57,8 @@ public class Core : MonoBehaviour, GrowerListener {
         //LoadMediumBigGrowth();
         //LoadDefaultGeometry();
 
-        //LoadBigGrowth();
-        //LoadBigGrowthGeometry();
+        LoadBigGrowth();
+        LoadBigGrowthGeometry();
 
         //LoadExactLimitedGrowth();
         //LoadExactLimitedGeometry();

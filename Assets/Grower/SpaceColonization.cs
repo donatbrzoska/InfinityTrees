@@ -194,7 +194,7 @@ public class SpaceColonization {
 
             float squaredClearDistance = growthProperties.GetSquaredClearDistance(i);
 
-            Dictionary<Node, List<Vector3>> nodesAttractionPoints = new Dictionary<Node, List<Vector3>>();
+            Dictionary<Node, List<Vector3>> nodes_to_attractionPoints = new Dictionary<Node, List<Vector3>>();
 
             findClosePointStopwatch.Start();
             //iterate through all attractionPoints
@@ -223,10 +223,10 @@ public class SpaceColonization {
                 //if there is a close Node
                 if (closest != null) {
                     //add it to the nodesAttractionPoints
-                    if (nodesAttractionPoints.ContainsKey(closest)) {
-                        nodesAttractionPoints[closest].Add(attractionPoint);
+                    if (nodes_to_attractionPoints.ContainsKey(closest)) {
+                        nodes_to_attractionPoints[closest].Add(attractionPoint);
                     } else {
-                        nodesAttractionPoints[closest] = new List<Vector3> { attractionPoint };
+                        nodes_to_attractionPoints[closest] = new List<Vector3> { attractionPoint };
                     }
                 }
 
@@ -244,8 +244,8 @@ public class SpaceColonization {
             int n_newNodes = 0;
 
             //iterate through all Nodes with attractionPoints associated
-            foreach (Node currentNode in nodesAttractionPoints.Keys) {
-                List<Vector3> associatedAttractionPoints = nodesAttractionPoints[currentNode];
+            foreach (Node currentNode in nodes_to_attractionPoints.Keys) {
+                List<Vector3> associatedAttractionPoints = nodes_to_attractionPoints[currentNode];
 
                 //calculate direction
                 Vector3 sum = new Vector3(0, 0, 0);

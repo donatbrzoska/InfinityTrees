@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class GrowthProperties {
@@ -11,17 +12,8 @@ public class GrowthProperties {
     private float perceptionAngle;
 
 
-    //private float clearDistance;
-    private float squaredClearDistance;
     private float clearDistance_min;
-    private float squaredClearDistance_min;
     private float clearDistance_max;
-    private float squaredClearDistance_max;
-
-    private float squaredClearDistance_range;
-
-    private float squaredClearDistance_begin;
-    private float squaredClearDistance_end;
 
 
     private Vector3 tropisms;
@@ -36,7 +28,6 @@ public class GrowthProperties {
 
     public void SetInfluenceDistance(float influenceDistance) {
         this.influenceDistance = influenceDistance;
-        this.squaredInfluenceDistance = influenceDistance * influenceDistance;
     }
 
     public float GetInfluenceDistance() {
@@ -44,7 +35,7 @@ public class GrowthProperties {
     }
 
     public float GetSquaredInfluenceDistance() {
-        return squaredInfluenceDistance;
+        return influenceDistance * influenceDistance;
     }
 
 
@@ -67,24 +58,12 @@ public class GrowthProperties {
     public void SetClearDistance(float min, float max) {
         this.clearDistance_min = min;
         this.clearDistance_max = max;
-
-        this.squaredClearDistance_min = min * min;
-        this.squaredClearDistance_max = max * max;
-
-        this.squaredClearDistance_range = squaredClearDistance_max - squaredClearDistance_min;
     }
 
 
     private float branchDensityBegin;
     public void SetBranchDensityBegin(float value) {
         this.branchDensityBegin = value;
-
-        //the density says how much of the squaredClearDistanceRange should be subtracted from the squaredClearDistance_max
-        //-> typically the density is low in the beginning
-        //-> this should result in a high squaredClearDistance_begin
-        //-> therefore density * squaredClearDistanceRange has to be subtracted from the squaredClearDistance_max
-        this.squaredClearDistance_begin = squaredClearDistance_max - value * squaredClearDistance_range;
-        //this.squaredClearDistance_begin = squaredClearDistance_min + value * squaredClearDistanceRange; //also possible
     }
 
     public float GetBranchDensityBegin() {
@@ -94,13 +73,6 @@ public class GrowthProperties {
     private float branchDensityEnd;
     public void SetBranchDensityEnd(float value) {
         this.branchDensityEnd = value;
-
-        //the density says how much of the squaredClearDistanceRange should be subtracted from the squaredClearDistance_max
-        //-> typically the density is high in the end
-        //-> this should result in a low squaredClearDistance_end
-        //-> therefore density * squaredClearDistanceRange has to be subtracted from the squaredClearDistance_max
-        this.squaredClearDistance_end = squaredClearDistance_max - value * squaredClearDistance_range;
-        //this.squaredClearDistance_end = squaredClearDistance_min + value * squaredClearDistanceRange; //also possible
     }
 
     public float GetBranchDensityEnd() {
@@ -126,10 +98,10 @@ public class GrowthProperties {
     }
 
     // TODO: make independant from class attributes
-    private float SigmoidInterpolation(int iteration) {
-        float d = squaredClearDistance_begin - squaredClearDistance_end;
+    private float SigmoidInterpolation(float from, float to, int iteration) {
+        float d = from - to;
 
-        return squaredClearDistance_begin - Sigmoid(MapIteration(iteration, -8, 4)) * d;
+        return from - Sigmoid(MapIteration(iteration, -8, 4)) * d;
     }
 
     //private float LinearInterpolation(int iteration) {
@@ -138,12 +110,32 @@ public class GrowthProperties {
     //    return squaredClearDistance_begin + step * (iteration+1);
     //}
 
-    public float GetSquaredClearDistance(int iteration) {
-        return SigmoidInterpolation(iteration);
-    }
+    private Dictionary<int, float> squaredClearDistanceCache = new Dictionary<int, float>();
 
-    public float GetSquaredClearDistance() {
-        return squaredClearDistance;
+    public float GetSquaredClearDistance(int iteration) {
+        if (squaredClearDistanceCache.ContainsKey(iteration)) {
+            return squaredClearDistanceCache[iteration];
+        } else {
+            float squaredClearDistance_max = clearDistance_max * clearDistance_max;
+            float squaredClearDistance_min = clearDistance_min * clearDistance_min;
+            float squaredClearDistance_range = squaredClearDistance_max - squaredClearDistance_min;
+
+            //the density says how much of the squaredClearDistanceRange should be subtracted from the squaredClearDistance_max
+            //-> typically the density is low in the beginning
+            //-> this should result in a high squaredClearDistance_begin
+            //-> therefore density * squaredClearDistanceRange has to be subtracted from the squaredClearDistance_max
+            float squaredClearDistance_begin = squaredClearDistance_max - branchDensityBegin * squaredClearDistance_range;
+
+            //the density says how much of the squaredClearDistanceRange should be subtracted from the squaredClearDistance_max
+            //-> typically the density is high in the end
+            //-> this should result in a low squaredClearDistance_end
+            //-> therefore density * squaredClearDistanceRange has to be subtracted from the squaredClearDistance_max
+            float squaredClearDistance_end = squaredClearDistance_max - branchDensityEnd * squaredClearDistance_range;
+
+            float result = SigmoidInterpolation(squaredClearDistance_begin, squaredClearDistance_end, iteration);
+            squaredClearDistanceCache[iteration] = result;
+            return result;
+        }
     }
 
     //0..1
