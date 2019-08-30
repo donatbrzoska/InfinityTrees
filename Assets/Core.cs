@@ -24,6 +24,7 @@ public class Core : MonoBehaviour, GrowerListener {
         LoadDefaultGrowth();
         LoadDefaultGeometry();
 
+        LoadLowGnarlyGrowth();
         //LoadGnarrlyGrowth();
 
         //LoadHangingGeometry();
@@ -112,6 +113,11 @@ public class Core : MonoBehaviour, GrowerListener {
 
 
         grower = new SpaceColonization(growthProperties, this);
+    }
+
+    void LoadLowGnarlyGrowth() {
+        grower.GetGrowthProperties().SetInfluenceDistance(1.3f);
+        grower.GetGrowthProperties().SetClearDistance(0.1f, 1.25f);
     }
 
     void LoadDefaultGeometry() {

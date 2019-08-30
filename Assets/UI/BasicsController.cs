@@ -116,34 +116,34 @@ public class BasicsController : MonoBehaviour {
 
 
 
-    bool modifyingCrownShape;
+    //bool modifyingCrownShape;
 
     public void OnValueChanged_Width() {
-        modifyingCrownShape = true;
+        //modifyingCrownShape = true;
         float value = GetComponent<Slider>().value;
         GameObject.Find("Core").GetComponent<Core>().OnCrownWidth(value);
     }
 
     public void OnValueChanged_Height() {
-        modifyingCrownShape = true;
+        //modifyingCrownShape = true;
         float value = GetComponent<Slider>().value;
         GameObject.Find("Core").GetComponent<Core>().OnCrownHeight(value);
     }
 
     public void OnValueChanged_Depth() {
-        modifyingCrownShape = true;
+        //modifyingCrownShape = true;
         float value = GetComponent<Slider>().value;
         GameObject.Find("Core").GetComponent<Core>().OnCrownDepth(value);
     }
 
     public void OnValueChanged_TopCutoff() {
-        modifyingCrownShape = true;
+        //modifyingCrownShape = true;
         float value = GetComponent<Slider>().value;
         GameObject.Find("Core").GetComponent<Core>().OnCrownTopCutoff(value);
     }
 
     public void OnValueChanged_BottomCutoff() {
-        modifyingCrownShape = true;
+        //modifyingCrownShape = true;
         float value = GetComponent<Slider>().value;
         GameObject.Find("Core").GetComponent<Core>().OnCrownBottomCutoff(value);
     }
@@ -236,7 +236,7 @@ public class BasicsController : MonoBehaviour {
 
     void Update() {
 
-        if (Input.GetMouseButtonDown(0) && GameObject.Find("EventSystem").GetComponent<EventSystem>().currentSelectedGameObject == gameObject && modifyingCrownShape) {
+        if (Input.GetMouseButtonDown(0) && GameObject.Find("EventSystem").GetComponent<EventSystem>().currentSelectedGameObject == gameObject) {
             GameObject.Find("Core").GetComponent<Core>().DisableCameraMovement();
             GameObject.Find("Core").GetComponent<Core>().EnablePointCloudRenderer();
         }

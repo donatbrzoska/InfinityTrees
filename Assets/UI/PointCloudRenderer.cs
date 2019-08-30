@@ -16,7 +16,7 @@ public class PointCloudRenderer : MonoBehaviour {
         mesh = new Mesh();
         GetComponent<MeshFilter>().sharedMesh = mesh;
 
-        triangleSize = 0.08f;
+        triangleSize = 0.11f;
 
         //Texture2D texture = Resources.Load("point_cloud_color_red") as Texture2D;
         Texture2D texture = new Texture2D(1, 1);

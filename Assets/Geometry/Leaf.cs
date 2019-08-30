@@ -54,13 +54,15 @@ public class Leaf {
 
     Quaternion rotation;
 
+    // the leaf needs its own random, since randoms should only be used from one thread at a time
+    private static System.Random random = new System.Random();
 
     public Leaf(Vector3 position, GeometryProperties geometryProperties) {
         this.position = position;
         this.geometryProperties = geometryProperties;
 
-        float rotationAngle = Util.RandomInRange(0, 360);
-        Vector3 rotationAxis = Util.RandomVector3();
+        float rotationAngle = Util.RandomInRange(0, 360, random);
+        Vector3 rotationAxis = Util.RandomVector3(random);
         rotation = Quaternion.AngleAxis(rotationAngle, rotationAxis);
 
         //size = geometryProperties.GetLeafSize();

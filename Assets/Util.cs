@@ -5,9 +5,28 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
 
 public static class Util {
+
+    //only one Random per Thread is allowed
+    // Growerthread:
+    // - leaf orientation
+    // - leaf positioning
+    // -> Leafs get own Random
+    // - Stem Generation has its own AdvancedRandom
+    // Mainthread:
+    // - n leaves
+    // - leaf size
+    // - point cloud seed generation
+    // - point cloud triangle orientation vector
+    // - point cloud triangle orientation angle
     private static System.Random random = new System.Random();
 
     public static float RandomInRange(float from, float to) {
+        float d = to - from;
+        float f = (float)random.NextDouble() * d;
+        return f + from;
+    }
+
+    public static float RandomInRange(float from, float to, System.Random random) {
         float d = to - from;
         float f = (float)random.NextDouble() * d;
         return f + from;
@@ -26,9 +45,16 @@ public static class Util {
     }
 
     public static Vector3 RandomVector3() {
-        float x = (float)(random.NextDouble() * 2) - 1;
-        float y = (float)(random.NextDouble() * 2) - 1;
-        float z = (float)(random.NextDouble() * 2) - 1;
+        float x = (float)random.NextDouble();
+        float y = (float)random.NextDouble();
+        float z = (float)random.NextDouble();
+        return new Vector3(x, y, z);
+    }
+
+    public static Vector3 RandomVector3(System.Random random) {
+        float x = (float)random.NextDouble();
+        float y = (float)random.NextDouble();
+        float z = (float)random.NextDouble();
         return new Vector3(x, y, z);
     }
 

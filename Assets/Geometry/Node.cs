@@ -101,8 +101,8 @@ public class Node : IEquatable<Node> {
         copy.SetGeometryProperties(geometryProperties);
 
         List<Node> subnodes_ = new List<Node>();
-        foreach (Node subnode in subnodes) {
-            subnodes_.Add(subnode.GetCopyWithSupernode(copy));
+        for (int i=0; i<subnodes.Count; i++) {
+            subnodes_.Add(subnodes[i].GetCopyWithSupernode(copy));
         }
         copy.SetSubnodes(subnodes_);
         
@@ -293,6 +293,8 @@ public class Node : IEquatable<Node> {
         }
     }
 
+    private static System.Random random = new System.Random();
+
     public void CalculateAndStoreLeafData(List<Vector3> verticesResult, List<Vector2> uvsResult, List<int> trianglesResult) {
         //if (geometryProperties.GetLeavesEnabled()
         if (radius < geometryProperties.GetMaxTwigRadiusForLeaves()) {
@@ -300,10 +302,12 @@ public class Node : IEquatable<Node> {
             int n_leaves = (int)geometryProperties.GetDisplayedLeavesPerNode();
             float floatingRest = geometryProperties.GetDisplayedLeavesPerNode() - n_leaves;
 
-            float r = Util.RandomInRange(0, 1);
+            float r = (float)random.NextDouble();//Util.RandomInRange(0, 1);
             if (r <= floatingRest) {
                 n_leaves++;
             }
+
+            //debug("displayed leaves per node: " + n_leaves);
 
             for (int i = 0; i < n_leaves; i++) {
 
