@@ -296,9 +296,6 @@ public class SpaceColonization {
                 if (!IsDuplicateNode(happyNodePosition, currentNode)) {
                     //add new node to currentNode
                     Node newNode = currentNode.Add(happyNodePosition);
-                    if (i == 0) {
-                        debug("new node at: " + newNode.GetPosition());
-                    }
                     n_newNodes++;
 
                     //add to the nodeList

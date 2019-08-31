@@ -5,6 +5,7 @@ using UnityEngine;
 [RequireComponent(typeof(MeshFilter))]
 public class TreeRenderer : MonoBehaviour {
 
+
     Core core;
 
 
@@ -17,6 +18,7 @@ public class TreeRenderer : MonoBehaviour {
     public Texture2D texture;
     Renderer renderer_;
 
+    int rendererId = -1;
 
     // Start is called before the first frame update
     void Start() {
@@ -37,7 +39,7 @@ public class TreeRenderer : MonoBehaviour {
     }
 
     //https://docs.unity3d.com/500/Documentation/ScriptReference/ShaderVariantCollection.html
-    //Important for this to work:
+    //Important for this to work outside of the unity development environment:
     //1. Run in Unity until it works
     //2. Unity -> Edit -> Project Settings ... -> Graphics -> Save to asset...
     //3. Unity -> Edit -> Project Settings ... -> Graphics -> Preloaded Shaders: Size := 1; Element 0 := saved_shader_variant_collection
@@ -68,19 +70,23 @@ public class TreeRenderer : MonoBehaviour {
         renderer_.material.SetTexture("_MainTex", texture);
     }
 
+
     // Update is called once per frame
     void Update() {
+        if (rendererId == -1) {
+            rendererId = core.GetRendererId();
+            name = "TreeRenderer_" + rendererId;
+        }
+
         SetTexture(core.GetTexture());
 
-        if (core.MeshReady()) {
-            core.GetMesh(ref vertices, ref normals, ref uvs, ref triangles);
+        core.GetMesh(rendererId, ref vertices, ref normals, ref uvs, ref triangles);
 
-            mesh.Clear();
-            mesh.vertices = vertices;
-            mesh.normals = normals;
-            mesh.uv = uvs;
-            mesh.triangles = triangles;
-        }
+        mesh.Clear();
+        mesh.vertices = vertices;
+        mesh.normals = normals;
+        mesh.uv = uvs;
+        mesh.triangles = triangles;
     }
 }
 
