@@ -43,16 +43,32 @@ public class Tree {
                 Vector3 d_pos = subnode.GetPosition() - node.GetPosition();
                 float d_angle = Vector3.Angle(d_pos, Vector3.down);
 
-                //rotate d
-                // .. towards the (0, -1, 0) Vector3
-                // .. by da degrees
-                Quaternion rotation = Quaternion.AngleAxis(geometryProperties.HangingBranchesIntensity * d_angle, Vector3.Cross(d_pos, Vector3.down));
+                // d_angle should have a max value of 180
+                // .. in this case, gravity is not having an impact (hypothesis) -> rotation_angle should be 0
+                // .. otherwise HangingBranchesIntensity says, how much of an impact the gravity has
+
+
+                // it should be rotated by a _fraction_ of d_angle
+                // - this _fraction_ is defined through someFactor * d_angle
+                // - - someFactor is 1.0, when d_angle is 0
+                // - - someFactor is 0.5, when d_angle is 90
+                // - - someFactor is 0.0, when d_angle is 180
+                // - > someFactor = 1 - (d_angle/180)
+                float someFactor = 1 - (d_angle / 180);
+
+                // - HaningBranchesIntensity just says how much of this _fraction_ will actually be applied as rotation angle
+                float rotation_angle =  geometryProperties.HangingBranchesIntensity * someFactor * d_angle;
+                // rotation angle is also 0, if d_angle is 0 (when no more hang is needed)
+                // -> because no matter how big of a fraction you will take (of d_angle) no rotation will be performed
+
+                //rotate d_pos towards the (0, -1, 0) Vector3
+                Quaternion rotation = Quaternion.AngleAxis(rotation_angle, Vector3.Cross(d_pos, Vector3.down));
 
                 //rotate the subnodes inclusive all its subnodes
                 subnode.Rotate(node.GetPosition(), rotation);
             }
 
-            Hang(subnode, ++depth);
+            Hang(subnode, depth+1);
         }
     }
 

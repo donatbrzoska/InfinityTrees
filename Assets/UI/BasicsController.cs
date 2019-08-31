@@ -81,6 +81,7 @@ public class BasicsController : MonoBehaviour {
     }
 
     public void OnValueChanged_CrownStemLength() {
+        modifyingPointCloudParameter = true;
         float value = GetComponent<Slider>().value;
         GameObject.Find("Core").GetComponent<Core>().OnCrownStemLength(value);
     }
@@ -116,34 +117,34 @@ public class BasicsController : MonoBehaviour {
 
 
 
-    //bool modifyingCrownShape;
+    bool modifyingPointCloudParameter;
 
     public void OnValueChanged_Width() {
-        //modifyingCrownShape = true;
+        modifyingPointCloudParameter = true;
         float value = GetComponent<Slider>().value;
         GameObject.Find("Core").GetComponent<Core>().OnCrownWidth(value);
     }
 
     public void OnValueChanged_Height() {
-        //modifyingCrownShape = true;
+        modifyingPointCloudParameter = true;
         float value = GetComponent<Slider>().value;
         GameObject.Find("Core").GetComponent<Core>().OnCrownHeight(value);
     }
 
     public void OnValueChanged_Depth() {
-        //modifyingCrownShape = true;
+        modifyingPointCloudParameter = true;
         float value = GetComponent<Slider>().value;
         GameObject.Find("Core").GetComponent<Core>().OnCrownDepth(value);
     }
 
     public void OnValueChanged_TopCutoff() {
-        //modifyingCrownShape = true;
+        modifyingPointCloudParameter = true;
         float value = GetComponent<Slider>().value;
         GameObject.Find("Core").GetComponent<Core>().OnCrownTopCutoff(value);
     }
 
     public void OnValueChanged_BottomCutoff() {
-        //modifyingCrownShape = true;
+        modifyingPointCloudParameter = true;
         float value = GetComponent<Slider>().value;
         GameObject.Find("Core").GetComponent<Core>().OnCrownBottomCutoff(value);
     }
@@ -240,18 +241,21 @@ public class BasicsController : MonoBehaviour {
 
     void Update() {
 
-        if (Input.GetMouseButtonDown(0) && GameObject.Find("EventSystem").GetComponent<EventSystem>().currentSelectedGameObject == gameObject) {
+        if (Input.GetMouseButton(0) //mouse has to be held down right now, regular GetMouseButtonDown(0) doesnt to the trick for the if(modifyingPointCloudParameter) condition, because the slider event listeners receive the event after the Update() method
+            && GameObject.Find("EventSystem").GetComponent<EventSystem>().currentSelectedGameObject == gameObject) { //and the mouse has to hover over the current element
+            
             GameObject.Find("Core").GetComponent<Core>().DisableCameraMovement();
-            GameObject.Find("Core").GetComponent<Core>().EnablePointCloudRenderer();
+            if (modifyingPointCloudParameter) {
+                GameObject.Find("Core").GetComponent<Core>().EnablePointCloudRenderer();
+            }
         }
 
         if (Input.GetMouseButtonUp(0)) {
+            modifyingPointCloudParameter = false;
+
             GameObject.Find("Core").GetComponent<Core>().EnableCameraMovement();
             GameObject.Find("Core").GetComponent<Core>().DisablePointCloudRenderer();
-            //if (modifyingCrownShape) {
-            //    modifyingCrownShape = false;
-                GameObject.Find("Core").GetComponent<Core>().OnCrownShapeDone();
-            //}
+            GameObject.Find("Core").GetComponent<Core>().OnCrownShapeDone();
         }
 
 

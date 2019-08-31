@@ -155,9 +155,7 @@ public class Core : MonoBehaviour, GrowerListener {
         //geometryProperties.SetCircleResolution(6);
         geometryProperties.SetMinRadiusRatioForNormalConnection(0.49f);
 
-        geometryProperties.HangingBranchesIntensityMin = 0;
-        geometryProperties.HangingBranchesIntensityMax = 0.3f;
-        geometryProperties.HangingBranchesIntensityRatio = 0;
+        geometryProperties.HangingBranchesIntensity = 0;
 
         geometryProperties.BranchOrientationBeginDepthMin = 0;
         geometryProperties.BranchOrientationBeginDepthMax = CalculateBranchOrientationBeginDepthMax(grower.GetGrowthProperties().GetIterations());
@@ -302,7 +300,7 @@ public class Core : MonoBehaviour, GrowerListener {
     }
 
     void LoadHangingGeometry() {
-        tree.GetGeometryProperties().HangingBranchesIntensityRatio = 0.5f;
+        tree.GetGeometryProperties().HangingBranchesIntensity = 0.5f;
     }
 
     void LoadBaobabGrowth() {
@@ -391,7 +389,7 @@ public class Core : MonoBehaviour, GrowerListener {
         GameObject.Find("Leaf Type Dropdown").GetComponent<Dropdown>().SetValueWithoutNotify(tree.GetGeometryProperties().CurrentLeafTypeStringsIndex);
         GameObject.Find("Leaf Type Dropdown").GetComponent<Dropdown>().RefreshShownValue();
 
-        GameObject.Find("Hanging Branches Intensity Slider").GetComponent<Slider>().SetValueWithoutNotify(tree.GetGeometryProperties().HangingBranchesIntensityRatio);
+        GameObject.Find("Hanging Branches Intensity Slider").GetComponent<Slider>().SetValueWithoutNotify(tree.GetGeometryProperties().HangingBranchesIntensity);
         GameObject.Find("Hanging Branches Begin Depth Slider").GetComponent<Slider>().SetValueWithoutNotify(tree.GetGeometryProperties().BranchOrientationBeginDepthRatio);
 
         GameObject.Find("Foliage Density Slider").GetComponent<Slider>().minValue = 0;
@@ -460,12 +458,12 @@ public class Core : MonoBehaviour, GrowerListener {
                 renderers.Add(tr);
             }
 
-            //remove renderers as they are not needed anymore
-            while (renderers.Count > vertices_.Count) {
-                Destroy(renderers[renderers.Count - 1]);
-                renderers.RemoveAt(renderers.Count - 1);
-                nextRendererId--;
-            }
+            ////remove renderers as they are not needed anymore
+            //while (renderers.Count > vertices_.Count) {
+            //    Destroy(renderers[renderers.Count - 1]);
+            //    renderers.RemoveAt(renderers.Count - 1);
+            //    nextRendererId--;
+            //}
         }
     }
 
@@ -593,9 +591,9 @@ public class Core : MonoBehaviour, GrowerListener {
         grower.Stop();
 
         grower.GetGrowthProperties().StemLength = value;
-        pointCloudReady = true; // ---// this is note precise, but a new PointCloud will follow soon---
 
         grower.RegrowStem(tree);
+        pointCloudReady = true;
     }
 
     public void OnThickness(float value) {
@@ -720,7 +718,7 @@ public class Core : MonoBehaviour, GrowerListener {
 
 
     public void OnHangingBranchesIntensity(float value) {
-        tree.GetGeometryProperties().HangingBranchesIntensityRatio = value;
+        tree.GetGeometryProperties().HangingBranchesIntensity = value;
         recalculateMesh = true;
     }
 

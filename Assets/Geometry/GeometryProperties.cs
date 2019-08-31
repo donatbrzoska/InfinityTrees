@@ -72,12 +72,7 @@ public class GeometryProperties {
         return minRadiusRatioForNormalConnection;
     }
 
-    public float HangingBranchesIntensityMin { private get; set; }
-    public float HangingBranchesIntensityMax { private get; set; }
-    public float HangingBranchesIntensityRatio { get; set; } //-1..1 positive values make the branches hang down, negative values point up
-    public float HangingBranchesIntensity {
-        get { return HangingBranchesIntensityRatio * (HangingBranchesIntensityMax - HangingBranchesIntensityMin); }
-    }
+    public float HangingBranchesIntensity { get; set; } //0..1
 
     public int BranchOrientationBeginDepthMin {private get; set; } //should be set to 0 or n_initial_stem_segments
     public int BranchOrientationBeginDepthMax {private get; set; } //should be set to n_initial_stem_segments + iterations

@@ -88,8 +88,8 @@ public static class Util {
     //}
 
     public static void SplitMesh(List<Vector3> vertices, List<Vector3> normals, List<Vector2> uvs, List<int> triangles, ref List<Vector3[]> vertices_, ref List<Vector3[]> normals_, ref List<Vector2[]> uvs_, ref List<int[]> triangles_, object additionLock) {
-        Stopwatch sw = new Stopwatch();
-        sw.Start();
+        //Stopwatch sw = new Stopwatch();
+        //sw.Start();
 
         vertices_ = new List<Vector3[]>();
         normals_ = new List<Vector3[]>();
@@ -185,6 +185,7 @@ public static class Util {
         //debug(n_triangles + " triangles");
 
         //SplitCheck();
-        UnityEngine.Debug.Log("Splitting mesh took: " + sw.Elapsed);
+
+        //UnityEngine.Debug.Log("Splitting mesh took: " + sw.Elapsed);
     }
 }

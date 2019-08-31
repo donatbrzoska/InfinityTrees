@@ -18,7 +18,6 @@ public class GrowthProperties {
 
     private Vector3 tropisms;
     private Vector3 tropismsWeights;
-    private float hangingBranchesIntensity;
 
     private float growthDistance;
 
@@ -149,16 +148,9 @@ public class GrowthProperties {
         this.tropisms = tropisms.normalized;
     }
 
-    public Vector3 GetTropisms(int iteration) {
-        bool hanging = iteration > (1 - hangingBranchesIntensity) * iterations;
-
-        if (hanging) {
-            return Util.Hadamard(tropisms, new Vector3(1, -1, 1));
-        } else {
-            return tropisms;
-        }
+    public Vector3 GetTropisms() {
+        return tropisms;
     }
-
 
 
     // DELETE THIS OR INTEGRATE?
