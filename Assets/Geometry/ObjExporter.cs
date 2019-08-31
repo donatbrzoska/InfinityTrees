@@ -2,6 +2,7 @@
 using System.Collections;
 using System.IO;
 using System.Text;
+using System.Collections.Generic;
 //http://wiki.unity3d.com/index.php/ObjExporter
 public static class ObjExporter {
 
@@ -49,6 +50,8 @@ public static class ObjExporter {
     }
 
 
+
+
     public static string MeshToString(Vector3[] vertices, Vector3[] normals, Vector2[] uvs, int[] triangles) {
         StringBuilder sb = new StringBuilder();
 
@@ -72,6 +75,38 @@ public static class ObjExporter {
     }
 
     public static void MeshToFile(Vector3[] vertices, Vector3[] normals, Vector2[] uvs, int[] triangles, string filename) {
+        using (StreamWriter sw = new StreamWriter(filename)) {
+            sw.Write(MeshToString(vertices, normals, uvs, triangles));
+        }
+    }
+
+
+
+
+
+    public static string MeshToString(List<Vector3> vertices, List<Vector3> normals, List<Vector2> uvs, List<int> triangles) {
+        StringBuilder sb = new StringBuilder();
+
+        sb.Append("g ").Append("TreeMesh").Append("\n");
+        foreach (Vector3 v in vertices) {
+            sb.Append(string.Format("v {0} {1} {2}\n", v.x, v.y, v.z));
+        }
+        sb.Append("\n");
+        foreach (Vector3 v in normals) {
+            sb.Append(string.Format("vn {0} {1} {2}\n", v.x, v.y, v.z));
+        }
+        sb.Append("\n");
+        foreach (Vector3 v in uvs) {
+            sb.Append(string.Format("vt {0} {1}\n", v.x, v.y));
+        }
+        for (int i = 0; i < triangles.Count; i += 3) {
+            sb.Append(string.Format("f {0}/{0}/{0} {1}/{1}/{1} {2}/{2}/{2}\n",
+                triangles[i] + 1, triangles[i + 1] + 1, triangles[i + 2] + 1));
+        }
+        return sb.ToString();
+    }
+
+    public static void MeshToFile(List<Vector3> vertices, List<Vector3> normals, List<Vector2> uvs, List<int> triangles, string filename) {
         using (StreamWriter sw = new StreamWriter(filename)) {
             sw.Write(MeshToString(vertices, normals, uvs, triangles));
         }

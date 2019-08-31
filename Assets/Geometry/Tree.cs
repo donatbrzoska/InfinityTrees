@@ -62,7 +62,7 @@ public class Tree {
 	private int leafTriangles;
 
 
-	public void GetMesh(ref Vector3[] vertices, ref Vector3[] normals, ref Vector2[] uvs, ref int[] triangles) {
+    public void GetMesh(ref Vector3[] vertices, ref Vector3[] normals, ref Vector2[] uvs, ref int[] triangles) {
 
         twigVertices = 0;
         twigTriangles = 0;
@@ -76,13 +76,13 @@ public class Tree {
         List<Vector2> uvsTmp = new List<Vector2>();// uvsTmp.Capacity = 5000;
         List<int> trianglesTmp = new List<int>();// trianglesTmp.Capacity = 5000;
 
-        //if (!true) {
+        if (geometryProperties.HangingBranchesIntensity > 0) {
             Node copy = StemRoot.GetCopyWithSupernode(null);
             Hang(copy, 0);
             CalculateEverything(copy, nodeVerticesPositions, 0, verticesTmp, uvsTmp, trianglesTmp);
-        //} else {
-        //    CalculateEverything(StemRoot, nodeVerticesPositions, 0, verticesTmp, uvsTmp, trianglesTmp);
-        //}
+        } else {
+            CalculateEverything(StemRoot, nodeVerticesPositions, 0, verticesTmp, uvsTmp, trianglesTmp);
+        }
 
 
         vertices = new Vector3[verticesTmp.Count];
@@ -101,6 +101,25 @@ public class Tree {
         debug(new FormatString("{0} vertices, {1} triangles", vertices.Length, triangles.Length / 3));
         debug(new FormatString("{0} twig vertices, {1} twig triangles", twigVertices, twigTriangles / 3));
         debug(new FormatString("{0} leaf vertices, {1} leaf triangles", leafVertices, leafTriangles / 3));
+    }
+
+    public void GetMesh(ref List<Vector3> vertices, ref List<Vector3> normals, ref List<Vector2> uvs, ref List<int> triangles) {
+        //stores at which index the vertices of a node are stored
+        Dictionary<Node, int> nodeVerticesPositions = new Dictionary<Node, int>();
+
+        vertices = new List<Vector3>();
+        uvs = new List<Vector2>();
+        triangles = new List<int>();
+
+        if (geometryProperties.HangingBranchesIntensity > 0) {
+            Node copy = StemRoot.GetCopyWithSupernode(null);
+            Hang(copy, 0);
+            CalculateEverything(copy, nodeVerticesPositions, 0, vertices, uvs, triangles);
+        } else {
+            CalculateEverything(StemRoot, nodeVerticesPositions, 0, vertices, uvs, triangles);
+        }
+
+        normals = TreeUtil.CalculateNormals(vertices, triangles);
     }
 
     private float segmentLength;

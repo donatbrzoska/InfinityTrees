@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
+using System.Diagnostics;
 
 public static class Util {
 
@@ -85,4 +86,105 @@ public static class Util {
     //        return (T)formatter.Deserialize(ms);
     //    }
     //}
+
+    public static void SplitMesh(List<Vector3> vertices, List<Vector3> normals, List<Vector2> uvs, List<int> triangles, ref List<Vector3[]> vertices_, ref List<Vector3[]> normals_, ref List<Vector2[]> uvs_, ref List<int[]> triangles_, object additionLock) {
+        Stopwatch sw = new Stopwatch();
+        sw.Start();
+
+        vertices_ = new List<Vector3[]>();
+        normals_ = new List<Vector3[]>();
+        uvs_ = new List<Vector2[]>();
+        triangles_ = new List<int[]>();
+
+        List<Vector3> currentVertices = null;
+        List<Vector3> currentNormals = null;
+        List<Vector2> currentUVs = null;
+        List<int> currentTriangles = null;
+
+        Dictionary<int, int> globalVerticesIndizes_to_localVerticesIndizes = null;
+
+        //copy triangles until the max amount of vertices is reached
+        for (int i = 0; i < triangles.Count; i += 3) {
+            // reinitialize if not initialized or currentVertices is full
+            if (currentVertices == null || currentVertices.Count + 2 > 65535) {
+
+                // initialize new arrays
+                currentVertices = new List<Vector3>();
+                currentNormals = new List<Vector3>();
+                currentUVs = new List<Vector2>();
+
+                currentTriangles = new List<int>();
+
+                // reset the stored vertexIndizes, since we now have nothing stored again
+                //triangles_to_vertexIndizes = new Dictionary<Vector3Int, Vector3Int>();
+                globalVerticesIndizes_to_localVerticesIndizes = new Dictionary<int, int>();
+            }
+
+            // get the indizes of the vertices that the current triangle depends on
+            Vector3Int globalTriangleIndizes = new Vector3Int(triangles[i], triangles[i + 1], triangles[i + 2]);
+
+            Vector3Int localTriangleIndizes = new Vector3Int(); //will store the vertex indizes of the currently looked at triangle in the local arrays
+            if (!globalVerticesIndizes_to_localVerticesIndizes.ContainsKey(globalTriangleIndizes.x)) {
+                // do this if we have not stored the respective vertex locally
+                currentVertices.Add(vertices[globalTriangleIndizes.x]);
+                currentNormals.Add(normals[globalTriangleIndizes.x]);
+                currentUVs.Add(uvs[globalTriangleIndizes.x]);
+
+                // and point to it
+                localTriangleIndizes.x = currentVertices.Count - 1;
+                globalVerticesIndizes_to_localVerticesIndizes[globalTriangleIndizes.x] = currentVertices.Count - 1;
+            } else {
+                // or look up where we stored it and point to it
+                localTriangleIndizes.x = globalVerticesIndizes_to_localVerticesIndizes[globalTriangleIndizes.x];
+            }
+            currentTriangles.Add(localTriangleIndizes.x);
+
+
+            if (!globalVerticesIndizes_to_localVerticesIndizes.ContainsKey(globalTriangleIndizes.y)) {
+                currentVertices.Add(vertices[globalTriangleIndizes.y]);
+                currentNormals.Add(normals[globalTriangleIndizes.y]);
+                currentUVs.Add(uvs[globalTriangleIndizes.y]);
+
+                localTriangleIndizes.y = currentVertices.Count - 1;
+                globalVerticesIndizes_to_localVerticesIndizes[globalTriangleIndizes.y] = currentVertices.Count - 1;
+            } else {
+                localTriangleIndizes.y = globalVerticesIndizes_to_localVerticesIndizes[globalTriangleIndizes.y];
+            }
+            currentTriangles.Add(localTriangleIndizes.y);
+
+            if (!globalVerticesIndizes_to_localVerticesIndizes.ContainsKey(globalTriangleIndizes.z)) {
+                currentVertices.Add(vertices[globalTriangleIndizes.z]);
+                currentNormals.Add(normals[globalTriangleIndizes.z]);
+                currentUVs.Add(uvs[globalTriangleIndizes.z]);
+
+                localTriangleIndizes.z = currentVertices.Count - 1;
+                globalVerticesIndizes_to_localVerticesIndizes[globalTriangleIndizes.z] = currentVertices.Count - 1;
+            } else {
+                localTriangleIndizes.z = globalVerticesIndizes_to_localVerticesIndizes[globalTriangleIndizes.z];
+            }
+            currentTriangles.Add(localTriangleIndizes.z);
+
+
+            //put the data into the result lists
+            if (currentVertices.Count + 2 > 65535 || i == triangles.Count - 3) {
+                lock (additionLock) {
+                    vertices_.Add(currentVertices.ToArray());
+                    normals_.Add(currentNormals.ToArray());
+                    uvs_.Add(currentUVs.ToArray());
+
+                    triangles_.Add(currentTriangles.ToArray());
+                }
+            }
+        }
+
+        //debug(vertices_.Count + ((vertices_.Count == 1) ? " renderer active" : " renderer(s) active"));
+        //int n_triangles = 0;
+        //foreach (int[] triangleArray in triangles_) {
+        //    n_triangles += triangleArray.Length / 3;
+        //}
+        //debug(n_triangles + " triangles");
+
+        //SplitCheck();
+        UnityEngine.Debug.Log("Splitting mesh took: " + sw.Elapsed);
+    }
 }

@@ -24,7 +24,7 @@ public class Core : MonoBehaviour, GrowerListener {
         LoadDefaultGrowth();
         LoadDefaultGeometry();
 
-        LoadExtremelyDetailedGeometry();
+        //LoadExtremelyDetailedGeometry();
 
         //LoadGnarlyGrowth();
 
@@ -415,10 +415,15 @@ public class Core : MonoBehaviour, GrowerListener {
     //##########                              MESH AGENT                           ##########
     //#######################################################################################
 
-    Vector3[] vertices;
-    Vector3[] normals;
-    Vector2[] uvs;
-    int[] triangles;
+    //Vector3[] vertices;
+    //Vector3[] normals;
+    //Vector2[] uvs;
+    //int[] triangles;
+
+    List<Vector3> vertices;
+    List<Vector3> normals;
+    List<Vector2> uvs;
+    List<int> triangles;
 
     List<GameObject> renderers = new List<GameObject>();
     List<Vector3[]> vertices_;
@@ -427,137 +432,6 @@ public class Core : MonoBehaviour, GrowerListener {
     List<int[]> triangles_;
 
     bool recalculateMesh;
-
-    private void SplitCheck() {
-        int count = 0;
-
-        int j = 0;
-        for (int i=0; i<triangles.Length; i += 3, j+=3) {
-            Vector3Int triangle = new Vector3Int(triangles[i], triangles[i + 1], triangles[i + 2]);
-            Vector3 vertex1 = vertices[triangle.x];
-            Vector3 vertex2 = vertices[triangle.y];
-            Vector3 vertex3 = vertices[triangle.z];
-
-
-            if (j > triangles_[count].Length - 1) {
-                count++;
-                j = 0;
-            }
-
-            Vector3Int local_triangle = new Vector3Int(triangles_[count][j], triangles_[count][j + 1], triangles_[count][j + 2]);
-            Vector3 local_vertex1 = vertices_[count][local_triangle.x];
-            Vector3 local_vertex2 = vertices_[count][local_triangle.y];
-            Vector3 local_vertex3 = vertices_[count][local_triangle.z];
-
-            if (vertex1 != local_vertex1
-                || vertex2 != local_vertex2
-                || vertex3 != local_vertex3) {
-                debug("bug found");
-            }
-        }
-    }
-
-    private void SplitMesh() {
-        vertices_ = new List<Vector3[]>();
-        normals_ = new List<Vector3[]>();
-        uvs_ = new List<Vector2[]>();
-        triangles_ = new List<int[]>();
-
-        List<Vector3> currentVertices = null;
-        List<Vector3> currentNormals = null;
-        List<Vector2> currentUVs = null;
-
-        List<int> currentTriangles = null;
-
-        Dictionary<int, int> globalVerticesIndizes_to_localVerticesIndizes = null;
-
-        //copy triangles until the max amount of vertices is reached
-        for (int i = 0; i < triangles.Length; i += 3) {
-            // reinitialize
-            if (currentVertices == null || currentVertices.Count + 2 > 65535) {
-
-                // initialize new arrays
-                currentVertices = new List<Vector3>();
-                currentNormals = new List<Vector3>();
-                currentUVs = new List<Vector2>();
-
-                currentTriangles = new List<int>();
-
-                // reset the stored vertexIndizes, since we now have nothing stored again
-                //triangles_to_vertexIndizes = new Dictionary<Vector3Int, Vector3Int>();
-                globalVerticesIndizes_to_localVerticesIndizes = new Dictionary<int, int>();
-            }
-
-            // get the indizes of the vertices that the current triangle depends on
-            int t_1 = triangles[i];
-            int t_2 = triangles[i + 1];
-            int t_3 = triangles[i + 2];
-
-            Vector3Int globalTriangleIndizes = new Vector3Int(t_1, t_2, t_3);
-
-            Vector3Int localTriangleIndizes = new Vector3Int(); //will store the vertex indizes of the currently looked at triangle in the local arrays
-            if (!globalVerticesIndizes_to_localVerticesIndizes.ContainsKey(globalTriangleIndizes.x)) {
-                // do this if we have not stored the respective vertex locally
-                currentVertices.Add(vertices[globalTriangleIndizes.x]);
-                currentNormals.Add(normals[globalTriangleIndizes.x]);
-                currentUVs.Add(uvs[globalTriangleIndizes.x]);
-
-                // and point to it
-                localTriangleIndizes.x = currentVertices.Count - 1;
-                globalVerticesIndizes_to_localVerticesIndizes[globalTriangleIndizes.x] = currentVertices.Count - 1;
-            } else {
-                // or look up where we stored it and point to it
-                localTriangleIndizes.x = globalVerticesIndizes_to_localVerticesIndizes[globalTriangleIndizes.x];
-            }
-            currentTriangles.Add(localTriangleIndizes.x);
-
-
-            if (!globalVerticesIndizes_to_localVerticesIndizes.ContainsKey(globalTriangleIndizes.y)) {
-                currentVertices.Add(vertices[globalTriangleIndizes.y]);
-                currentNormals.Add(normals[globalTriangleIndizes.y]);
-                currentUVs.Add(uvs[globalTriangleIndizes.y]);
-
-                localTriangleIndizes.y = currentVertices.Count - 1;
-                globalVerticesIndizes_to_localVerticesIndizes[globalTriangleIndizes.y] = currentVertices.Count - 1;
-            } else {
-                localTriangleIndizes.y = globalVerticesIndizes_to_localVerticesIndizes[globalTriangleIndizes.y];
-            }
-            currentTriangles.Add(localTriangleIndizes.y);
-
-            if (!globalVerticesIndizes_to_localVerticesIndizes.ContainsKey(globalTriangleIndizes.z)) {
-                currentVertices.Add(vertices[globalTriangleIndizes.z]);
-                currentNormals.Add(normals[globalTriangleIndizes.z]);
-                currentUVs.Add(uvs[globalTriangleIndizes.z]);
-
-                localTriangleIndizes.z = currentVertices.Count - 1;
-                globalVerticesIndizes_to_localVerticesIndizes[globalTriangleIndizes.z] = currentVertices.Count - 1;
-            } else {
-                localTriangleIndizes.z = globalVerticesIndizes_to_localVerticesIndizes[globalTriangleIndizes.z];
-            }
-            currentTriangles.Add(localTriangleIndizes.z);
-
-
-            //put the data into the result lists
-            if (currentVertices.Count + 2 > 65535 || i==triangles.Length-3) {
-                lock (recalculationLock) { //GetMesh() only has access to the split meshes, so the lock is placed here
-                    vertices_.Add(currentVertices.ToArray());
-                    normals_.Add(currentNormals.ToArray());
-                    uvs_.Add(currentUVs.ToArray());
-
-                    triangles_.Add(currentTriangles.ToArray());
-                }
-            }
-        }
-
-        //debug(vertices_.Count + ((vertices_.Count == 1) ? " renderer active" : " renderer(s) active"));
-        //int n_triangles = 0;
-        //foreach (int[] triangleArray in triangles_) {
-        //    n_triangles += triangleArray.Length / 3;
-        //}
-        //debug(n_triangles + " triangles");
-
-        //SplitCheck();
-    }
 
 
     private object recalculationLock = new object();
@@ -568,10 +442,12 @@ public class Core : MonoBehaviour, GrowerListener {
 
             recalculateMesh = false;
 
-            GameObject.Find("Vertices Text").GetComponent<Text>().text = vertices.Length + " vertices";
-            GameObject.Find("Triangles Text").GetComponent<Text>().text = triangles.Length / 3 + " triangles";
+            GameObject.Find("Vertices Text").GetComponent<Text>().text = vertices.Count + " vertices";
+            GameObject.Find("Triangles Text").GetComponent<Text>().text = triangles.Count / 3 + " triangles";
 
-            SplitMesh();
+            //lock (recalculationLock) {
+                Util.SplitMesh(vertices, normals, uvs, triangles, ref vertices_, ref normals_, ref uvs_, ref triangles_, recalculationLock);
+            //}
 
 
             //add renderers as needed
@@ -1133,7 +1009,7 @@ public class Core : MonoBehaviour, GrowerListener {
 
     //TODO: specify location &| unique naming
     public void OnSave() {
-        string meshFilename = "tree_" + vertices.Length + "_" + triangles.Length + ".obj";
+        string meshFilename = "tree_" + vertices.Count + "_" + triangles.Count + ".obj";
         ObjExporter.MeshToFile(vertices, normals, uvs, triangles, meshFilename);
 
         //Important: make sure that the textures have "Alpha is Transparency" checked, otherwise there are black borders
