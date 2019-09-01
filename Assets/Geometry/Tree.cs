@@ -57,7 +57,7 @@ public class Tree {
                 float someFactor = 1 - (d_angle / 180);
 
                 // - HaningBranchesIntensity just says how much of this _fraction_ will actually be applied as rotation angle
-                float rotation_angle =  geometryProperties.HangingBranchesIntensity * someFactor * d_angle;
+                float rotation_angle =  geometryProperties.PendulousBranchesIntensity * someFactor * d_angle;
                 // rotation angle is also 0, if d_angle is 0 (when no more hang is needed)
                 // -> because no matter how big of a fraction you will take (of d_angle) no rotation will be performed
 
@@ -92,7 +92,7 @@ public class Tree {
         List<Vector2> uvsTmp = new List<Vector2>();// uvsTmp.Capacity = 5000;
         List<int> trianglesTmp = new List<int>();// trianglesTmp.Capacity = 5000;
 
-        if (geometryProperties.HangingBranchesIntensity > 0) {
+        if (geometryProperties.PendulousBranchesIntensity > 0) {
             Node copy = StemRoot.GetCopyWithSupernode(null);
             Hang(copy, 0);
             CalculateEverything(copy, nodeVerticesPositions, 0, verticesTmp, uvsTmp, trianglesTmp);
@@ -127,7 +127,7 @@ public class Tree {
         uvs = new List<Vector2>();
         triangles = new List<int>();
 
-        if (geometryProperties.HangingBranchesIntensity > 0) {
+        if (geometryProperties.PendulousBranchesIntensity > 0) {
             Node copy = StemRoot.GetCopyWithSupernode(null);
             Hang(copy, 0);
             CalculateEverything(copy, nodeVerticesPositions, 0, vertices, uvs, triangles);
@@ -155,7 +155,7 @@ public class Tree {
         for (int i=0; i<n_subnodes; i++) {
             Node subnode = node.GetSubnodes()[i];
 
-            if (subnode.GetRadius() > geometryProperties.GetMinRadiusRatioForNormalConnection() * node.GetRadius()) { //subnode radius has to be at least x*node.GetRadius() for a usual connection
+            if (geometryProperties.UsualConnection(node.GetRadius(), subnode.GetRadius())) { //subnode radius has to be at least x*node.GetRadius() for a usual connection
                 //calculate and store vertices
                 CalculateAndStoreCircleVertices(subnode, nodeVerticesPositions, verticesResult);
 

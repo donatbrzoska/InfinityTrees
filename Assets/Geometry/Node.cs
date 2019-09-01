@@ -252,7 +252,9 @@ public class Node : IEquatable<Node> {
             } else { //many subnodes
                 normal = Vector3.zero;
                 foreach (Node subnode in subnodes) {
-                    normal = normal + (subnode.GetPosition() - position) * subnode.GetRadius();// * subnode.GetRadius();
+                    if (geometryProperties.UsualConnection(this.GetRadius(), subnode.GetRadius())) {
+                        normal = normal + (subnode.GetPosition() - position) * subnode.GetRadius();// * subnode.GetRadius();
+                    }
                 }
             }
         }

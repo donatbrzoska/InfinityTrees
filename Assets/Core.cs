@@ -6,6 +6,8 @@ using System.IO;
 using System.Threading;
 using System;
 
+// watch out for NOT PRETTY 
+
 public class Core : MonoBehaviour, GrowerListener {
     private static void debug(string message, [CallerMemberName]string callerName = "") {
         if (true) {
@@ -24,13 +26,15 @@ public class Core : MonoBehaviour, GrowerListener {
         LoadDefaultGrowth();
         LoadDefaultGeometry();
 
+        //LoadNotWorkingPendulousGrowth();
+
         //LoadExtremelyDetailedGeometry();
 
         //LoadGnarlyGrowth();
 
         //LoadLowGnarlyGrowth();
 
-        //LoadHangingGeometry();
+        //LoadPendulousGeometry();
 
 
         //LoadBaobabGrowth();
@@ -154,8 +158,9 @@ public class Core : MonoBehaviour, GrowerListener {
         geometryProperties.SetCircleResolution(3);
         //geometryProperties.SetCircleResolution(6);
         geometryProperties.SetMinRadiusRatioForNormalConnection(0.49f);
+        //geometryProperties.SetMinRadiusRatioForNormalConnection(0.1f);
 
-        geometryProperties.HangingBranchesIntensity = 0;
+        geometryProperties.PendulousBranchesIntensity = 0;
 
         geometryProperties.BranchOrientationBeginDepthMin = 0;
         geometryProperties.BranchOrientationBeginDepthMax = CalculateBranchOrientationBeginDepthMax(grower.GetGrowthProperties().GetIterations());
@@ -184,6 +189,12 @@ public class Core : MonoBehaviour, GrowerListener {
 
         tree = new Tree(geometryProperties);
     }
+
+    //void LoadNotWorkingPendulousGrowth() {
+    //    PseudoEllipsoid attractionPoints = new PseudoEllipsoid(new Vector3(0, 0f, 0), 4.5f, 5,4f, 15, 0.15f, 0.05f);
+    //    grower.GetGrowthProperties().SetAttractionPoints(attractionPoints);
+    //    grower.GetGrowthProperties().SetGrowthDistance(0.5f);
+    //}
 
     void LoadYoungGrowth() {
         grower.GetGrowthProperties().StemLength = 1.2f;
@@ -299,8 +310,8 @@ public class Core : MonoBehaviour, GrowerListener {
         geometryProperties.SetDisplayedLeavesPerNode(Leaf.LeafType.ParticleCrossFoil, 0f);
     }
 
-    void LoadHangingGeometry() {
-        tree.GetGeometryProperties().HangingBranchesIntensity = 0.5f;
+    void LoadPendulousGeometry() {
+        tree.GetGeometryProperties().PendulousBranchesIntensity = 0.5f;
     }
 
     void LoadBaobabGrowth() {
@@ -332,7 +343,7 @@ public class Core : MonoBehaviour, GrowerListener {
     //    growthProperties.SetTropismsWeights(new Vector3(1, 0.3f, 1)); //adjusted by hand
     //    growthProperties.UpTropismsDampRatio = 0.36f;
     //    growthProperties.UpTropismsWhenDamped = 0.3f;
-    //    growthProperties.SetHangingBranchesIntensity(0);
+    //    growthProperties.SetPendulousBranchesIntensity(0);
 
     //    growthProperties.UpTropismWeight_min = 0;
     //    growthProperties.UpTropismWeight_max = 5;
@@ -372,8 +383,6 @@ public class Core : MonoBehaviour, GrowerListener {
 
         GameObject.Find("Gnarly Branches Toggle").GetComponent<Toggle>().SetIsOnWithoutNotify(false);
 
-        //GameObject.Find("Hanging Branches Slider").GetComponent<Slider>().SetValueWithoutNotify(growthProperties.GetHangingBranchesIntensity());
-
         //GameObject.Find("Grow Towards Light Slider").GetComponent<Slider>().SetValueWithoutNotify(growthProperties.UpTropismWeightRatio);
 
 
@@ -389,8 +398,8 @@ public class Core : MonoBehaviour, GrowerListener {
         GameObject.Find("Leaf Type Dropdown").GetComponent<Dropdown>().SetValueWithoutNotify(tree.GetGeometryProperties().CurrentLeafTypeStringsIndex);
         GameObject.Find("Leaf Type Dropdown").GetComponent<Dropdown>().RefreshShownValue();
 
-        GameObject.Find("Hanging Branches Intensity Slider").GetComponent<Slider>().SetValueWithoutNotify(tree.GetGeometryProperties().HangingBranchesIntensity);
-        GameObject.Find("Hanging Branches Begin Depth Slider").GetComponent<Slider>().SetValueWithoutNotify(tree.GetGeometryProperties().BranchOrientationBeginDepthRatio);
+        GameObject.Find("Pendulous Branches Intensity Slider").GetComponent<Slider>().SetValueWithoutNotify(tree.GetGeometryProperties().PendulousBranchesIntensity);
+        GameObject.Find("Pendulous Branches Begin Depth Slider").GetComponent<Slider>().SetValueWithoutNotify(tree.GetGeometryProperties().BranchOrientationBeginDepthRatio);
 
         GameObject.Find("Foliage Density Slider").GetComponent<Slider>().minValue = 0;
         GameObject.Find("Foliage Density Slider").GetComponent<Slider>().maxValue = tree.GetGeometryProperties().DisplayedLeafesPerNodeMaximum;
@@ -592,6 +601,9 @@ public class Core : MonoBehaviour, GrowerListener {
 
         grower.GetGrowthProperties().StemLength = value;
 
+        // NOT PRETTY
+        tree.GetGeometryProperties().BranchOrientationBeginDepthMax = CalculateBranchOrientationBeginDepthMax(grower.GetGrowthProperties().GetIterations());
+
         grower.RegrowStem(tree);
         pointCloudReady = true;
     }
@@ -717,12 +729,12 @@ public class Core : MonoBehaviour, GrowerListener {
 
 
 
-    public void OnHangingBranchesIntensity(float value) {
-        tree.GetGeometryProperties().HangingBranchesIntensity = value;
+    public void OnPendulousBranchesIntensity(float value) {
+        tree.GetGeometryProperties().PendulousBranchesIntensity = value;
         recalculateMesh = true;
     }
 
-    public void OnHangingBranchesBeginDepth(float value) {
+    public void OnPendulousBranchesBeginDepth(float value) {
         tree.GetGeometryProperties().BranchOrientationBeginDepthRatio = value;
         recalculateMesh = true;
     }
@@ -953,6 +965,7 @@ public class Core : MonoBehaviour, GrowerListener {
         grower.GetGrowthProperties().SetIterations(value);
         grower.GetGrowthProperties().GetAttractionPoints().Reset();
 
+        // NOT PRETTY
         tree.GetGeometryProperties().BranchOrientationBeginDepthMax = CalculateBranchOrientationBeginDepthMax(grower.GetGrowthProperties().GetIterations());
 
         tree.Reset();

@@ -88,13 +88,13 @@ public class BasicsController : MonoBehaviour {
 
 
 
-    public void OnValueChanged_HangingBranchesIntensity() {
+    public void OnValueChanged_PendulousBranchesIntensity() {
         float value = GetComponent<Slider>().value;
-        GameObject.Find("Core").GetComponent<Core>().OnHangingBranchesIntensity(value);
+        GameObject.Find("Core").GetComponent<Core>().OnPendulousBranchesIntensity(value);
     }
-    public void OnValueChanged_HangingBranchesBeginDepth() {
+    public void OnValueChanged_PendulousBranchesBeginDepth() {
         float value = GetComponent<Slider>().value;
-        GameObject.Find("Core").GetComponent<Core>().OnHangingBranchesBeginDepth(value);
+        GameObject.Find("Core").GetComponent<Core>().OnPendulousBranchesBeginDepth(value);
     }
 
 

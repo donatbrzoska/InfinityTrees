@@ -3133,7 +3133,7 @@ GameObject:
   - component: {fileID: 249955542}
   - component: {fileID: 249955541}
   m_Layer: 5
-  m_Name: Hanging Branches Intensity Text
+  m_Name: Pendulous Branches Intensity Text
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3287,7 +3287,7 @@ GameObject:
   - component: {fileID: 256431613}
   - component: {fileID: 256431612}
   m_Layer: 5
-  m_Name: Hanging Branches Text
+  m_Name: Pendulous Branches Text
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3347,7 +3347,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Hanging Branches
+  m_Text: Pendulous Branches
 --- !u!222 &256431613
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -7430,7 +7430,7 @@ GameObject:
   - component: {fileID: 902532844}
   - component: {fileID: 902532843}
   m_Layer: 5
-  m_Name: Hanging Branches Begin Depth Text
+  m_Name: Pendulous Branches Begin Depth Text
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -10582,7 +10582,7 @@ GameObject:
   - component: {fileID: 1282468995}
   - component: {fileID: 1282468996}
   m_Layer: 5
-  m_Name: Hanging Branches Begin Depth Slider
+  m_Name: Pendulous Branches Begin Depth Slider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -10661,7 +10661,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 1282468996}
-        m_MethodName: OnValueChanged_HangingBranchesBeginDepth
+        m_MethodName: OnValueChanged_PendulousBranchesBeginDepth
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -15611,7 +15611,7 @@ GameObject:
   - component: {fileID: 1720804142}
   - component: {fileID: 1720804143}
   m_Layer: 5
-  m_Name: Hanging Branches Intensity Slider
+  m_Name: Pendulous Branches Intensity Slider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -15690,7 +15690,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 1720804143}
-        m_MethodName: OnValueChanged_HangingBranchesIntensity
+        m_MethodName: OnValueChanged_PendulousBranchesIntensity
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
