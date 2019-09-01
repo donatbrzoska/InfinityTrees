@@ -22,7 +22,7 @@ public class Node : IEquatable<Node> {
     private GeometryProperties geometryProperties;
 
     private Vector3 position;
-    public int Order { get; private set; } // this is actually the order of the branch between this and supernode
+    //public int Order { get; private set; } // this is actually the order of the branch between this and supernode
     private Vector3 normal;
     private float radius;
     public bool Active { get; set; }
@@ -44,7 +44,7 @@ public class Node : IEquatable<Node> {
 
         Active = true;
 
-        CalculateOrder();
+        //CalculateOrder();
         CalculateNormal();
         AddLeaves();
     }
@@ -98,6 +98,7 @@ public class Node : IEquatable<Node> {
     public Node GetCopyWithSupernode(Node supernode) {
         Node copy = new Node(supernode);
         copy.SetPosition(position);
+        //copy.Order = Order;
         copy.SetNormal(normal);
         copy.SetRadius(radius);
         copy.SetGeometryProperties(geometryProperties);
@@ -225,17 +226,17 @@ public class Node : IEquatable<Node> {
         }
     }
 
-    private void CalculateOrder() {
-        if (this.supernode != null && this.supernode.supernode != null) {
-            float d_angle = Vector3.Angle(supernode.GetDirection(), GetDirection());
-            if (d_angle > 10) {
-                Order = supernode.Order+1;
-            } else {
-                Order = supernode.Order;
-            }
-        }
-        debug("order is " + Order);
-    }
+    //private void CalculateOrder() {
+    //    if (this.supernode != null && this.supernode.supernode != null) {
+    //        float d_angle = Vector3.Angle(supernode.GetDirection(), GetDirection());
+    //        if (d_angle > 10) {
+    //            Order = supernode.Order+1;
+    //        } else {
+    //            Order = supernode.Order;
+    //        }
+    //    }
+    //    debug("order is " + Order);
+    //}
 
     private void CalculateNormal() {
         if (supernode == null) { //if this is the root node
