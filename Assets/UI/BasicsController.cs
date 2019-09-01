@@ -76,6 +76,7 @@ public class BasicsController : MonoBehaviour {
     }
 
     public void OnValueChanged_Length() {
+        modifyingPointCloudParameter = true;
         float value = GetComponent<Slider>().value;
         GameObject.Find("Core").GetComponent<Core>().OnLength(value);
     }
@@ -244,8 +245,8 @@ public class BasicsController : MonoBehaviour {
         if (Input.GetMouseButton(0) //mouse has to be held down right now, regular GetMouseButtonDown(0) doesnt to the trick for the if(modifyingPointCloudParameter) condition, because the slider event listeners receive the event after the Update() method
             && GameObject.Find("EventSystem").GetComponent<EventSystem>().currentSelectedGameObject == gameObject) { //and the mouse has to hover over the current element
             
-            GameObject.Find("Core").GetComponent<Core>().DisableCameraMovement();
             if (modifyingPointCloudParameter) {
+                GameObject.Find("Core").GetComponent<Core>().DisableCameraMovement();
                 GameObject.Find("Core").GetComponent<Core>().EnablePointCloudRenderer();
             }
         }
