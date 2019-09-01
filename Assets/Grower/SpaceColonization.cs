@@ -259,7 +259,7 @@ public class SpaceColonization {
                     //sum += (associatedAttractionPoint - currentNode.GetPosition()) * (1/((associatedAttractionPoint - currentNode.GetPosition()).magnitude* (associatedAttractionPoint - currentNode.GetPosition()).magnitude));
                 }
 
-                Vector3 direction = (sum + Util.Hadamard(growthProperties.GetTropisms(), growthProperties.GetTropismsWeights())).normalized * growthProperties.GetGrowthDistance();
+                Vector3 direction = (sum + Util.Hadamard(growthProperties.GetTropisms(), growthProperties.TropismsWeights)).normalized * growthProperties.GetGrowthDistance();
 
                 //Vector3 direction;
                 //if (i < 0.3 * growthProperties.GetIterations()) {

@@ -17,7 +17,7 @@ public class GrowthProperties {
 
 
     private Vector3 tropisms;
-    private Vector3 tropismsWeights;
+    public Vector3 TropismsWeights { get; private set; }
 
     private float growthDistance;
 
@@ -137,12 +137,6 @@ public class GrowthProperties {
         //}
     }
 
-    //0..1
-    //the biger, the earlier up tropisms get damped
-    //when 0.5, tropisms get damped when the height is equal to (width+depth)/2
-    public float UpTropismsDampRatio { get; set; }
-
-    public float UpTropismsWhenDamped { get; set; }
 
     public void SetTropisms(Vector3 tropisms) {
         this.tropisms = tropisms.normalized;
@@ -152,27 +146,21 @@ public class GrowthProperties {
         return tropisms;
     }
 
+    public void UpdateTropismsWeights() {
+        float w = attractionPoints.GetWidth();
+        float h = attractionPoints.GetHeight();
+        float d = attractionPoints.GetDepth();
 
-    // DELETE THIS OR INTEGRATE?
-    public float UpTropismWeight_min { private get; set; }
-    public float UpTropismWeight_max { private get; set; }
-    public float UpTropismWeightRatio { //0..1
-        set {
-            this.tropismsWeights.y = value * (UpTropismWeight_max - UpTropismWeight_min);
+        float verticallyRevelant = Math.Max(w, d);
+
+        if (verticallyRevelant > h) {
+            // up tropisms should be smaller, when h is smaller than Max(w, d)
+            float upTropismsWeights = h / verticallyRevelant;
+
+            this.TropismsWeights = new Vector3(1, upTropismsWeights * upTropismsWeights, 1);
+        } else {
+            this.TropismsWeights = new Vector3(1, 1, 1);
         }
-        get {
-            //this.tropismsWeights.y = value * (UpTropismWeight_max - UpTropismWeight_min);
-            //this.tropismsWeights.y / (UpTropismWeight_max - UpTropismWeight_min) = value;
-            return this.tropismsWeights.y / (UpTropismWeight_max - UpTropismWeight_min);
-        }
-    }
-
-    public void SetTropismsWeights(Vector3 value) {
-        this.tropismsWeights = value;
-    }
-
-    public Vector3 GetTropismsWeights() {
-        return tropismsWeights;
     }
 
 
@@ -193,6 +181,7 @@ public class GrowthProperties {
 
     public void SetAttractionPoints(PseudoEllipsoid attractionPoints) {
         this.attractionPoints = attractionPoints;
+        UpdateTropismsWeights();
     }
 
     public PseudoEllipsoid GetAttractionPoints() {
