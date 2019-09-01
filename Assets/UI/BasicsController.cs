@@ -252,11 +252,13 @@ public class BasicsController : MonoBehaviour {
         }
 
         if (Input.GetMouseButtonUp(0)) {
-            modifyingPointCloudParameter = false;
+            if (modifyingPointCloudParameter) {
+                modifyingPointCloudParameter = false;
+                GameObject.Find("Core").GetComponent<Core>().OnCrownShapeDone();
+            }
 
             GameObject.Find("Core").GetComponent<Core>().EnableCameraMovement();
             GameObject.Find("Core").GetComponent<Core>().DisablePointCloudRenderer();
-            GameObject.Find("Core").GetComponent<Core>().OnCrownShapeDone();
         }
 
 
