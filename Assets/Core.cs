@@ -28,7 +28,7 @@ public class Core : MonoBehaviour, GrowerListener {
 
         //LoadNotWorkingPendulousGrowth();
 
-        //LoadExtremelyDetailedGeometry();
+        LoadExtremelyDetailedGeometry();
 
         //LoadGnarlyGrowth();
 
@@ -162,9 +162,9 @@ public class Core : MonoBehaviour, GrowerListener {
 
         geometryProperties.PendulousBranchesIntensity = 0;
 
-        geometryProperties.BranchOrientationBeginDepthMin = 0;
-        geometryProperties.BranchOrientationBeginDepthMax = CalculateBranchOrientationBeginDepthMax(grower.GetGrowthProperties().GetIterations());
-        geometryProperties.BranchOrientationBeginDepthRatio = 0.75f;
+        geometryProperties.PendulousBranchesBeginDepthMin = 0;
+        geometryProperties.PendulousBranchesBeginDepthMax = CalculateBranchOrientationBeginDepthMax(grower.GetGrowthProperties().GetIterations());
+        geometryProperties.PendulousBranchesBeginDepthRatio = 0.75f;
 
         geometryProperties.SetMaxTwigRadiusForLeaves(0.009f);
         geometryProperties.SetLeafSize(Leaf.LeafType.Triangle, 0.4f);
@@ -399,7 +399,7 @@ public class Core : MonoBehaviour, GrowerListener {
         GameObject.Find("Leaf Type Dropdown").GetComponent<Dropdown>().RefreshShownValue();
 
         GameObject.Find("Pendulous Branches Intensity Slider").GetComponent<Slider>().SetValueWithoutNotify(tree.GetGeometryProperties().PendulousBranchesIntensity);
-        GameObject.Find("Pendulous Branches Begin Depth Slider").GetComponent<Slider>().SetValueWithoutNotify(tree.GetGeometryProperties().BranchOrientationBeginDepthRatio);
+        GameObject.Find("Pendulous Branches Begin Depth Slider").GetComponent<Slider>().SetValueWithoutNotify(tree.GetGeometryProperties().PendulousBranchesBeginDepthRatio);
 
         GameObject.Find("Foliage Density Slider").GetComponent<Slider>().minValue = 0;
         GameObject.Find("Foliage Density Slider").GetComponent<Slider>().maxValue = tree.GetGeometryProperties().DisplayedLeafesPerNodeMaximum;
@@ -440,8 +440,8 @@ public class Core : MonoBehaviour, GrowerListener {
 
     bool recalculateMesh;
 
-
-    private object recalculationLock = new object();
+    
+    //private object recalculationLock = new object(); //this is not needed, as the recalculation is called from an Update() method - like the GetMesh() method
     private void RecalculateMesh() {
         if (recalculateMesh) {
 
@@ -453,7 +453,7 @@ public class Core : MonoBehaviour, GrowerListener {
             GameObject.Find("Triangles Text").GetComponent<Text>().text = triangles.Count / 3 + " triangles";
 
             //lock (recalculationLock) {
-                Util.SplitMesh(vertices, normals, uvs, triangles, ref vertices_, ref normals_, ref uvs_, ref triangles_, recalculationLock);
+                Util.SplitMesh(vertices, normals, uvs, triangles, ref vertices_, ref normals_, ref uvs_, ref triangles_/*, recalculationLock*/);
             //}
 
 
@@ -484,7 +484,7 @@ public class Core : MonoBehaviour, GrowerListener {
 
     //called by TreeRenderer
     public void GetMesh(int rendererId, ref Vector3[] vertices, ref Vector3[] normals, ref Vector2[] uvs, ref int[] triangles) {
-        lock (recalculationLock) {
+        //lock (recalculationLock) {
             if (vertices_ != null && rendererId < vertices_.Count) {
                 vertices = this.vertices_[rendererId];
                 normals = this.normals_[rendererId];
@@ -496,7 +496,7 @@ public class Core : MonoBehaviour, GrowerListener {
                 uvs = null;
                 triangles = null;
             }
-        }
+        //}
     }
 
 
@@ -602,7 +602,7 @@ public class Core : MonoBehaviour, GrowerListener {
         grower.GetGrowthProperties().StemLength = value;
 
         // NOT PRETTY
-        tree.GetGeometryProperties().BranchOrientationBeginDepthMax = CalculateBranchOrientationBeginDepthMax(grower.GetGrowthProperties().GetIterations());
+        tree.GetGeometryProperties().PendulousBranchesBeginDepthMax = CalculateBranchOrientationBeginDepthMax(grower.GetGrowthProperties().GetIterations());
 
         grower.RegrowStem(tree);
         pointCloudReady = true;
@@ -735,7 +735,7 @@ public class Core : MonoBehaviour, GrowerListener {
     }
 
     public void OnPendulousBranchesBeginDepth(float value) {
-        tree.GetGeometryProperties().BranchOrientationBeginDepthRatio = value;
+        tree.GetGeometryProperties().PendulousBranchesBeginDepthRatio = value;
         recalculateMesh = true;
     }
 
@@ -966,7 +966,7 @@ public class Core : MonoBehaviour, GrowerListener {
         grower.GetGrowthProperties().GetAttractionPoints().Reset();
 
         // NOT PRETTY
-        tree.GetGeometryProperties().BranchOrientationBeginDepthMax = CalculateBranchOrientationBeginDepthMax(grower.GetGrowthProperties().GetIterations());
+        tree.GetGeometryProperties().PendulousBranchesBeginDepthMax = CalculateBranchOrientationBeginDepthMax(grower.GetGrowthProperties().GetIterations());
 
         tree.Reset();
 

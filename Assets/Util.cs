@@ -87,14 +87,19 @@ public static class Util {
     //    }
     //}
 
-    public static void SplitMesh(List<Vector3> vertices, List<Vector3> normals, List<Vector2> uvs, List<int> triangles, ref List<Vector3[]> vertices_, ref List<Vector3[]> normals_, ref List<Vector2[]> uvs_, ref List<int[]> triangles_, object additionLock) {
+    public static void SplitMesh(List<Vector3> vertices, List<Vector3> normals, List<Vector2> uvs, List<int> triangles, ref List<Vector3[]> verticesResult, ref List<Vector3[]> normalsResult, ref List<Vector2[]> uvsResult, ref List<int[]> trianglesResult/*, object additionLock*/) {
         //Stopwatch sw = new Stopwatch();
         //sw.Start();
 
-        vertices_ = new List<Vector3[]>();
-        normals_ = new List<Vector3[]>();
-        uvs_ = new List<Vector2[]>();
-        triangles_ = new List<int[]>();
+        //List<Vector3[]> verticesResult_ = new List<Vector3[]>();
+        //List<Vector3[]> normalsResult_ = new List<Vector3[]>();
+        //List<Vector2[]> uvsResult_ = new List<Vector2[]>();
+        //trianglesResult = new List<int[]>();
+
+        verticesResult = new List<Vector3[]>();
+        normalsResult = new List<Vector3[]>();
+        uvsResult = new List<Vector2[]>();
+        trianglesResult = new List<int[]>();
 
         List<Vector3> currentVertices = null;
         List<Vector3> currentNormals = null;
@@ -167,13 +172,13 @@ public static class Util {
 
             //put the data into the result lists
             if (currentVertices.Count + 2 > 65535 || i == triangles.Count - 3) {
-                lock (additionLock) {
-                    vertices_.Add(currentVertices.ToArray());
-                    normals_.Add(currentNormals.ToArray());
-                    uvs_.Add(currentUVs.ToArray());
+                //lock (additionLock) {
+                    verticesResult.Add(currentVertices.ToArray());
+                    normalsResult.Add(currentNormals.ToArray());
+                    uvsResult.Add(currentUVs.ToArray());
 
-                    triangles_.Add(currentTriangles.ToArray());
-                }
+                    trianglesResult.Add(currentTriangles.ToArray());
+                //}
             }
         }
 

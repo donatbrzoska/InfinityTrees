@@ -39,7 +39,7 @@ public class Tree {
 
     private void Hang(Node node, int depth) {
         foreach (Node subnode in node.GetSubnodes()) {
-            if (depth >= geometryProperties.BranchOrientationBeginDepth) {
+            if (depth >= geometryProperties.PendulousBranchesBeginDepth) {
                 Vector3 d_pos = subnode.GetPosition() - node.GetPosition();
                 float d_angle = Vector3.Angle(d_pos, Vector3.down);
 

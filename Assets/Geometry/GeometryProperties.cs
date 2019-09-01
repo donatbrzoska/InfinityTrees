@@ -77,12 +77,12 @@ public class GeometryProperties {
 
     public float PendulousBranchesIntensity { get; set; } //0..1
 
-    public int BranchOrientationBeginDepthMin { get; set; } //should be set to 0 or n_initial_stem_segments
-    public int BranchOrientationBeginDepthMax { get; set; } //should be set to n_initial_stem_segments + iterations
-    public float BranchOrientationBeginDepthRatio { get; set; } //0..1
-    public int BranchOrientationBeginDepth {
+    public int PendulousBranchesBeginDepthMin { get; set; } //should be set to 0 or n_initial_stem_segments
+    public int PendulousBranchesBeginDepthMax { get; set; } //should be set to n_initial_stem_segments + iterations
+    public float PendulousBranchesBeginDepthRatio { get; set; } //0..1
+    public int PendulousBranchesBeginDepth {
         get {
-            return (int)(BranchOrientationBeginDepthRatio * (BranchOrientationBeginDepthMax - BranchOrientationBeginDepthMin));
+            return (int)(PendulousBranchesBeginDepthRatio * (PendulousBranchesBeginDepthMax - PendulousBranchesBeginDepthMin));
         }
     }
 
