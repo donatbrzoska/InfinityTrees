@@ -20,6 +20,7 @@ public class Core : MonoBehaviour, GrowerListener {
 
     // Start is called before the first frame update
     void Start() {
+        renderers.Add(new GameObject("TreeRenderer_0", new MeshRenderer().GetType(), new MeshFilter().GetType(), new TreeRenderer().GetType()));
 
         //vl, tl || v, t
         //7728, 7210 || 3856, 5274
@@ -28,11 +29,11 @@ public class Core : MonoBehaviour, GrowerListener {
 
         //LoadNotWorkingPendulousGrowth();
 
-        LoadExtremelyDetailedGeometry();
+        //LoadExtremelyDetailedGeometry();
 
         //LoadGnarlyGrowth();
 
-        //LoadLowGnarlyGrowth();
+        LoadLowGnarlyGrowth();
 
         //LoadPendulousGeometry();
 
@@ -88,7 +89,7 @@ public class Core : MonoBehaviour, GrowerListener {
             initialized = true;
         }
 
-        RecalculateMesh();
+        //RecalculateMesh();
     }
 
     void LoadDefaultGrowth() {
@@ -101,7 +102,7 @@ public class Core : MonoBehaviour, GrowerListener {
         growthProperties.SetClearDistance(0.1f, 0.95f); //always also change this in UnloadGnarlyGrowth()
 
         growthProperties.SetBranchDensityBegin(0f);
-        growthProperties.SetBranchDensityEnd(0.8f);
+        growthProperties.SetBranchDensityEnd(0.6f);
 
         growthProperties.SetTropisms(new Vector3(0f, 1f, 0));
         growthProperties.SetTropismsWeights(new Vector3(1, 1f, 1));
@@ -135,7 +136,7 @@ public class Core : MonoBehaviour, GrowerListener {
         PseudoEllipsoid attractionPoints = new PseudoEllipsoid(new Vector3(0, 0f, 0), o.GetRadius_x(), o.GetRadius_y(), o.GetRadius_z(), 30, o.GetCutoffRatio_bottom(), o.GetCutoffRatio_top(), o.Seed);
         grower.GetGrowthProperties().SetAttractionPoints(attractionPoints);
         grower.GetGrowthProperties().SetInfluenceDistance(0.5f);
-        grower.GetGrowthProperties().SetClearDistance(0.05f, 0.425f);
+        grower.GetGrowthProperties().SetClearDistance(0.05f, 0.4125f);
     }
 
     void UnLoadGnarlyGrowth() {
@@ -456,7 +457,6 @@ public class Core : MonoBehaviour, GrowerListener {
                 Util.SplitMesh(vertices, normals, uvs, triangles, ref vertices_, ref normals_, ref uvs_, ref triangles_/*, recalculationLock*/);
             //}
 
-
             //add renderers as needed
             while (vertices_.Count > renderers.Count) {
                 GameObject tr = new GameObject();
@@ -484,6 +484,10 @@ public class Core : MonoBehaviour, GrowerListener {
 
     //called by TreeRenderer
     public void GetMesh(int rendererId, ref Vector3[] vertices, ref Vector3[] normals, ref Vector2[] uvs, ref int[] triangles) {
+        if (rendererId == 0) {
+            RecalculateMesh();
+        }
+
         //lock (recalculationLock) {
             if (vertices_ != null && rendererId < vertices_.Count) {
                 vertices = this.vertices_[rendererId];
