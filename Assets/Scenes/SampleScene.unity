@@ -9197,7 +9197,7 @@ GameObject:
   - component: {fileID: 1129034057}
   - component: {fileID: 1129034056}
   m_Layer: 5
-  m_Name: Age Text
+  m_Name: Growth Iterations Text
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -9220,8 +9220,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 22.180054, y: -96}
-  m_SizeDelta: {x: 27.02, y: 15.350006}
+  m_AnchoredPosition: {x: 59.5, y: -94.2}
+  m_SizeDelta: {x: 100.16, y: 14.73}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1129034056
 MonoBehaviour:
@@ -9256,7 +9256,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Age
+  m_Text: Growth Iterations
 --- !u!222 &1129034057
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -11315,7 +11315,7 @@ GameObject:
   - component: {fileID: 1352574986}
   - component: {fileID: 1352574985}
   m_Layer: 5
-  m_Name: Age Slider
+  m_Name: Iterations Slider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -11340,7 +11340,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 115.02996, y: -7.450035}
+  m_AnchoredPosition: {x: 115.02996, y: -19.5}
   m_SizeDelta: {x: 120, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1352574985
@@ -11406,7 +11406,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 1352574985}
-        m_MethodName: OnValueChanged_Age
+        m_MethodName: OnValueChanged_Iterations
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -14978,7 +14978,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 48.400024, y: 15.200012}
+  m_AnchoredPosition: {x: 48.399902, y: 15.200012}
   m_SizeDelta: {x: 160, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1670856961

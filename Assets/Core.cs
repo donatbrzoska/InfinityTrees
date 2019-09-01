@@ -366,7 +366,7 @@ public class Core : MonoBehaviour, GrowerListener {
         GameObject.Find("Crown Stem Length Slider").GetComponent<Slider>().SetValueWithoutNotify(grower.GetGrowthProperties().CrownStemLengthRatio);
 
 
-        GameObject.Find("Age Slider").GetComponent<Slider>().SetValueWithoutNotify(grower.GetGrowthProperties().GetIterations());
+        GameObject.Find("Iterations Slider").GetComponent<Slider>().SetValueWithoutNotify(grower.GetGrowthProperties().GetIterations());
 
         GameObject.Find("Crown Width Slider").GetComponent<Slider>().SetValueWithoutNotify(grower.GetGrowthProperties().GetAttractionPoints().GetRadius_x());
         GameObject.Find("Crown Height Slider").GetComponent<Slider>().SetValueWithoutNotify(grower.GetGrowthProperties().GetAttractionPoints().GetRadius_y());
@@ -938,7 +938,7 @@ public class Core : MonoBehaviour, GrowerListener {
                                                                 + iterations;
     }
 
-    public void OnAge(int value) {
+    public void OnIterations(int value) {
         SetMessage("");
 
         grower.Stop();

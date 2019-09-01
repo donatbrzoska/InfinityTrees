@@ -65,9 +65,9 @@ public class BasicsController : MonoBehaviour {
 
     // SLIDERS
 
-    public void OnValueChanged_Age() {
+    public void OnValueChanged_Iterations() {
         int value = (int)GetComponent<Slider>().value;
-        GameObject.Find("Core").GetComponent<Core>().OnAge(value);
+        GameObject.Find("Core").GetComponent<Core>().OnIterations(value);
     }
 
     public void OnValueChanged_Thickness() {
