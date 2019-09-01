@@ -63,7 +63,9 @@ public class SpaceColonization {
             growingStopwatch.Start();
 
             GrowStem(tree);
+            growerListener.OnIterationFinished();
             GrowCrownStem(tree);
+            growerListener.OnIterationFinished();
             GrowCrown(tree);
 
             growingStopwatch.Stop();

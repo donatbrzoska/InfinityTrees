@@ -20,7 +20,11 @@ public class Core : MonoBehaviour, GrowerListener {
 
     // Start is called before the first frame update
     void Start() {
-        renderers.Add(new GameObject("TreeRenderer_0", new MeshRenderer().GetType(), new MeshFilter().GetType(), new TreeRenderer().GetType()));
+        GameObject treeRenderer = new GameObject();
+        treeRenderer.AddComponent<MeshRenderer>();
+        treeRenderer.AddComponent<MeshFilter>();
+        treeRenderer.AddComponent<TreeRenderer>();
+        renderers.Add(treeRenderer);
 
         //vl, tl || v, t
         //7728, 7210 || 3856, 5274
@@ -46,8 +50,8 @@ public class Core : MonoBehaviour, GrowerListener {
         //LoadYoungGeometry();
 
         //9152, 8334 || 4352, 5934
-        //LoadExcurrentGrowth();
-        //LoadExcurrentGeometry();
+        LoadExcurrentGrowth();
+        LoadExcurrentGeometry();
 
         //7024, 6514 || 3392, 4698
         //4896, 5450 || 3392, 4698 //0.1 displayed leaves per node

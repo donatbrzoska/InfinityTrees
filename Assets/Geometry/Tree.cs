@@ -72,6 +72,26 @@ public class Tree {
         }
     }
 
+    private void HangByOrder(Node node) {
+        foreach (Node subnode in node.GetSubnodes()) {
+            if (subnode.Order >= geometryProperties.PendulousBranchesBeginDepth) {
+                Vector3 d_pos = subnode.GetPosition() - node.GetPosition();
+                float d_angle = Vector3.Angle(d_pos, Vector3.down);
+
+                float someFactor = 1 - (d_angle / 180);
+                float rotation_angle = geometryProperties.PendulousBranchesIntensity * someFactor * d_angle;
+
+                //rotate d_pos towards the (0, -1, 0) Vector3
+                Quaternion rotation = Quaternion.AngleAxis(rotation_angle, Vector3.Cross(d_pos, Vector3.down));
+
+                //rotate the subnodes inclusive all its subnodes
+                subnode.Rotate(node.GetPosition(), rotation);
+            }
+
+            HangByOrder(subnode);
+        }
+    }
+
     private int twigVertices;
 	private int twigTriangles;
 	private int leafVertices;
@@ -94,7 +114,8 @@ public class Tree {
 
         if (geometryProperties.PendulousBranchesIntensity > 0) {
             Node copy = StemRoot.GetCopyWithSupernode(null);
-            Hang(copy, 0);
+            //Hang(copy, 0);
+            HangByOrder(copy);
             CalculateEverything(copy, nodeVerticesPositions, 0, verticesTmp, uvsTmp, trianglesTmp);
         } else {
             CalculateEverything(StemRoot, nodeVerticesPositions, 0, verticesTmp, uvsTmp, trianglesTmp);
