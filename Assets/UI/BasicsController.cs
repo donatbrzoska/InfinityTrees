@@ -171,7 +171,7 @@ public class BasicsController : MonoBehaviour {
 
 
     public void OnValueChanged_GnarlyBranches() {
-        bool value = GetComponent<Toggle>().isOn;
+        float value = GetComponent<Slider>().value;
         GameObject.Find("Core").GetComponent<Core>().OnGnarlyBranches(value);
     }
 

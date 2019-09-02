@@ -8,12 +8,7 @@ public class GrowthProperties {
     public float StemAngleRange { get; set; }
 
     private float influenceDistance;
-    private float squaredInfluenceDistance;
     private float perceptionAngle;
-
-
-    private float clearDistance_min;
-    private float clearDistance_max;
 
 
     private Vector3 tropisms;
@@ -25,20 +20,36 @@ public class GrowthProperties {
 
     private int iterations;
 
-    public void SetInfluenceDistance(float influenceDistance) {
-        this.influenceDistance = influenceDistance;
-    }
-
     public float GetInfluenceDistance() {
-        return influenceDistance;
+        // more gnarlyness means less influence distance
+        return Gnarlyness_di_min + (1-Gnarlyness) * (Gnarlyness_di_max - Gnarlyness_di_min);
     }
 
     public float GetSquaredInfluenceDistance() {
-        return influenceDistance * influenceDistance;
+        return GetInfluenceDistance() * GetInfluenceDistance();
     }
 
 
 
+    public float Gnarlyness_di_min { private get; set; } //what is the smallest value for the influence distance
+    public float Gnarlyness_di_max { private get; set; } //what is the biggest value for the influence distance
+    public float Gnarlyness_dc_min_min { private get; set; } //what is the smallest value for the clear distance when the gnarlyness is at its minimum
+    public float Gnarlyness_dc_min_max { private get; set; } //what is the biggest value for the clear distance when the gnarlyness is at its minimum
+    public float Gnarlyness_dc_max_min { private get; set; } //what is the smallest value for the clear distance when the gnarlyness is at its minimum
+    public float Gnarlyness_dc_max_max { private get; set; } //what is the biggest value for the clear distance when the gnarlyness is at its minimum
+    public int Gnarlyness_pointCloudDensity_min { private get; set; }
+    public int Gnarlyness_pointCloudDensity_max { private get; set; }
+    private float gnarlyness;
+    public float Gnarlyness {
+        get {
+            return gnarlyness;
+        }
+        set {
+            gnarlyness = value;
+            // more gnarlyness needed more points
+            attractionPoints.UpdateDensity(Gnarlyness_pointCloudDensity_min + value * (Gnarlyness_pointCloudDensity_max - Gnarlyness_pointCloudDensity_min));
+        }
+    } //0..1
 
 
 
@@ -51,13 +62,6 @@ public class GrowthProperties {
         return perceptionAngle;
     }
 
-
-
-    //only set once
-    public void SetClearDistance(float min, float max) {
-        this.clearDistance_min = min;
-        this.clearDistance_max = max;
-    }
 
 
     private float branchDensityBegin;
@@ -109,33 +113,34 @@ public class GrowthProperties {
     //    return squaredClearDistance_begin + step * (iteration+1);
     //}
 
-    //private Dictionary<int, float> squaredClearDistanceCache = new Dictionary<int, float>();
 
     public float GetSquaredClearDistance(int iteration) {
-        //if (squaredClearDistanceCache.ContainsKey(iteration)) {
-        //    return squaredClearDistanceCache[iteration];
-        //} else {
-            float squaredClearDistance_max = clearDistance_max * clearDistance_max;
-            float squaredClearDistance_min = clearDistance_min * clearDistance_min;
-            float squaredClearDistance_range = squaredClearDistance_max - squaredClearDistance_min;
+        // bigger values for the Gnarlyness make a smaller clear distance
+        // .. this is needed because the influence distance also gets smaller
+        float clearDistance_max = Gnarlyness_dc_min_max + (1-Gnarlyness) * (Gnarlyness_dc_max_max - Gnarlyness_dc_min_max);
+        float clearDistance_min = Gnarlyness_dc_min_min + (1-Gnarlyness) * (Gnarlyness_dc_max_min - Gnarlyness_dc_min_min);
 
-            //the density says how much of the squaredClearDistanceRange should be subtracted from the squaredClearDistance_max
-            //-> typically the density is low in the beginning
-            //-> this should result in a high squaredClearDistance_begin
-            //-> therefore density * squaredClearDistanceRange has to be subtracted from the squaredClearDistance_max
-            float squaredClearDistance_begin = squaredClearDistance_max - branchDensityBegin * squaredClearDistance_range;
 
-            //the density says how much of the squaredClearDistanceRange should be subtracted from the squaredClearDistance_max
-            //-> typically the density is high in the end
-            //-> this should result in a low squaredClearDistance_end
-            //-> therefore density * squaredClearDistanceRange has to be subtracted from the squaredClearDistance_max
-            float squaredClearDistance_end = squaredClearDistance_max - branchDensityEnd * squaredClearDistance_range;
+        float squaredClearDistance_max = clearDistance_max * clearDistance_max;
+        float squaredClearDistance_min = clearDistance_min * clearDistance_min;
+        float squaredClearDistance_range = squaredClearDistance_max - squaredClearDistance_min;
 
-            float result = SigmoidInterpolation(squaredClearDistance_begin, squaredClearDistance_end, iteration);
-            //squaredClearDistanceCache[iteration] = result;
-            return result;
-        //}
+        //the density says how much of the squaredClearDistanceRange should be subtracted from the squaredClearDistance_max
+        //-> typically the density is low in the beginning
+        //-> this should result in a high squaredClearDistance_begin
+        //-> therefore density * squaredClearDistanceRange has to be subtracted from the squaredClearDistance_max
+        float squaredClearDistance_begin = squaredClearDistance_max - branchDensityBegin * squaredClearDistance_range;
+
+        //the density says how much of the squaredClearDistanceRange should be subtracted from the squaredClearDistance_max
+        //-> typically the density is high in the end
+        //-> this should result in a low squaredClearDistance_end
+        //-> therefore density * squaredClearDistanceRange has to be subtracted from the squaredClearDistance_max
+        float squaredClearDistance_end = squaredClearDistance_max - branchDensityEnd * squaredClearDistance_range;
+
+        float result = SigmoidInterpolation(squaredClearDistance_begin, squaredClearDistance_end, iteration);
+        return result;
     }
+
 
 
     public void SetTropisms(Vector3 tropisms) {

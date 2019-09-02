@@ -101,9 +101,7 @@ public class Core : MonoBehaviour, GrowerListener {
 
 
         GrowthProperties growthProperties = new GrowthProperties();
-        growthProperties.SetInfluenceDistance(1f); //always also change this in UnloadGnarlyGrowth()
         growthProperties.SetPerceptionAngle(160);
-        growthProperties.SetClearDistance(0.1f, 0.95f); //always also change this in UnloadGnarlyGrowth()
         
         growthProperties.SetBranchDensityBegin(0f);
         growthProperties.SetBranchDensityEnd(0.8f);
@@ -119,30 +117,18 @@ public class Core : MonoBehaviour, GrowerListener {
         growthProperties.SetIterations(30);
 
 
+        growthProperties.Gnarlyness_dc_min_min = 0.05f;
+        growthProperties.Gnarlyness_dc_min_max = 0.4125f;
+        growthProperties.Gnarlyness_dc_max_min = 0.1f;
+        growthProperties.Gnarlyness_dc_max_max = 1.25f;
+        growthProperties.Gnarlyness_di_min = 0.5f;
+        growthProperties.Gnarlyness_di_max = 1.3f;
+        //growthProperties.Gnarlyness_pointCloudDensity_min = 11;
+        growthProperties.Gnarlyness_pointCloudDensity_min = 30;
+        growthProperties.Gnarlyness_pointCloudDensity_max = 30;
+        growthProperties.Gnarlyness = 1f;
+
         grower = new SpaceColonization(growthProperties, this);
-    }
-
-    void LoadLowGnarlyGrowth() {
-        grower.GetGrowthProperties().SetInfluenceDistance(1.3f);
-        grower.GetGrowthProperties().SetClearDistance(0.1f, 1.25f);
-    }
-
-    void LoadGnarlyGrowth() {
-        PseudoEllipsoid o = grower.GetGrowthProperties().GetAttractionPoints();
-
-        PseudoEllipsoid attractionPoints = new PseudoEllipsoid(new Vector3(0, 0f, 0), o.GetRadius_x(), o.GetRadius_y(), o.GetRadius_z(), 30, o.GetCutoffRatio_bottom(), o.GetCutoffRatio_top(), o.Seed);
-        grower.GetGrowthProperties().SetAttractionPoints(attractionPoints);
-        grower.GetGrowthProperties().SetInfluenceDistance(0.5f);
-        grower.GetGrowthProperties().SetClearDistance(0.05f, 0.4125f);
-    }
-
-    void UnLoadGnarlyGrowth() {
-        PseudoEllipsoid o = grower.GetGrowthProperties().GetAttractionPoints();
-
-        PseudoEllipsoid attractionPoints = new PseudoEllipsoid(new Vector3(0, 0f, 0), o.GetRadius_x(), o.GetRadius_y(), o.GetRadius_z(), 15, o.GetCutoffRatio_bottom(), o.GetCutoffRatio_top(), o.Seed);
-        grower.GetGrowthProperties().SetAttractionPoints(attractionPoints);
-        grower.GetGrowthProperties().SetInfluenceDistance(1f);
-        grower.GetGrowthProperties().SetClearDistance(0.1f, 0.95f);
     }
 
     void LoadDefaultGeometry() {
@@ -382,7 +368,7 @@ public class Core : MonoBehaviour, GrowerListener {
         GameObject.Find("Branch Density Begin Slider").GetComponent<Slider>().SetValueWithoutNotify(grower.GetGrowthProperties().GetBranchDensityBegin());
         GameObject.Find("Branch Density End Slider").GetComponent<Slider>().SetValueWithoutNotify(grower.GetGrowthProperties().GetBranchDensityEnd());
 
-        GameObject.Find("Gnarly Branches Toggle").GetComponent<Toggle>().SetIsOnWithoutNotify(false);
+        GameObject.Find("Gnarly Branches Slider").GetComponent<Slider>().SetValueWithoutNotify(grower.GetGrowthProperties().Gnarlyness);
 
         //GameObject.Find("Grow Towards Light Slider").GetComponent<Slider>().SetValueWithoutNotify(growthProperties.UpTropismWeightRatio);
 
@@ -783,14 +769,10 @@ public class Core : MonoBehaviour, GrowerListener {
 
 
 
-    public void OnGnarlyBranches(bool value) {
+    public void OnGnarlyBranches(float value) {
         grower.Stop();
 
-        if (value) {
-            LoadGnarlyGrowth();
-        } else {
-            UnLoadGnarlyGrowth();
-        }
+        grower.GetGrowthProperties().Gnarlyness = value;
 
         tree.Reset();
 

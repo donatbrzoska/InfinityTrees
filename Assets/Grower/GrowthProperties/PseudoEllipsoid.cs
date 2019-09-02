@@ -191,7 +191,7 @@ public sealed class PseudoEllipsoid : List<Vector3> {
             volume = volume * transformation.determinant; //https://youtu.be/Ip3X9LOh2dk?list=PLZHQObOWTQDPD3MizzM2xVFitgF8hE_ab
 
             //3. Calculate the amount of points for the given density
-            int n_points = (int)(volume * density);
+            int n_points = (int)Math.Ceiling(volume * density);
 
             //4. Generate n_points attraction points
             while (base.Count < n_points) {

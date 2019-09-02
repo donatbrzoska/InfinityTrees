@@ -44,11 +44,12 @@ public class VoxelGridAlgorithm : NearestNodeAlgorithm {
         //z direction
         n_ks = (int)Math.Ceiling(attractionPoints.GetDepth() / voxelSize);
 
-        voxelGrid = new List<Node>[n_is, n_js, n_ks];
         debug("Cloud width: " + attractionPoints.GetWidth());
         debug("Cloud height: " + attractionPoints.GetHeight());
         debug("Cloud depth: " + attractionPoints.GetDepth());
         debug("Grid dimensions: " + n_is + "x" + n_js + "x" + n_ks);
+
+        voxelGrid = new List<Node>[n_is, n_js, n_ks];
 
         for (int i = 0; i < n_is; i++) {
             for (int j = 0; j < n_js; j++) {
