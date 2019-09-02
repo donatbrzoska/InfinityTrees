@@ -209,7 +209,6 @@ public class SpaceColonization {
 
             Dictionary<Node, List<Vector3>> nodes_to_attractionPoints = new Dictionary<Node, List<Vector3>>();
 
-            findClosePointStopwatch.Start();
             //iterate through all attractionPoints
             //foreach (Vector3 attractionPoint in growthProperties.GetAttractionPoints()) { //there is some threading problem with the enumeration foreach loop, usual for should fix it
             for (int j = 0; j < growthProperties.GetAttractionPoints().Count; j++) {
@@ -227,22 +226,24 @@ public class SpaceColonization {
                 //}
 
                 //and find the closest Node respectively
+                findClosePointStopwatch.Start();
                 Node closest = nearestNodeAlgorithm.GetNearestWithinSquaredDistance(attractionPoint);
+                findClosePointStopwatch.Stop();
 
                 //if there is a close Node
                 if (closest != null) {
                     // Rudis ultimate plan to make the removal in the next iteration
-                    findClosePointStopwatch.Stop();
                     removeClosePointsStopwatch.Start();
                     if (i > 0) { //in the first iteration, the attraction points shall not get deleted
                         if (Util.SquaredDistance(attractionPoint, closest.GetPosition()) <= squaredClearDistance) {
                             j--;
                             growthProperties.GetAttractionPoints().Remove(attractionPoint);
+                            removeClosePointsStopwatch.Stop();
                             continue;
+                        } else {
+                            removeClosePointsStopwatch.Stop();
                         }
                     }
-                    removeClosePointsStopwatch.Stop();
-                    findClosePointStopwatch.Start();
 
                     //add it to the nodesAttractionPoints
                     if (nodes_to_attractionPoints.ContainsKey(closest)) {
@@ -256,7 +257,6 @@ public class SpaceColonization {
                     return;
                 }
             }
-            findClosePointStopwatch.Stop();
 
             if (!running) {
                 return;
