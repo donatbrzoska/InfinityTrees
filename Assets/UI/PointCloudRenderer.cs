@@ -30,16 +30,15 @@ public class PointCloudRenderer : MonoBehaviour {
 
         //always get the latest point cloud
         if (GameObject.Find("Core").GetComponent<Core>().PointCloudReady()) {
-            List<Vector3> pointCloud = GameObject.Find("Core").GetComponent<Core>().GetPointCloud();
-            int pointCloudSize = pointCloud.Count; //the size will change while it gets generated!
+            Vector3[] pointCloud = GameObject.Find("Core").GetComponent<Core>().GetPointCloud();
 
             int vertexPointer = 0;
 
-            vertices = new Vector3[pointCloudSize * 3]; //3 vertices for every point in the cloud to make up one triangle respectively
-            uvs = new Vector2[pointCloudSize * 3];
-            triangles = new int[pointCloudSize * 3]; //1 triangle for every point in the cloud
+            vertices = new Vector3[pointCloud.Length * 3]; //3 vertices for every point in the cloud to make up one triangle respectively
+            uvs = new Vector2[pointCloud.Length * 3];
+            triangles = new int[pointCloud.Length * 3]; //1 triangle for every point in the cloud
 
-            for (int i = 0; i < pointCloudSize; i++) {
+            for (int i = 0; i < pointCloud.Length; i++) {
 
                 Quaternion rotation = Quaternion.AngleAxis(Util.RandomInRange(0, 360), Util.RandomVector3());
 

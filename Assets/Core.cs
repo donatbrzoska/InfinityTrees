@@ -241,7 +241,7 @@ public class Core : MonoBehaviour, GrowerListener {
 
         growthProperties.GnarlyBranchesRatio = 0.625f;
         growthProperties.SetAttractionPoints(new PseudoEllipsoid(new Vector3(0, 0f, 0), 10, 10, 10, 15, 0.15f, 0.05f));
-        debug(growthProperties.GetAttractionPoints().Count + " attraction points");
+        debug(growthProperties.GetAttractionPoints().Points.Length + " attraction points");
 
         growthProperties.SetIterations(50);
 
@@ -431,10 +431,10 @@ public class Core : MonoBehaviour, GrowerListener {
     //private object recalculationLock = new object(); //this is not needed, as the recalculation is called from an Update() method - like the GetMesh() method
     private void RecalculateMesh() {
         if (recalculateMesh) {
+            recalculateMesh = false;
 
             tree.GetMesh(ref this.vertices, ref this.normals, ref this.uvs, ref this.triangles);
 
-            recalculateMesh = false;
 
             GameObject.Find("Vertices Text").GetComponent<Text>().text = vertices.Count + " vertices";
             GameObject.Find("Triangles Text").GetComponent<Text>().text = triangles.Count / 3 + " triangles";
@@ -500,7 +500,7 @@ public class Core : MonoBehaviour, GrowerListener {
     }
 
     public void OnGrowthStopped() {
-        if (grower.GetGrowthProperties().GetAttractionPoints().ActiveCount > 0.75*grower.GetGrowthProperties().GetAttractionPoints().Count) {
+        if (grower.GetGrowthProperties().GetAttractionPoints().ActiveCount > 0.75*grower.GetGrowthProperties().GetAttractionPoints().Points.Length) {
             SetMessage("You discovered some unfortunate randomness, try a different seed");
         } else {
             SetMessage("Growth stopped unexpectedly, try defining wider crown shape bounds or use less iterations (Age Slider)");
@@ -522,7 +522,7 @@ public class Core : MonoBehaviour, GrowerListener {
         PointCloudRenderingEnabled = false;
     }
 
-    bool pointCloudReady = false;
+    bool pointCloudReady = true;
 
     // called by PointCloudRenderer
     public bool PointCloudReady() {
@@ -530,9 +530,9 @@ public class Core : MonoBehaviour, GrowerListener {
     }
 
     // called by PointCloudRenderer
-    public List<Vector3> GetPointCloud() {
+    public Vector3[] GetPointCloud() {
         pointCloudReady = false;
-        return grower.GetGrowthProperties().GetAttractionPoints();//.GetPoints();
+        return grower.GetGrowthProperties().GetAttractionPoints().Points;
     }
 
 

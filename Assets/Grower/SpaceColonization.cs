@@ -211,9 +211,9 @@ public class SpaceColonization {
 
             //iterate through all attractionPoints
             //foreach (Vector3 attractionPoint in growthProperties.GetAttractionPoints()) { //there is some threading problem with the enumeration foreach loop, usual for should fix it
-            for (int j = 0; j < growthProperties.GetAttractionPoints().Count; j++) {
+            for (int j = 0; j < growthProperties.GetAttractionPoints().Points.Length; j++) {
 
-                Vector3 attractionPoint = growthProperties.GetAttractionPoints()[j];
+                Vector3 attractionPoint = growthProperties.GetAttractionPoints().Points[j];
                 if (growthProperties.GetAttractionPoints().Active[j]) {
 
                     //if (attractionPoint.x<smallest_x - influenceDistance
@@ -359,7 +359,7 @@ public class SpaceColonization {
             //removeClosePointsStopwatch.Stop();
 
             growerListener.OnIterationFinished();
-            //debug("finished iteration " + i);
+            debug("finished iteration " + i);
 
             if (n_newNodes == 0) {
                 growerListener.OnGrowthStopped();

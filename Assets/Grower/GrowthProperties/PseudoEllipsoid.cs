@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public sealed class PseudoEllipsoid : List<Vector3> {
+public sealed class PseudoEllipsoid {
 
     private Vector3 center;
     public Vector3 GetCenter() {
@@ -34,8 +34,10 @@ public sealed class PseudoEllipsoid : List<Vector3> {
         return biggest_z - smallest_z;
     }
 
-    public List<bool> Active { get; private set; }
+    public bool[] Active { get; private set; }
     public int ActiveCount { get; set; }
+    public Vector3[] Points { get; set; }
+
 
     public int Seed { private set; get; }
     private System.Random random;
@@ -57,7 +59,7 @@ public sealed class PseudoEllipsoid : List<Vector3> {
 
     //"copies" all points in backup to the base
     public void Reset() {
-        for (int i=0; i<Active.Count; i++) {
+        for (int i=0; i<Active.Length; i++) {
             Active[i] = true;
         }
     }
@@ -142,13 +144,10 @@ public sealed class PseudoEllipsoid : List<Vector3> {
     }
 
     private void Initialize() {
-        Active = new List<bool>();
         Generate();
     }
 
     private void Generate() {
-        base.Clear();
-        Active.Clear();
         ActiveCount = 0;
 
         smallest_x = float.MaxValue;
@@ -184,9 +183,11 @@ public sealed class PseudoEllipsoid : List<Vector3> {
 
         //3. Calculate the amount of points for the given density
         int n_points = (int)Math.Ceiling(volume * density);
+        Points = new Vector3[n_points];
+        Active = new bool[n_points];
 
         //4. Generate n_points attraction points
-        while (base.Count < n_points) {
+        while (ActiveCount < n_points) {
             //4.1 generate points within the sphere with radius 1
             float y = RandomInRange(-1, 1);
             if ((y < 0 - radius + cutoffThreshhold_bottom) | y > 0 + radius - cutoffThreshhold_top) {
@@ -213,34 +214,35 @@ public sealed class PseudoEllipsoid : List<Vector3> {
                 //4.3 Translate the points based on the real cutoff threshhold at the bottom (it is a different one than the one for the sphere with radius 1!)
                 float real_cutoffThreshhold_bottom = 2f * radius_y * cutoffRatio_bottom;
                 Vector3 targetCenter = new Vector3(Position.x, Position.y + radius_y - real_cutoffThreshhold_bottom, Position.z);// Vector3.up*radius + position;
-                                                                                                                                 //Vector3 targetCenter = new Vector3(0, radius_y - real_cutoffThreshhold_bottom, 0);// Vector3.up*radius + position;
 
-                base.Add(point + targetCenter);
-                Active.Add(true);
+                Vector3 calculatedPoint = point + targetCenter;
+                
+                Points[ActiveCount] = calculatedPoint; //ActiveCount is used as an indexer here
+                Active[ActiveCount] = true;
                 ActiveCount++;
 
                 // for Core -> CameraMovement and UpTropismDamping
-                if (smallest_x > base[base.Count - 1].x) {
-                    smallest_x = base[base.Count - 1].x;
+                if (smallest_x > calculatedPoint.x) {
+                    smallest_x = calculatedPoint.x;
                 }
-                if (biggest_x < base[base.Count - 1].x) {
-                    biggest_x = base[base.Count - 1].x;
+                if (biggest_x < calculatedPoint.x) {
+                    biggest_x = calculatedPoint.x;
                 }
-                if (smallest_y > base[base.Count - 1].y) {
-                    smallest_y = base[base.Count - 1].y;
+                if (smallest_y > calculatedPoint.y) {
+                    smallest_y = calculatedPoint.y;
                 }
-                if (biggest_y < base[base.Count - 1].y) {
-                    biggest_y = base[base.Count - 1].y;
+                if (biggest_y < calculatedPoint.y) {
+                    biggest_y = calculatedPoint.y;
                 }
-                if (smallest_z > base[base.Count - 1].z) {
-                    smallest_z = base[base.Count - 1].z;
+                if (smallest_z > calculatedPoint.z) {
+                    smallest_z = calculatedPoint.z;
                 }
-                if (biggest_z < base[base.Count - 1].z) {
-                    biggest_z = base[base.Count - 1].z;
+                if (biggest_z < calculatedPoint.z) {
+                    biggest_z = calculatedPoint.z;
                 }
                 // for Core -> CameraMovement
-                if (center.y < base[base.Count - 1].y / 2) {
-                    center.y = base[base.Count - 1].y / 2;
+                if (center.y < calculatedPoint.y / 2) {
+                    center.y = calculatedPoint.y / 2;
                 }
             }
         }
