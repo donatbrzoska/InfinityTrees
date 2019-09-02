@@ -263,6 +263,14 @@ public class SpaceColonization {
 
                 Vector3 direction = (sum + Util.Hadamard(growthProperties.GetTropisms(), growthProperties.TropismsWeights)).normalized * growthProperties.GetGrowthDistance();
 
+                //sometimes tropisms make the nodes grow "backwards" again, this fixes that:
+                float d_angle = Vector3.Angle(currentNode.GetDirection(), direction);
+                if (d_angle > growthProperties.GetPerceptionAngle() / 2) {
+                    float unallowedDiff = d_angle - growthProperties.GetPerceptionAngle() / 2;
+                    Vector3 axis = Vector3.Cross(direction, currentNode.GetDirection());
+                    direction = Quaternion.AngleAxis(unallowedDiff, axis) * direction;
+                }
+
                 //Vector3 direction;
                 //if (i < 0.3 * growthProperties.GetIterations()) {
                 //    direction = (sum + Util.Hadamard(growthProperties.GetTropisms(i), new Vector3(0, 10, 0))).normalized * growthProperties.GetGrowthDistance();
