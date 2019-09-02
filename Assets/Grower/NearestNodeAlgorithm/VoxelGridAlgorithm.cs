@@ -6,7 +6,7 @@ using UnityEngine;
 
 public class VoxelGridAlgorithm : NearestNodeAlgorithm {
 
-    private static bool debugEnabled = false;
+    private static bool debugEnabled = true;
     private static void debug(string message, [CallerMemberName]string callerName = "") {
         if (debugEnabled) {
             UnityEngine.Debug.Log("DEBUG: VoxelGridAlgorithm: " + callerName + "(): " + message);
@@ -60,6 +60,7 @@ public class VoxelGridAlgorithm : NearestNodeAlgorithm {
             }
         }
     }
+        
 
     public void Add(Node node) {
         Vector3Int gridPos = PositionToGridPosition(node.GetPosition());
@@ -67,25 +68,46 @@ public class VoxelGridAlgorithm : NearestNodeAlgorithm {
         voxelGrid[gridPos.x, gridPos.y, gridPos.z].Add(node);
 
         voxels_to_nodesAround.Clear();
+
+        ActivateVoxelsAround(gridPos);
+    }
+
+    private HashSet<Vector3Int> activeVoxels = new HashSet<Vector3Int>(); //contains all voxels that have been activated
+    private HashSet<Vector3Int> activeVoxelsAround = new HashSet<Vector3Int>(); //contains all voxels, that have been put into this function
+    public void ActivateVoxelsAround(Vector3Int voxel) {
+        if (!activeVoxelsAround.Contains(voxel)) {
+            List<Vector3Int> voxelsAround = VoxelsAroundVoxel(voxel);
+            foreach (Vector3Int voxelAround in voxelsAround) {
+                activeVoxels.Add(voxelAround);
+            }
+
+            activeVoxelsAround.Add(voxel);
+        }
     }
 
 
     public Node GetNearestWithinSquaredDistance(Vector3 position) {
-        Vector3Int gridPosition = PositionToGridPosition(position);
-        List<Node> candidates = NodesAroundVoxel(gridPosition);
-        //if (candidates.Count > 0) {
-        //    debug("n candidates: " + candidates.Count);
-        //}
-
         Node closest = null;
-        float closestDistance = float.MaxValue;
 
-        foreach (Node n in candidates) {
-            float squaredDistance = Util.SquaredDistance(position, n.GetPosition());
-            if (squaredDistance < closestDistance && squaredDistance <= squaredInfluenceDistance) {
-                if (AttractionPointInPerceptionAngle(n, position)) {
-                    closest = n;
-                    closestDistance = squaredDistance;
+        Vector3Int gridPosition = PositionToGridPosition(position);
+
+        // all voxels that are near a voxel that has nodes get activated in the Add() method
+        if (activeVoxels.Contains(gridPosition)) {
+
+            List<Node> candidates = NodesAroundVoxel(gridPosition);
+            //if (candidates.Count > 0) {
+            //    debug("n candidates: " + candidates.Count);
+            //}
+
+            float closestDistance = float.MaxValue;
+
+            foreach (Node n in candidates) {
+                float squaredDistance = Util.SquaredDistance(position, n.GetPosition());
+                if (squaredDistance < closestDistance && squaredDistance <= squaredInfluenceDistance) {
+                    if (AttractionPointInPerceptionAngle(n, position)) {
+                        closest = n;
+                        closestDistance = squaredDistance;
+                    }
                 }
             }
         }
@@ -99,16 +121,16 @@ public class VoxelGridAlgorithm : NearestNodeAlgorithm {
         return isInPerceptionAngle;
     }
 
-    private int Crop(int v, int lo, int hi) {
-        if (v < lo) {
-            return lo;
+    private int Crop(int value, int min, int max) {
+        if (value < min) {
+            return min;
         }
 
-        if (v > hi) {
-            return hi;
+        if (value > max) {
+            return max;
         }
 
-        return v;
+        return value;
     }
 
     private Vector3Int PositionToGridPosition(Vector3 pos) {
@@ -118,12 +140,12 @@ public class VoxelGridAlgorithm : NearestNodeAlgorithm {
         return new Vector3Int(i, j, k);
     }
 
-    public Stopwatch voxelsAround = new Stopwatch();
+    //public Stopwatch voxelsAroundSW = new Stopwatch();
 
     //cache
     private Dictionary<Vector3Int, List<Vector3Int>> voxels_to_voxelsAround = new Dictionary<Vector3Int, List<Vector3Int>>();
     private List<Vector3Int> VoxelsAroundVoxel(Vector3Int voxel) {
-        voxelsAround.Start();
+        //voxelsAroundSW.Start();
         List<Vector3Int> result = new List<Vector3Int>();
 
         if (voxels_to_voxelsAround.ContainsKey(voxel)) {
@@ -145,25 +167,25 @@ public class VoxelGridAlgorithm : NearestNodeAlgorithm {
 
             voxels_to_voxelsAround[voxel] = result;
         }
-        voxelsAround.Stop();
+        //voxelsAroundSW.Stop();
 
         return result;
     }
 
-    public Stopwatch nodesAround = new Stopwatch();
+    //public Stopwatch nodesAroundSW = new Stopwatch();
 
     //cache, needs to be reset in every iteration though because then new nodes are present in the tree,
     // .. the latter is done in the Add() method
     private Dictionary<Vector3Int, List<Node>> voxels_to_nodesAround = new Dictionary<Vector3Int, List<Node>>();
     private List<Node> NodesAroundVoxel(Vector3Int voxel) {
-        List<Vector3Int> voxelsAroundVoxel = VoxelsAroundVoxel(voxel);
-
-        nodesAround.Start();
+        //nodesAroundSW.Start();
         List<Node> result = new List<Node>();
 
         if (voxels_to_nodesAround.ContainsKey(voxel)) {
             result = voxels_to_nodesAround[voxel];
         } else {
+            List<Vector3Int> voxelsAroundVoxel = VoxelsAroundVoxel(voxel);
+
             foreach (Vector3Int v in voxelsAroundVoxel) {
                 foreach (Node n in voxelGrid[v.x, v.y, v.z]) {
                     result.Add(n);
@@ -173,7 +195,7 @@ public class VoxelGridAlgorithm : NearestNodeAlgorithm {
             voxels_to_nodesAround[voxel] = result;
         }
 
-        nodesAround.Stop();
+        //nodesAroundSW.Stop();
 
         return result;
     }

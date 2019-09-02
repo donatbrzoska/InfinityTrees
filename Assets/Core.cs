@@ -123,8 +123,8 @@ public class Core : MonoBehaviour, GrowerListener {
         growthProperties.GnarlyBranches_max_dc_max = 1.25f;
         growthProperties.GnarlyBranches_min_di = 0.5f;
         growthProperties.GnarlyBranches_max_di = 1.3f;
+        growthProperties.GnarlyBranches_min_pointCloudDensity = 12;
         growthProperties.GnarlyBranches_max_pointCloudDensity = 30;
-        growthProperties.GnarlyBranches_max_pointCloudDensity = 15;
         growthProperties.GnarlyBranchesRatio = 0.625f;
 
         grower = new SpaceColonization(growthProperties, this);
