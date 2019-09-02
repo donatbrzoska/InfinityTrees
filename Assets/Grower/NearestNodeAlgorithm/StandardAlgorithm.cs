@@ -28,7 +28,7 @@ public class StandardAlgorithm : NearestNodeAlgorithm {
 
             float distance = Vector3.Distance(current.GetPosition(), attractionPoint);
 
-            if (distance < currentSmallestDistance) { //check if the distance is smaller than required
+            if (distance <= currentSmallestDistance) { //check if the distance is smaller than required
                 if (AttractionPointInPerceptionAngle(current, attractionPoint)) { //angle calculation is a lot slower than one distance calculation
                     currentSmallestDistance = distance;
                     closest = current;

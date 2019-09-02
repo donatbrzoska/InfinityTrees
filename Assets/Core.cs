@@ -69,8 +69,8 @@ public class Core : MonoBehaviour, GrowerListener {
         //LoadMediumBigGrowth();
         //LoadDefaultGeometry();
 
-        //LoadBigGrowth();
-        //LoadBigGrowthGeometry();
+        LoadBigGrowth();
+        LoadBigGrowthGeometry();
 
         //LoadExactLimitedGrowth();
         //LoadExactLimitedGeometry();
@@ -97,7 +97,7 @@ public class Core : MonoBehaviour, GrowerListener {
     }
 
     void LoadDefaultGrowth() {
-        PseudoEllipsoid attractionPoints = new PseudoEllipsoid(new Vector3(0, 0f, 0), 3, 5, 3.5f, 15, 0.15f, 0.05f);
+        PseudoEllipsoid attractionPoints = new PseudoEllipsoid(new Vector3(0, 0f, 0), 3, 5, 3.5f, 30, 0.15f, 0.05f);
 
 
         GrowthProperties growthProperties = new GrowthProperties();
@@ -117,16 +117,15 @@ public class Core : MonoBehaviour, GrowerListener {
         growthProperties.SetIterations(30);
 
 
-        growthProperties.Gnarlyness_dc_min_min = 0.05f;
-        growthProperties.Gnarlyness_dc_min_max = 0.4125f;
-        growthProperties.Gnarlyness_dc_max_min = 0.1f;
-        growthProperties.Gnarlyness_dc_max_max = 1.25f;
-        growthProperties.Gnarlyness_di_min = 0.5f;
-        growthProperties.Gnarlyness_di_max = 1.3f;
-        //growthProperties.Gnarlyness_pointCloudDensity_min = 11;
-        growthProperties.Gnarlyness_pointCloudDensity_min = 30;
-        growthProperties.Gnarlyness_pointCloudDensity_max = 30;
-        growthProperties.Gnarlyness = 1f;
+        growthProperties.GnarlyBranches_min_dc_min = 0.05f;
+        growthProperties.GnarlyBranches_min_dc_max = 0.4125f;
+        growthProperties.GnarlyBranches_max_dc_min = 0.1f;
+        growthProperties.GnarlyBranches_max_dc_max = 1.25f;
+        growthProperties.GnarlyBranches_min_di = 0.5f;
+        growthProperties.GnarlyBranches_max_di = 1.3f;
+        growthProperties.GnarlyBranches_max_pointCloudDensity = 30;
+        growthProperties.GnarlyBranches_max_pointCloudDensity = 15;
+        growthProperties.GnarlyBranchesRatio = 0.625f;
 
         grower = new SpaceColonization(growthProperties, this);
     }
@@ -191,7 +190,7 @@ public class Core : MonoBehaviour, GrowerListener {
     }
 
     void LoadExcurrentGrowth() {
-        grower.GetGrowthProperties().SetAttractionPoints(new PseudoEllipsoid(new Vector3(0, 0f, 0), 3, 10, 3.2f, 15, 0.5f, 0));
+        grower.GetGrowthProperties().SetAttractionPoints(new PseudoEllipsoid(new Vector3(0, 0f, 0), 3, 10, 3.2f, 30, 0.5f, 0));
 
         grower.GetGrowthProperties().SetBranchDensityBegin(0.3f);
         grower.GetGrowthProperties().StemLength = 1f;
@@ -205,7 +204,7 @@ public class Core : MonoBehaviour, GrowerListener {
 
 
     void LoadBushGrowth() {
-        grower.GetGrowthProperties().SetAttractionPoints(new PseudoEllipsoid(new Vector3(0, 0f, 0), 7, 4, 7f, 15, 0.15f, 0.05f));
+        grower.GetGrowthProperties().SetAttractionPoints(new PseudoEllipsoid(new Vector3(0, 0f, 0), 7, 4, 7f, 30, 0.15f, 0.05f));
 
         grower.GetGrowthProperties().SetBranchDensityBegin(0.2f);
         grower.GetGrowthProperties().StemLength = 0f;
@@ -221,7 +220,7 @@ public class Core : MonoBehaviour, GrowerListener {
     void LoadPseudoPoplarGrowth() {
         GrowthProperties growthProperties = grower.GetGrowthProperties();
 
-        growthProperties.SetAttractionPoints(new PseudoEllipsoid(new Vector3(0, 0f, 0), 2.1f, 7, 1.9f, 15, 0.15f, 0.05f));
+        growthProperties.SetAttractionPoints(new PseudoEllipsoid(new Vector3(0, 0f, 0), 2.1f, 7, 1.9f, 30, 0.15f, 0.05f));
 
         growthProperties.SetBranchDensityBegin(0.6f);
         growthProperties.StemLength = 1;
@@ -232,7 +231,7 @@ public class Core : MonoBehaviour, GrowerListener {
     void LoadMediumBigGrowth() {
         GrowthProperties growthProperties = grower.GetGrowthProperties();
 
-        growthProperties.SetAttractionPoints(new PseudoEllipsoid(new Vector3(0, 0f, 0), 10, 10, 10, 15, 0.15f, 0.05f));
+        growthProperties.SetAttractionPoints(new PseudoEllipsoid(new Vector3(0, 0f, 0), 10, 10, 10, 30, 0.15f, 0.05f));
 
         growthProperties.SetIterations(35);
     }
@@ -240,6 +239,7 @@ public class Core : MonoBehaviour, GrowerListener {
     void LoadBigGrowth() {
         GrowthProperties growthProperties = grower.GetGrowthProperties();
 
+        growthProperties.GnarlyBranchesRatio = 0.625f;
         growthProperties.SetAttractionPoints(new PseudoEllipsoid(new Vector3(0, 0f, 0), 10, 10, 10, 15, 0.15f, 0.05f));
         debug(growthProperties.GetAttractionPoints().Count + " attraction points");
 
@@ -255,7 +255,7 @@ public class Core : MonoBehaviour, GrowerListener {
     void LoadExactLimitedGrowth() {
         GrowthProperties growthProperties = grower.GetGrowthProperties();
 
-        growthProperties.SetAttractionPoints(new PseudoEllipsoid(new Vector3(0, 0f, 0), 6, 6, 6, 15, 0.15f, 0.05f));
+        growthProperties.SetAttractionPoints(new PseudoEllipsoid(new Vector3(0, 0f, 0), 6, 6, 6, 30, 0.15f, 0.05f));
 
         growthProperties.StemLength = 0;
         growthProperties.SetIterations(45);
@@ -272,7 +272,7 @@ public class Core : MonoBehaviour, GrowerListener {
     void LoadBitLimitedGrowth() {
         GrowthProperties growthProperties = grower.GetGrowthProperties();
 
-        growthProperties.SetAttractionPoints(new PseudoEllipsoid(new Vector3(0, 0f, 0), 5, 4, 4, 15, 0.15f, 0.05f));
+        growthProperties.SetAttractionPoints(new PseudoEllipsoid(new Vector3(0, 0f, 0), 5, 4, 4, 30, 0.15f, 0.05f));
 
         growthProperties.StemLength = 0;
         growthProperties.SetIterations(33);
@@ -286,7 +286,7 @@ public class Core : MonoBehaviour, GrowerListener {
     void LoadExtremeLimitedGrowth() {
         GrowthProperties growthProperties = grower.GetGrowthProperties();
 
-        growthProperties.SetAttractionPoints(new PseudoEllipsoid(new Vector3(0, 0f, 0), 3, 4, 3f, 15, 0.15f, 0.05f));
+        growthProperties.SetAttractionPoints(new PseudoEllipsoid(new Vector3(0, 0f, 0), 3, 4, 3f, 30, 0.15f, 0.05f));
 
         growthProperties.StemLength = 0;
         growthProperties.SetIterations(50);
@@ -304,7 +304,7 @@ public class Core : MonoBehaviour, GrowerListener {
     void LoadBaobabGrowth() {
         GrowthProperties growthProperties = grower.GetGrowthProperties();
 
-        growthProperties.SetAttractionPoints(new PseudoEllipsoid(new Vector3(0, 0f, 0), 5, 3, 5, 15, 0.5f, 0.0f));
+        growthProperties.SetAttractionPoints(new PseudoEllipsoid(new Vector3(0, 0f, 0), 5, 3, 5, 30, 0.5f, 0.0f));
 
         growthProperties.StemLength = 6;
     }
@@ -368,7 +368,7 @@ public class Core : MonoBehaviour, GrowerListener {
         GameObject.Find("Branch Density Begin Slider").GetComponent<Slider>().SetValueWithoutNotify(grower.GetGrowthProperties().GetBranchDensityBegin());
         GameObject.Find("Branch Density End Slider").GetComponent<Slider>().SetValueWithoutNotify(grower.GetGrowthProperties().GetBranchDensityEnd());
 
-        GameObject.Find("Gnarly Branches Slider").GetComponent<Slider>().SetValueWithoutNotify(grower.GetGrowthProperties().Gnarlyness);
+        GameObject.Find("Gnarly Branches Slider").GetComponent<Slider>().SetValueWithoutNotify(grower.GetGrowthProperties().GnarlyBranchesRatio);
 
         //GameObject.Find("Grow Towards Light Slider").GetComponent<Slider>().SetValueWithoutNotify(growthProperties.UpTropismWeightRatio);
 
@@ -772,7 +772,7 @@ public class Core : MonoBehaviour, GrowerListener {
     public void OnGnarlyBranches(float value) {
         grower.Stop();
 
-        grower.GetGrowthProperties().Gnarlyness = value;
+        grower.GetGrowthProperties().GnarlyBranchesRatio = value;
 
         tree.Reset();
 

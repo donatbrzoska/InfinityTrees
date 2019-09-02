@@ -36,6 +36,7 @@ public class VoxelGridAlgorithm : NearestNodeAlgorithm {
         this.squaredInfluenceDistance = squaredInfluenceDistance;
         this.perceptionAngle = perceptionAngle;
         this.voxelSize = (float)Math.Sqrt(squaredInfluenceDistance);
+        //this.voxelSize = squaredInfluenceDistance;
 
         //x direction
         n_is = (int)Math.Ceiling(attractionPoints.GetWidth() / voxelSize);
@@ -81,7 +82,7 @@ public class VoxelGridAlgorithm : NearestNodeAlgorithm {
 
         foreach (Node n in candidates) {
             float squaredDistance = Util.SquaredDistance(position, n.GetPosition());
-            if (squaredDistance < closestDistance && squaredDistance < squaredInfluenceDistance) {
+            if (squaredDistance < closestDistance && squaredDistance <= squaredInfluenceDistance) {
                 if (AttractionPointInPerceptionAngle(n, position)) {
                     closest = n;
                     closestDistance = squaredDistance;

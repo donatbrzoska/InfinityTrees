@@ -22,7 +22,7 @@ public class GrowthProperties {
 
     public float GetInfluenceDistance() {
         // more gnarlyness means less influence distance
-        return Gnarlyness_di_min + (1-Gnarlyness) * (Gnarlyness_di_max - Gnarlyness_di_min);
+        return GnarlyBranches_min_di + (1-GnarlyBranchesRatio) * (GnarlyBranches_max_di - GnarlyBranches_min_di);
     }
 
     public float GetSquaredInfluenceDistance() {
@@ -31,23 +31,25 @@ public class GrowthProperties {
 
 
 
-    public float Gnarlyness_di_min { private get; set; } //what is the smallest value for the influence distance
-    public float Gnarlyness_di_max { private get; set; } //what is the biggest value for the influence distance
-    public float Gnarlyness_dc_min_min { private get; set; } //what is the smallest value for the clear distance when the gnarlyness is at its minimum
-    public float Gnarlyness_dc_min_max { private get; set; } //what is the biggest value for the clear distance when the gnarlyness is at its minimum
-    public float Gnarlyness_dc_max_min { private get; set; } //what is the smallest value for the clear distance when the gnarlyness is at its minimum
-    public float Gnarlyness_dc_max_max { private get; set; } //what is the biggest value for the clear distance when the gnarlyness is at its minimum
-    public int Gnarlyness_pointCloudDensity_min { private get; set; }
-    public int Gnarlyness_pointCloudDensity_max { private get; set; }
-    private float gnarlyness;
-    public float Gnarlyness {
+    public float GnarlyBranches_min_di { private get; set; } //what is the smallest value for the influence distance
+    public float GnarlyBranches_max_di { private get; set; } //what is the biggest value for the influence distance
+    public float GnarlyBranches_min_dc_min { private get; set; } //what is the smallest value for the clear distance when the gnarlyness is at its minimum
+    public float GnarlyBranches_min_dc_max { private get; set; } //what is the biggest value for the clear distance when the gnarlyness is at its minimum
+    public float GnarlyBranches_max_dc_min { private get; set; } //what is the smallest value for the clear distance when the gnarlyness is at its minimum
+    public float GnarlyBranches_max_dc_max { private get; set; } //what is the biggest value for the clear distance when the gnarlyness is at its minimum
+    public float GnarlyBranches_min_pointCloudDensity { private get; set; }
+    public float GnarlyBranches_max_pointCloudDensity { private get; set; }
+
+    private float gnarlyBranchesRatio;
+    public float GnarlyBranchesRatio {
         get {
-            return gnarlyness;
+            return gnarlyBranchesRatio;
         }
         set {
-            gnarlyness = value;
-            // more gnarlyness needed more points
-            attractionPoints.UpdateDensity(Gnarlyness_pointCloudDensity_min + value * (Gnarlyness_pointCloudDensity_max - Gnarlyness_pointCloudDensity_min));
+            gnarlyBranchesRatio = value;
+
+            //more gnarlyness needs more attraction points
+            attractionPoints.UpdateDensity(GnarlyBranches_min_pointCloudDensity + value * (GnarlyBranches_max_pointCloudDensity - GnarlyBranches_min_pointCloudDensity));
         }
     } //0..1
 
@@ -117,8 +119,8 @@ public class GrowthProperties {
     public float GetSquaredClearDistance(int iteration) {
         // bigger values for the Gnarlyness make a smaller clear distance
         // .. this is needed because the influence distance also gets smaller
-        float clearDistance_max = Gnarlyness_dc_min_max + (1-Gnarlyness) * (Gnarlyness_dc_max_max - Gnarlyness_dc_min_max);
-        float clearDistance_min = Gnarlyness_dc_min_min + (1-Gnarlyness) * (Gnarlyness_dc_max_min - Gnarlyness_dc_min_min);
+        float clearDistance_max = GnarlyBranches_min_dc_max + (1-GnarlyBranchesRatio) * (GnarlyBranches_max_dc_max - GnarlyBranches_min_dc_max);
+        float clearDistance_min = GnarlyBranches_min_dc_min + (1-GnarlyBranchesRatio) * (GnarlyBranches_max_dc_min - GnarlyBranches_min_dc_min);
 
 
         float squaredClearDistance_max = clearDistance_max * clearDistance_max;
