@@ -21,10 +21,10 @@ public class SpaceColonization {
         }
     }
 
-	NearestNodeAlgorithm nearestNodeAlgorithm;
-	//VoxelGridAlgorithm nearestNodeAlgorithm;
+    NearestNodeAlgorithm nearestNodeAlgorithm;
+    //VoxelGridAlgorithm nearestNodeAlgorithm;
 
-	private float treeHeight;
+    private float treeHeight;
     public float GetTreeHeight() {
         return treeHeight;
     }
@@ -214,7 +214,7 @@ public class SpaceColonization {
             for (int j = 0; j < growthProperties.GetAttractionPoints().Points.Length; j++) {
 
                 Vector3 attractionPoint = growthProperties.GetAttractionPoints().Points[j];
-                if (growthProperties.GetAttractionPoints().Active[j]) {
+                if (growthProperties.GetAttractionPoints().ActivePoints[j]) {
 
                     if (attractionPoint.x < smallest_x - influenceDistance
                         || attractionPoint.x > biggest_x + influenceDistance
@@ -237,7 +237,7 @@ public class SpaceColonization {
                         removeClosePointsStopwatch.Start();
                         if (i > 0) { //in the first iteration, the attraction points shall not get deleted
                             if (Util.SquaredDistance(attractionPoint, closest.GetPosition()) <= squaredClearDistance) {
-                                growthProperties.GetAttractionPoints().Active[j] = false;
+                                growthProperties.GetAttractionPoints().ActivePoints[j] = false;
                                 growthProperties.GetAttractionPoints().ActiveCount--;
                                 removeClosePointsStopwatch.Stop();
                                 continue;

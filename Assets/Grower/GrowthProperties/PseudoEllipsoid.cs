@@ -34,7 +34,7 @@ public sealed class PseudoEllipsoid {
         return biggest_z - smallest_z;
     }
 
-    public bool[] Active { get; private set; }
+    public bool[] ActivePoints { get; private set; }
     public int ActiveCount { get; set; }
     public Vector3[] Points { get; set; }
 
@@ -59,8 +59,8 @@ public sealed class PseudoEllipsoid {
 
     //"copies" all points in backup to the base
     public void Reset() {
-        for (int i=0; i<Active.Length; i++) {
-            Active[i] = true;
+        for (int i=0; i<ActivePoints.Length; i++) {
+            ActivePoints[i] = true;
         }
     }
 
@@ -184,7 +184,7 @@ public sealed class PseudoEllipsoid {
         //3. Calculate the amount of points for the given density
         int n_points = (int)Math.Ceiling(volume * density);
         Points = new Vector3[n_points];
-        Active = new bool[n_points];
+        ActivePoints = new bool[n_points];
 
         //4. Generate n_points attraction points
         while (ActiveCount < n_points) {
@@ -218,7 +218,7 @@ public sealed class PseudoEllipsoid {
                 Vector3 calculatedPoint = point + targetCenter;
                 
                 Points[ActiveCount] = calculatedPoint; //ActiveCount is used as an indexer here
-                Active[ActiveCount] = true;
+                ActivePoints[ActiveCount] = true;
                 ActiveCount++;
 
                 // for Core -> CameraMovement and UpTropismDamping
