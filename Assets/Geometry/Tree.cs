@@ -113,7 +113,7 @@ public class Tree {
         List<int> trianglesTmp = new List<int>();// trianglesTmp.Capacity = 5000;
 
         if (geometryProperties.PendulousBranchesIntensity > 0) {
-            Node copy = StemRoot.GetCopyWithSupernode(null);
+            Node copy = StemRoot.GetDeepCopyWithSupernode(null);
             //Hang(copy, 0);
             //HangByOrder(copy);
             CalculateEverything(copy, nodeVerticesPositions, 0, verticesTmp, uvsTmp, trianglesTmp);
@@ -149,7 +149,7 @@ public class Tree {
         triangles = new List<int>();
 
         if (geometryProperties.PendulousBranchesIntensity > 0) {
-            Node copy = StemRoot.GetCopyWithSupernode(null);
+            Node copy = StemRoot.GetDeepCopyWithSupernode(null);
             Hang(copy, 0);
             CalculateEverything(copy, nodeVerticesPositions, 0, vertices, uvs, triangles);
         } else {

@@ -63,9 +63,7 @@ public class SpaceColonization {
             growingStopwatch.Start();
 
             GrowStem(tree);
-            growerListener.OnIterationFinished();
             GrowCrownStem(tree);
-            growerListener.OnIterationFinished();
             GrowCrown(tree);
 
             growingStopwatch.Stop();
@@ -146,6 +144,7 @@ public class SpaceColonization {
 
         nearestNodeAlgorithm.Add(crownRoot);
         growthProperties.GetAttractionPoints().UpdatePosition(crownRoot.GetPosition());
+        growerListener.OnIterationFinished();
     }
 
 
@@ -180,6 +179,7 @@ public class SpaceColonization {
                 nearestNodeAlgorithm.Add(crownStemTip);
             }
         }
+        growerListener.OnIterationFinished();
     }
 
     private void GrowCrown(Tree tree) {

@@ -95,7 +95,7 @@ public class Node : IEquatable<Node> {
         this.leaves = leaves;
     }
     //used for deep copy
-    public Node GetCopyWithSupernode(Node supernode) {
+    public Node GetDeepCopyWithSupernode(Node supernode) {
         Node copy = new Node(supernode);
         copy.SetPosition(position);
         //copy.Order = Order;
@@ -105,7 +105,7 @@ public class Node : IEquatable<Node> {
 
         List<Node> subnodes_ = new List<Node>();
         for (int i=0; i<subnodes.Count; i++) {
-            subnodes_.Add(subnodes[i].GetCopyWithSupernode(copy));
+            subnodes_.Add(subnodes[i].GetDeepCopyWithSupernode(copy));
         }
         copy.SetSubnodes(subnodes_);
         

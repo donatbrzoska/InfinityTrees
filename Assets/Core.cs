@@ -580,7 +580,7 @@ public class Core : MonoBehaviour, GrowerListener {
     }
 
     public float GetLookAtTop() {
-        return grower.GetGrowthProperties().GetAttractionPoints().GetHighestPoint();
+        return grower.GetGrowthProperties().GetAttractionPoints().GetHighestPoint() + grower.GetGrowthProperties().StemLength;
     }
 
     public float GetDistanceToAttractionPoints() {
@@ -627,6 +627,9 @@ public class Core : MonoBehaviour, GrowerListener {
 
         // NOT PRETTY
         tree.GetGeometryProperties().PendulousBranchesBeginDepthMax = CalculateBranchOrientationBeginDepthMax(grower.GetGrowthProperties().GetIterations());
+        //tree.GetGeometryProperties().PendulousBranchesBeginDepthRatio = tree.GetGeometryProperties().PrecisePendulousBranchesBeginDepth / (tree.GetGeometryProperties().PendulousBranchesBeginDepthMax - tree.GetGeometryProperties().PendulousBranchesBeginDepthMin);
+        //InitializeUI();
+
 
         grower.RegrowStem(tree);
         pointCloudReady = true;
@@ -959,7 +962,7 @@ public class Core : MonoBehaviour, GrowerListener {
 
     private int CalculateBranchOrientationBeginDepthMax(int iterations) {
         return (int)Math.Ceiling(grower.GetGrowthProperties().StemLength / grower.GetGrowthProperties().GetGrowthDistance())
-                                                                + iterations;
+                                                                + iterations-1;
     }
 
     public void OnIterations(int value) {
@@ -972,6 +975,7 @@ public class Core : MonoBehaviour, GrowerListener {
 
         // NOT PRETTY
         tree.GetGeometryProperties().PendulousBranchesBeginDepthMax = CalculateBranchOrientationBeginDepthMax(grower.GetGrowthProperties().GetIterations());
+        InitializeUI();
 
         tree.Reset();
 

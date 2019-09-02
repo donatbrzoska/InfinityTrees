@@ -76,7 +76,6 @@ public class BasicsController : MonoBehaviour {
     }
 
     public void OnValueChanged_Length() {
-        modifyingPointCloudParameter = true;
         float value = GetComponent<Slider>().value;
         GameObject.Find("Core").GetComponent<Core>().OnLength(value);
     }

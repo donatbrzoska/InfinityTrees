@@ -232,3 +232,12 @@ generate_for_parameters(texture_type_list,
                         leaf_color_name_list,
                         leaf_size_list)
 
+#generate_for_parameters(texture_type_list,
+#                        low_quality,
+#                        stem_color_list,
+#                        stem_color_name_list,
+#                        leaf_color_list,
+#                        leaf_color_name_list,
+#                        leaf_size_list)
+
+print()
