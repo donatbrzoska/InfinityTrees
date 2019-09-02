@@ -50,8 +50,8 @@ public class Core : MonoBehaviour, GrowerListener {
         //LoadYoungGeometry();
 
         //9152, 8334 || 4352, 5934
-        LoadExcurrentGrowth();
-        LoadExcurrentGeometry();
+        //LoadExcurrentGrowth();
+        //LoadExcurrentGeometry();
 
         //7024, 6514 || 3392, 4698
         //4896, 5450 || 3392, 4698 //0.1 displayed leaves per node
@@ -587,10 +587,30 @@ public class Core : MonoBehaviour, GrowerListener {
         if (cameraMode == CameraMode.Tree) { //normal case
             return -1;
         } else { //case when attraction points are beeing modified
-            return grower.GetGrowthProperties().GetAttractionPoints().GetHeight() / 4
-                + grower.GetGrowthProperties().GetAttractionPoints().GetDepth() / 4
-                + grower.GetGrowthProperties().GetAttractionPoints().GetWidth() / 4
-                + grower.GetGrowthProperties().StemLength / 4;
+                 //float distance = grower.GetGrowthProperties().GetAttractionPoints().GetHeight() / 4
+                 //    + grower.GetGrowthProperties().GetAttractionPoints().GetDepth() / 4
+                 //    + grower.GetGrowthProperties().GetAttractionPoints().GetWidth() / 4
+                 //    + grower.GetGrowthProperties().StemLength / 4;
+
+            //float distance = Math.Max(grower.GetGrowthProperties().GetAttractionPoints().GetHeight(), Math.Max(grower.GetGrowthProperties().GetAttractionPoints().GetDepth(), grower.GetGrowthProperties().GetAttractionPoints().GetWidth())) / 2
+            //    + grower.GetGrowthProperties().StemLength / 2;
+
+
+
+
+
+
+            //fraction these value by some bigger factor when big and less when small?
+            float h = grower.GetGrowthProperties().GetAttractionPoints().GetHeight() + grower.GetGrowthProperties().StemLength;
+            float w = Math.Max(grower.GetGrowthProperties().GetAttractionPoints().GetDepth(), grower.GetGrowthProperties().GetAttractionPoints().GetWidth());
+
+            float distance = 4 + Math.Max(h / 5.5f, w / 5.5f);
+
+            //float minDistance = 5;
+            //float distance = Math.Max(minDistance, +Math.Max(h / 3, w / 3));
+
+
+            return distance;
         }
     }
 
