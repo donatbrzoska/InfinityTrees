@@ -68,21 +68,6 @@ public class VoxelGridAlgorithm : NearestNodeAlgorithm {
         voxelGrid[gridPos.x, gridPos.y, gridPos.z].Add(node);
 
         voxels_to_nodesAround.Clear();
-
-        ActivateVoxelsAround(gridPos);
-    }
-
-    private HashSet<Vector3Int> activeVoxels = new HashSet<Vector3Int>(); //contains all voxels that have been activated
-    private HashSet<Vector3Int> activeVoxelsAround = new HashSet<Vector3Int>(); //contains all voxels, that have been put into this function
-    public void ActivateVoxelsAround(Vector3Int voxel) {
-        if (!activeVoxelsAround.Contains(voxel)) {
-            List<Vector3Int> voxelsAround = VoxelsAroundVoxel(voxel);
-            foreach (Vector3Int voxelAround in voxelsAround) {
-                activeVoxels.Add(voxelAround);
-            }
-
-            activeVoxelsAround.Add(voxel);
-        }
     }
 
 
@@ -91,23 +76,19 @@ public class VoxelGridAlgorithm : NearestNodeAlgorithm {
 
         Vector3Int gridPosition = PositionToGridPosition(position);
 
-        // all voxels that are near a voxel that has nodes get activated in the Add() method
-        if (activeVoxels.Contains(gridPosition)) {
+        List<Node> candidates = NodesAroundVoxel(gridPosition);
+        //if (candidates.Count > 0) {
+        //    debug("n candidates: " + candidates.Count);
+        //}
 
-            List<Node> candidates = NodesAroundVoxel(gridPosition);
-            //if (candidates.Count > 0) {
-            //    debug("n candidates: " + candidates.Count);
-            //}
+        float closestDistance = float.MaxValue;
 
-            float closestDistance = float.MaxValue;
-
-            foreach (Node n in candidates) {
-                float squaredDistance = Util.SquaredDistance(position, n.GetPosition());
-                if (squaredDistance < closestDistance && squaredDistance <= squaredInfluenceDistance) {
-                    if (AttractionPointInPerceptionAngle(n, position)) {
-                        closest = n;
-                        closestDistance = squaredDistance;
-                    }
+        foreach (Node n in candidates) {
+            float squaredDistance = Util.SquaredDistance(position, n.GetPosition());
+            if (squaredDistance < closestDistance && squaredDistance <= squaredInfluenceDistance) {
+                if (AttractionPointInPerceptionAngle(n, position)) {
+                    closest = n;
+                    closestDistance = squaredDistance;
                 }
             }
         }

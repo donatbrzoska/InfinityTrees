@@ -185,12 +185,12 @@ public class SpaceColonization {
 
 
     private void GrowCrown(Tree tree) {
-        //float smallest_x = crownRoot.GetPosition().x;
-        //float biggest_x = crownRoot.GetPosition().x;
-        //float smallest_y = crownRoot.GetPosition().y;
-        //float biggest_y = crownRoot.GetPosition().y;
-        //float smallest_z = crownRoot.GetPosition().z;
-        //float biggest_z = crownRoot.GetPosition().z;
+        float smallest_x = crownRoot.GetPosition().x;
+        float biggest_x = crownRoot.GetPosition().x;
+        float smallest_y = crownRoot.GetPosition().y;
+        float biggest_y = crownRoot.GetPosition().y;
+        float smallest_z = crownRoot.GetPosition().z;
+        float biggest_z = crownRoot.GetPosition().z;
 
         treeHeight = 0;
 
@@ -204,7 +204,7 @@ public class SpaceColonization {
                 return;
             }
 
-            //float influenceDistnace = growthProperties.GetInfluenceDistance();
+            float influenceDistance = growthProperties.GetInfluenceDistance();
             float squaredClearDistance = growthProperties.GetSquaredClearDistance(i);
 
             Dictionary<Node, List<Vector3>> nodes_to_attractionPoints = new Dictionary<Node, List<Vector3>>();
@@ -216,15 +216,15 @@ public class SpaceColonization {
                 Vector3 attractionPoint = growthProperties.GetAttractionPoints().Points[j];
                 if (growthProperties.GetAttractionPoints().Active[j]) {
 
-                    //if (attractionPoint.x<smallest_x - influenceDistance
-                    //    || attractionPoint.x> biggest_x + influenceDistance
-                    //    || attractionPoint.y<smallest_y - influenceDistance
-                    //    || attractionPoint.y> biggest_y + influenceDistance
-                    //    || attractionPoint.z<smallest_z - influenceDistance
-                    //    || attractionPoint.z> biggest_z + influenceDistance
-                    //    ) {
-                    //    continue;
-                    //}
+                    if (attractionPoint.x < smallest_x - influenceDistance
+                        || attractionPoint.x > biggest_x + influenceDistance
+                        || attractionPoint.y < smallest_y - influenceDistance
+                        || attractionPoint.y > biggest_y + influenceDistance
+                        || attractionPoint.z < smallest_z - influenceDistance
+                        || attractionPoint.z > biggest_z + influenceDistance
+                        ) {
+                        continue;
+                    }
 
                     //and find the closest Node respectively
                     findClosePointStopwatch.Start();
@@ -333,24 +333,24 @@ public class SpaceColonization {
                     if (treeHeight < happyNodePosition.y) {
                         treeHeight = happyNodePosition.y;
                     }
-                    //    if (happyNodePosition.x<smallest_x) {
-                    //        smallest_x = happyNodePosition.x;
-                    //    }
-                    //    if (happyNodePosition.x > biggest_x) {
-                    //        biggest_x = happyNodePosition.x;
-                    //    }
-                    //    if (happyNodePosition.y<smallest_y) {
-                    //        smallest_y = happyNodePosition.y;
-                    //    }
-                    //    if (happyNodePosition.y > biggest_y) {
-                    //        biggest_y = happyNodePosition.y;
-                    //    }
-                    //    if (happyNodePosition.z<smallest_z) {
-                    //        smallest_z = happyNodePosition.z;
-                    //    }
-                    //    if (happyNodePosition.z > biggest_z) {
-                    //        biggest_z = happyNodePosition.z;
-                    //    }
+                    if (happyNodePosition.x < smallest_x) {
+                        smallest_x = happyNodePosition.x;
+                    }
+                    if (happyNodePosition.x > biggest_x) {
+                        biggest_x = happyNodePosition.x;
+                    }
+                    if (happyNodePosition.y < smallest_y) {
+                        smallest_y = happyNodePosition.y;
+                    }
+                    if (happyNodePosition.y > biggest_y) {
+                        biggest_y = happyNodePosition.y;
+                    }
+                    if (happyNodePosition.z < smallest_z) {
+                        smallest_z = happyNodePosition.z;
+                    }
+                    if (happyNodePosition.z > biggest_z) {
+                        biggest_z = happyNodePosition.z;
+                    }
                 }
             }
 

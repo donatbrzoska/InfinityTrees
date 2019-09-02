@@ -69,8 +69,8 @@ public class Core : MonoBehaviour, GrowerListener {
         //LoadMediumBigGrowth();
         //LoadDefaultGeometry();
 
-        LoadBigGrowth();
-        LoadBigGrowthGeometry();
+        //LoadBigGrowth();
+        //LoadBigGrowthGeometry();
 
         //LoadExactLimitedGrowth();
         //LoadExactLimitedGeometry();
