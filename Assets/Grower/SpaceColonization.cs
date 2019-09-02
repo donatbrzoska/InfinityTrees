@@ -237,7 +237,6 @@ public class SpaceColonization {
                         removeClosePointsStopwatch.Start();
                         if (i > 0) { //in the first iteration, the attraction points shall not get deleted
                             if (Util.SquaredDistance(attractionPoint, closest.GetPosition()) <= squaredClearDistance) {
-                                //j--;
                                 growthProperties.GetAttractionPoints().Active[j] = false;
                                 growthProperties.GetAttractionPoints().ActiveCount--;
                                 removeClosePointsStopwatch.Stop();
