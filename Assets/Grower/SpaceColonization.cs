@@ -214,42 +214,45 @@ public class SpaceColonization {
             for (int j = 0; j < growthProperties.GetAttractionPoints().Count; j++) {
 
                 Vector3 attractionPoint = growthProperties.GetAttractionPoints()[j];
+                if (growthProperties.GetAttractionPoints().Active[j]) {
 
-                //if (attractionPoint.x<smallest_x - influenceDistance
-                //    || attractionPoint.x> biggest_x + influenceDistance
-                //    || attractionPoint.y<smallest_y - influenceDistance
-                //    || attractionPoint.y> biggest_y + influenceDistance
-                //    || attractionPoint.z<smallest_z - influenceDistance
-                //    || attractionPoint.z> biggest_z + influenceDistance
-                //    ) {
-                //    continue;
-                //}
+                    //if (attractionPoint.x<smallest_x - influenceDistance
+                    //    || attractionPoint.x> biggest_x + influenceDistance
+                    //    || attractionPoint.y<smallest_y - influenceDistance
+                    //    || attractionPoint.y> biggest_y + influenceDistance
+                    //    || attractionPoint.z<smallest_z - influenceDistance
+                    //    || attractionPoint.z> biggest_z + influenceDistance
+                    //    ) {
+                    //    continue;
+                    //}
 
-                //and find the closest Node respectively
-                findClosePointStopwatch.Start();
-                Node closest = nearestNodeAlgorithm.GetNearestWithinSquaredDistance(attractionPoint);
-                findClosePointStopwatch.Stop();
+                    //and find the closest Node respectively
+                    findClosePointStopwatch.Start();
+                    Node closest = nearestNodeAlgorithm.GetNearestWithinSquaredDistance(attractionPoint);
+                    findClosePointStopwatch.Stop();
 
-                //if there is a close Node
-                if (closest != null) {
-                    // Rudis ultimate plan to make the removal in the next iteration
-                    removeClosePointsStopwatch.Start();
-                    if (i > 0) { //in the first iteration, the attraction points shall not get deleted
-                        if (Util.SquaredDistance(attractionPoint, closest.GetPosition()) <= squaredClearDistance) {
-                            j--;
-                            growthProperties.GetAttractionPoints().Remove(attractionPoint);
-                            removeClosePointsStopwatch.Stop();
-                            continue;
-                        } else {
-                            removeClosePointsStopwatch.Stop();
+                    //if there is a close Node
+                    if (closest != null) {
+                        // Rudis ultimate plan to make the removal in the next iteration
+                        removeClosePointsStopwatch.Start();
+                        if (i > 0) { //in the first iteration, the attraction points shall not get deleted
+                            if (Util.SquaredDistance(attractionPoint, closest.GetPosition()) <= squaredClearDistance) {
+                                //j--;
+                                growthProperties.GetAttractionPoints().Active[j] = false;
+                                growthProperties.GetAttractionPoints().ActiveCount--;
+                                removeClosePointsStopwatch.Stop();
+                                continue;
+                            } else {
+                                removeClosePointsStopwatch.Stop();
+                            }
                         }
-                    }
 
-                    //add it to the nodesAttractionPoints
-                    if (nodes_to_attractionPoints.ContainsKey(closest)) {
-                        nodes_to_attractionPoints[closest].Add(attractionPoint);
-                    } else {
-                        nodes_to_attractionPoints[closest] = new List<Vector3> { attractionPoint };
+                        //add it to the nodesAttractionPoints
+                        if (nodes_to_attractionPoints.ContainsKey(closest)) {
+                            nodes_to_attractionPoints[closest].Add(attractionPoint);
+                        } else {
+                            nodes_to_attractionPoints[closest] = new List<Vector3> { attractionPoint };
+                        }
                     }
                 }
 

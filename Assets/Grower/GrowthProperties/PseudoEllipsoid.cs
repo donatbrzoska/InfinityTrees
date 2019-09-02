@@ -34,19 +34,8 @@ public sealed class PseudoEllipsoid : List<Vector3> {
         return biggest_z - smallest_z;
     }
 
-    private object backupLock = new object();
-    //backup points, so the tree can be regrown with any amount of iterations
-    private List<Vector3> backup;
-    public List<Vector3> Backup {
-        get {
-            lock (backupLock) { //corresponding one in the Generate() method
-                return backup;
-            }
-        }
-        private set {
-            backup = value;
-        }
-    }
+    public List<bool> Active { get; private set; }
+    public int ActiveCount { get; set; }
 
     public int Seed { private set; get; }
     private System.Random random;
@@ -68,9 +57,8 @@ public sealed class PseudoEllipsoid : List<Vector3> {
 
     //"copies" all points in backup to the base
     public void Reset() {
-        base.Clear();
-        foreach (Vector3 p in Backup) {
-            base.Add(p);
+        for (int i=0; i<Active.Count; i++) {
+            Active[i] = true;
         }
     }
 
@@ -117,7 +105,7 @@ public sealed class PseudoEllipsoid : List<Vector3> {
         this.cutoffRatio_bottom = cutoffRatio_bottom;
         this.cutoffRatio_top = cutoffRatio_top;
 
-        Generate();
+        Initialize();
     }
 
     //density says: how many points per 1x1x1 voxel
@@ -134,7 +122,7 @@ public sealed class PseudoEllipsoid : List<Vector3> {
         this.cutoffRatio_bottom = cutoffRatio_bottom;
         this.cutoffRatio_top = cutoffRatio_top;
 
-        Generate();
+        Initialize();
     }
 
     //density says: how many points per 1x1x1 voxel
@@ -142,7 +130,6 @@ public sealed class PseudoEllipsoid : List<Vector3> {
         //seed = (int)(new System.Random()).NextDouble() * 65335;
         Seed = seed;// (int)Util.RandomInRange(0, 65335); //when deleting this seed, also hand the old seed over at LoadGnarlyBranches!
         random = new System.Random(Seed);
-
         this.Position = position;
         this.radius_x = radius_x;
         this.radius_y = radius_y;
@@ -151,106 +138,110 @@ public sealed class PseudoEllipsoid : List<Vector3> {
         this.cutoffRatio_bottom = cutoffRatio_bottom;
         this.cutoffRatio_top = cutoffRatio_top;
 
+        Initialize();
+    }
+
+    private void Initialize() {
+        Active = new List<bool>();
         Generate();
     }
 
     private void Generate() {
-        lock (backupLock) { //points have to be added in one atomic step, otherwise the reference to continiously modified backup causes problems in the PointCloudRenderer
+        base.Clear();
+        Active.Clear();
+        ActiveCount = 0;
 
-            base.Clear();
-            Backup = new List<Vector3>();//.Clear();
-            smallest_x = float.MaxValue;
-            biggest_x = float.MinValue;
-            smallest_y = float.MaxValue;
-            biggest_y = float.MinValue;
-            smallest_z = float.MaxValue;
-            biggest_z = float.MinValue;
+        smallest_x = float.MaxValue;
+        biggest_x = float.MinValue;
+        smallest_y = float.MaxValue;
+        biggest_y = float.MinValue;
+        smallest_z = float.MaxValue;
+        biggest_z = float.MinValue;
 
-            center = new Vector3(0, 0, 0);
-            //Center = new Vector3(0, 0, 0);
+        center = new Vector3(0, 0, 0);
+        //Center = new Vector3(0, 0, 0);
 
-            //1. Calculate volume of sphere layer with radius 1
-            float radius = 1f;
+        //1. Calculate volume of sphere layer with radius 1
+        float radius = 1f;
 
-            float cutoffThreshhold_top = 2f * radius * cutoffRatio_top;
-            float h_top = radius - cutoffThreshhold_top;
-            float roh_squared_top = radius * radius - h_top * h_top;
+        float cutoffThreshhold_top = 2f * radius * cutoffRatio_top;
+        float h_top = radius - cutoffThreshhold_top;
+        float roh_squared_top = radius * radius - h_top * h_top;
 
-            float cutoffThreshhold_bottom = 2f * radius * cutoffRatio_bottom;
-            float h_bottom = radius - cutoffThreshhold_bottom;
-            float roh_squared_bottom = radius * radius - h_bottom * h_bottom;
+        float cutoffThreshhold_bottom = 2f * radius * cutoffRatio_bottom;
+        float h_bottom = radius - cutoffThreshhold_bottom;
+        float roh_squared_bottom = radius * radius - h_bottom * h_bottom;
 
-            float h = h_top + h_bottom;
+        float h = h_top + h_bottom;
 
-            float volume = (float)(Math.PI * h / 6f) * (3f * roh_squared_top + 3f * roh_squared_bottom + h * h);
+        float volume = (float)(Math.PI * h / 6f) * (3f * roh_squared_top + 3f * roh_squared_bottom + h * h);
 
-            //2. Calculate volume of sphere cut with given radii
-            //generate transformation matrix
-            Matrix4x4 transformation = Matrix4x4.Scale(new Vector3(radius_x, radius_y, radius_z));
-            //determine the volume of the target ellipsoid
-            volume = volume * transformation.determinant; //https://youtu.be/Ip3X9LOh2dk?list=PLZHQObOWTQDPD3MizzM2xVFitgF8hE_ab
+        //2. Calculate volume of sphere cut with given radii
+        //generate transformation matrix
+        Matrix4x4 transformation = Matrix4x4.Scale(new Vector3(radius_x, radius_y, radius_z));
+        //determine the volume of the target ellipsoid
+        volume = volume * transformation.determinant; //https://youtu.be/Ip3X9LOh2dk?list=PLZHQObOWTQDPD3MizzM2xVFitgF8hE_ab
 
-            //3. Calculate the amount of points for the given density
-            int n_points = (int)Math.Ceiling(volume * density);
+        //3. Calculate the amount of points for the given density
+        int n_points = (int)Math.Ceiling(volume * density);
 
-            //4. Generate n_points attraction points
-            while (base.Count < n_points) {
-                //4.1 generate points within the sphere with radius 1
-                float y = RandomInRange(-1, 1);
-                if ((y < 0 - radius + cutoffThreshhold_bottom) | y > 0 + radius - cutoffThreshhold_top) {
-                    continue;
+        //4. Generate n_points attraction points
+        while (base.Count < n_points) {
+            //4.1 generate points within the sphere with radius 1
+            float y = RandomInRange(-1, 1);
+            if ((y < 0 - radius + cutoffThreshhold_bottom) | y > 0 + radius - cutoffThreshhold_top) {
+                continue;
+            }
+
+            float x = RandomInRange(-1, 1);
+
+            float z = RandomInRange(-1, 1);
+
+            Vector3 point = new Vector3(x, y, z);
+
+            //float distance = (point - Vector3.zero).magnitude;
+            //if (distance <= radius) {
+            float squaredDistance = Util.SquaredDistance(point, Vector3.zero);
+            if (squaredDistance <= radius) {
+                //float ran = Util.RandomInRange(0, 1);
+                //if (ran < distance*distance) {
+
+                //if (distance <= radius && distance > 0.5f) { //near the envelope test
+                //4.2 Scale the points with the transformation matrix
+                point = transformation.MultiplyVector(point);
+
+                //4.3 Translate the points based on the real cutoff threshhold at the bottom (it is a different one than the one for the sphere with radius 1!)
+                float real_cutoffThreshhold_bottom = 2f * radius_y * cutoffRatio_bottom;
+                Vector3 targetCenter = new Vector3(Position.x, Position.y + radius_y - real_cutoffThreshhold_bottom, Position.z);// Vector3.up*radius + position;
+                                                                                                                                 //Vector3 targetCenter = new Vector3(0, radius_y - real_cutoffThreshhold_bottom, 0);// Vector3.up*radius + position;
+
+                base.Add(point + targetCenter);
+                Active.Add(true);
+                ActiveCount++;
+
+                // for Core -> CameraMovement and UpTropismDamping
+                if (smallest_x > base[base.Count - 1].x) {
+                    smallest_x = base[base.Count - 1].x;
                 }
-
-                float x = RandomInRange(-1, 1);
-
-                float z = RandomInRange(-1, 1);
-
-                Vector3 point = new Vector3(x, y, z);
-
-                //float distance = (point - Vector3.zero).magnitude;
-                //if (distance <= radius) {
-                float squaredDistance = Util.SquaredDistance(point, Vector3.zero);
-                if (squaredDistance <= radius) {
-                    //float ran = Util.RandomInRange(0, 1);
-                    //if (ran < distance*distance) {
-
-                    //if (distance <= radius && distance > 0.5f) { //near the envelope test
-                    //4.2 Scale the points with the transformation matrix
-                    point = transformation.MultiplyVector(point);
-
-                    //4.3 Translate the points based on the real cutoff threshhold at the bottom (it is a different one than the one for the sphere with radius 1!)
-                    float real_cutoffThreshhold_bottom = 2f * radius_y * cutoffRatio_bottom;
-                    Vector3 targetCenter = new Vector3(Position.x, Position.y + radius_y - real_cutoffThreshhold_bottom, Position.z);// Vector3.up*radius + position;
-                                                                                                                                     //Vector3 targetCenter = new Vector3(0, radius_y - real_cutoffThreshhold_bottom, 0);// Vector3.up*radius + position;
-
-                    base.Add(point + targetCenter);
-                    Backup.Add(point + targetCenter);
-
-                    // for Core -> CameraMovement and UpTropismDamping
-                    if (smallest_x > base[base.Count - 1].x) {
-                        smallest_x = base[base.Count - 1].x;
-                    }
-                    if (biggest_x < base[base.Count - 1].x) {
-                        biggest_x = base[base.Count - 1].x;
-                    }
-                    if (smallest_y > base[base.Count - 1].y) {
-                        smallest_y = base[base.Count - 1].y;
-                    }
-                    if (biggest_y < base[base.Count - 1].y) {
-                        biggest_y = base[base.Count - 1].y;
-                    }
-                    if (smallest_z > base[base.Count - 1].z) {
-                        smallest_z = base[base.Count - 1].z;
-                    }
-                    if (biggest_z < base[base.Count - 1].z) {
-                        biggest_z = base[base.Count - 1].z;
-                    }
-                    // for Core -> CameraMovement
-                    if (center.y < base[base.Count - 1].y / 2) {
-                        center.y = base[base.Count - 1].y / 2;
-                    }
+                if (biggest_x < base[base.Count - 1].x) {
+                    biggest_x = base[base.Count - 1].x;
                 }
-                //}
+                if (smallest_y > base[base.Count - 1].y) {
+                    smallest_y = base[base.Count - 1].y;
+                }
+                if (biggest_y < base[base.Count - 1].y) {
+                    biggest_y = base[base.Count - 1].y;
+                }
+                if (smallest_z > base[base.Count - 1].z) {
+                    smallest_z = base[base.Count - 1].z;
+                }
+                if (biggest_z < base[base.Count - 1].z) {
+                    biggest_z = base[base.Count - 1].z;
+                }
+                // for Core -> CameraMovement
+                if (center.y < base[base.Count - 1].y / 2) {
+                    center.y = base[base.Count - 1].y / 2;
+                }
             }
         }
     }

@@ -69,8 +69,8 @@ public class Core : MonoBehaviour, GrowerListener {
         //LoadMediumBigGrowth();
         //LoadDefaultGeometry();
 
-        LoadBigGrowth();
-        LoadBigGrowthGeometry();
+        //LoadBigGrowth();
+        //LoadBigGrowthGeometry();
 
         //LoadExactLimitedGrowth();
         //LoadExactLimitedGeometry();
@@ -500,7 +500,7 @@ public class Core : MonoBehaviour, GrowerListener {
     }
 
     public void OnGrowthStopped() {
-        if (grower.GetGrowthProperties().GetAttractionPoints().Count > 0.75*grower.GetGrowthProperties().GetAttractionPoints().Backup.Count) {
+        if (grower.GetGrowthProperties().GetAttractionPoints().ActiveCount > 0.75*grower.GetGrowthProperties().GetAttractionPoints().Count) {
             SetMessage("You discovered some unfortunate randomness, try a different seed");
         } else {
             SetMessage("Growth stopped unexpectedly, try defining wider crown shape bounds or use less iterations (Age Slider)");
@@ -522,7 +522,7 @@ public class Core : MonoBehaviour, GrowerListener {
         PointCloudRenderingEnabled = false;
     }
 
-    bool pointCloudReady = true;
+    bool pointCloudReady = false;
 
     // called by PointCloudRenderer
     public bool PointCloudReady() {
@@ -532,7 +532,7 @@ public class Core : MonoBehaviour, GrowerListener {
     // called by PointCloudRenderer
     public List<Vector3> GetPointCloud() {
         pointCloudReady = false;
-        return grower.GetGrowthProperties().GetAttractionPoints().Backup;
+        return grower.GetGrowthProperties().GetAttractionPoints();//.GetPoints();
     }
 
 
