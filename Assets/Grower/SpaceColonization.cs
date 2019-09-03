@@ -24,11 +24,71 @@ public class SpaceColonization {
     NearestNodeAlgorithm nearestNodeAlgorithm;
     //VoxelGridAlgorithm nearestNodeAlgorithm;
 
-    private float treeHeight;
+    // used by Core -> CameraMovement
     public float GetTreeHeight() {
-        return treeHeight;
+        return biggest_y - smallest_y;
     }
 
+    private float smallest_x;
+    private float biggest_x;
+    private float smallest_y;
+    private float biggest_y;
+    private float smallest_z;
+    private float biggest_z;
+
+    private void ResetBounds() {
+        smallest_x = float.MaxValue;
+        biggest_x = float.MinValue;
+        smallest_y = float.MaxValue;
+        biggest_y = float.MinValue;
+        smallest_z = float.MaxValue;
+        biggest_z = float.MinValue;
+    }
+
+    private void UpdateBoundStorage(Vector3 happyNodePosition) {
+        if (happyNodePosition.x < smallest_x) {
+            smallest_x = happyNodePosition.x;
+        }
+        if (happyNodePosition.x > biggest_x) {
+            biggest_x = happyNodePosition.x;
+        }
+        if (happyNodePosition.y < smallest_y) {
+            smallest_y = happyNodePosition.y;
+        }
+        if (happyNodePosition.y > biggest_y) {
+            biggest_y = happyNodePosition.y;
+        }
+        if (happyNodePosition.z < smallest_z) {
+            smallest_z = happyNodePosition.z;
+        }
+        if (happyNodePosition.z > biggest_z) {
+            biggest_z = happyNodePosition.z;
+        }
+
+        //debug("bounds are now\n"
+        //    + smallest_x + " " + biggest_x + "\n"
+        //    + smallest_y + " " + biggest_y + "\n"
+        //    + smallest_z + " " + biggest_z + "\n");
+    }
+
+    private bool OutOfBounds(Vector3 position, float influenceDistance) {
+        bool result = position.x < smallest_x - influenceDistance
+                    || position.x > biggest_x + influenceDistance
+                    || position.y < smallest_y - influenceDistance
+                    || position.y > biggest_y + influenceDistance
+                    || position.z < smallest_z - influenceDistance
+                    || position.z > biggest_z + influenceDistance;
+        //debug("out of bounds: " + result);
+        return result;
+
+        //IsInBounds()
+        //return position.x >= smallest_x - influenceDistance
+        //        && position.x <= biggest_x + influenceDistance
+        //        && position.y >= smallest_y - influenceDistance
+        //        && position.y <= biggest_y + influenceDistance
+        //        && position.z >= smallest_z - influenceDistance
+        //        && position.z <= biggest_z + influenceDistance;
+    }
 
     GrowthProperties growthProperties;
     GrowerListener growerListener;
@@ -51,6 +111,8 @@ public class SpaceColonization {
     Node crownRoot;
 
     public void Grow(Tree tree) {
+        ResetBounds();
+
         //nearestNodeAlgorithm = new StandardAlgorithm(growthProperties.GetInfluenceDistance(), growthProperties.GetPerceptionAngle());
         //nearestNodeAlgorithm = new SquaredDistanceAlgorithm(growthProperties.GetSquaredInfluenceDistance(), growthProperties.GetPerceptionAngle());
         //nearestNodeAlgorithm = new BinarySearchAlgorithm(growthProperties.GetSquaredInfluenceDistance(), growthProperties.GetPerceptionAngle()); //little bug somewhere
@@ -152,6 +214,7 @@ public class SpaceColonization {
 
     private void GrowCrownStem(Tree tree) {
         if (!Util.AlmostEqual(growthProperties.CrownStemLengthRatio, 0)) {
+            debug("growing crown stem");
             Node crownStemTip = crownRoot;
 
             stemRandom = new AdvancedRandom(growthProperties.GetAttractionPoints().Seed);
@@ -166,6 +229,7 @@ public class SpaceColonization {
                 crownStemTip = crownStemTip.Add(crownStemTip.GetPosition() + direction * growthProperties.GetGrowthDistance());
 
                 nearestNodeAlgorithm.Add(crownStemTip);
+                UpdateBoundStorage(crownStemTip.GetPosition());
             }
 
             float rest = growthProperties.StemLength % growthProperties.GetGrowthDistance();
@@ -178,6 +242,7 @@ public class SpaceColonization {
                 crownStemTip = crownStemTip.Add(crownStemTip.GetPosition() + direction * growthProperties.GetGrowthDistance());
 
                 nearestNodeAlgorithm.Add(crownStemTip);
+                UpdateBoundStorage(crownStemTip.GetPosition());
             }
         }
         growerListener.OnIterationFinished();
@@ -185,16 +250,8 @@ public class SpaceColonization {
 
 
     private void GrowCrown(Tree tree) {
-        float smallest_x = crownRoot.GetPosition().x;
-        float biggest_x = crownRoot.GetPosition().x;
-        float smallest_y = crownRoot.GetPosition().y;
-        float biggest_y = crownRoot.GetPosition().y;
-        float smallest_z = crownRoot.GetPosition().z;
-        float biggest_z = crownRoot.GetPosition().z;
-
+        UpdateBoundStorage(crownRoot.GetPosition());
         int n_nodes = 0;
-
-        treeHeight = 0;
 
         Stopwatch findClosePointStopwatch = new Stopwatch();
         Stopwatch removeClosePointsStopwatch = new Stopwatch();
@@ -222,13 +279,7 @@ public class SpaceColonization {
                 Vector3 attractionPoint = growthProperties.GetAttractionPoints().Points[j];
                 if (growthProperties.GetAttractionPoints().ActivePoints[j]) {
 
-                    if (attractionPoint.x < smallest_x - influenceDistance
-                        || attractionPoint.x > biggest_x + influenceDistance
-                        || attractionPoint.y < smallest_y - influenceDistance
-                        || attractionPoint.y > biggest_y + influenceDistance
-                        || attractionPoint.z < smallest_z - influenceDistance
-                        || attractionPoint.z > biggest_z + influenceDistance
-                        ) {
+                    if (OutOfBounds(attractionPoint, influenceDistance)) {
                         continue;
                     }
 
@@ -332,28 +383,7 @@ public class SpaceColonization {
                     //add to the nodeList
                     nearestNodeAlgorithm.Add(newNode);
 
-                    // used by Core -> CameraMovement
-                    if (treeHeight < happyNodePosition.y) {
-                        treeHeight = happyNodePosition.y;
-                    }
-                    if (happyNodePosition.x < smallest_x) {
-                        smallest_x = happyNodePosition.x;
-                    }
-                    if (happyNodePosition.x > biggest_x) {
-                        biggest_x = happyNodePosition.x;
-                    }
-                    if (happyNodePosition.y < smallest_y) {
-                        smallest_y = happyNodePosition.y;
-                    }
-                    if (happyNodePosition.y > biggest_y) {
-                        biggest_y = happyNodePosition.y;
-                    }
-                    if (happyNodePosition.z < smallest_z) {
-                        smallest_z = happyNodePosition.z;
-                    }
-                    if (happyNodePosition.z > biggest_z) {
-                        biggest_z = happyNodePosition.z;
-                    }
+                    UpdateBoundStorage(happyNodePosition);
                 }
             }
 

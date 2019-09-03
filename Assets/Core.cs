@@ -32,8 +32,8 @@ public class Core : MonoBehaviour, GrowerListener {
         LoadDefaultGeometry();
 
         //3844, 5112 || 14772, 10576 || 5988, 6184 (low vertices with leaves)
-        LoadPseudoPoplarGrowth();
-        LoadPseudoPoplarGeometry();
+        //LoadPseudoPoplarGrowth();
+        //LoadPseudoPoplarGeometry();
 
         //9152, 8334 || 4352, 5934
         //LoadExcurrentGrowth();
@@ -62,6 +62,27 @@ public class Core : MonoBehaviour, GrowerListener {
 
         //LoadMaxGnarlyBranchesGrowth();
         //LoadMaxGnarlyBranchesGeometry();
+
+
+
+
+
+
+
+        //LoadExactLimitedGrowth();
+        //LoadExactLimitedGeometry();
+
+        //LoadBitLimitedGrowth();
+        //LoadBitLimitedGeometry();
+
+        //LoadExtremeLimitedGrowth();
+        //LoadExtremeLimitedGeometry();
+
+
+        //LoadEarlyBorderGrowth(); //not working as expected
+        //LoadNoLeavesGeometry();
+
+
 
 
         //LoadNotWorkingPendulousGrowth();
@@ -93,14 +114,6 @@ public class Core : MonoBehaviour, GrowerListener {
         //LoadBigGrowth();
         //LoadBigGrowthGeometry();
 
-        //LoadExactLimitedGrowth();
-        //LoadExactLimitedGeometry();
-
-        //LoadBitLimitedGrowth();
-        //LoadBitLimitedGeometry();
-
-        //LoadExtremeLimitedGrowth();
-        //LoadExtremeLimitedGeometry();
 
 
         grower.Grow(tree);
@@ -195,11 +208,10 @@ public class Core : MonoBehaviour, GrowerListener {
         tree = new Tree(geometryProperties);
     }
 
-    //void LoadNotWorkingPendulousGrowth() {
-    //    PseudoEllipsoid attractionPoints = new PseudoEllipsoid(new Vector3(0, 0f, 0), 4.5f, 5,4f, 15, 0.15f, 0.05f);
-    //    grower.GetGrowthProperties().SetAttractionPoints(attractionPoints);
-    //    grower.GetGrowthProperties().SetGrowthDistance(0.5f);
-    //}
+    void LoadNoLeavesGeometry() {
+        tree.GetGeometryProperties().SetDisplayedLeavesPerNode(Leaf.LeafType.ParticleCrossFoil, 0);
+    }
+
 
 
     void LoadPseudoPoplarGrowth() {
@@ -244,7 +256,7 @@ public class Core : MonoBehaviour, GrowerListener {
 
     void LoadPendulousBranchesGeometry_() {
         tree.GetGeometryProperties().SetNthRoot(2.1f);
-        tree.GetGeometryProperties().SetDisplayedLeavesPerNode(Leaf.LeafType.ParticleCrossFoil, 0);
+        LoadNoLeavesGeometry();
         tree.GetGeometryProperties().PendulousBranchesIntensity = 0.4f;
         tree.GetGeometryProperties().PendulousBranchesBeginDepthRatio = 0.7f;
     }
@@ -297,7 +309,7 @@ public class Core : MonoBehaviour, GrowerListener {
     }
 
     void LoadDecurrentNewSeedGeometry() {
-        tree.GetGeometryProperties().SetDisplayedLeavesPerNode(Leaf.LeafType.ParticleCrossFoil, 0f);
+        LoadNoLeavesGeometry();
     }
 
 
@@ -309,7 +321,7 @@ public class Core : MonoBehaviour, GrowerListener {
     }
 
     void LoadMinGnarlyBranchesGeometry() {
-        tree.GetGeometryProperties().SetDisplayedLeavesPerNode(Leaf.LeafType.ParticleCrossFoil, 0f);
+        LoadNoLeavesGeometry();
     }
 
 
@@ -321,8 +333,68 @@ public class Core : MonoBehaviour, GrowerListener {
 
     void LoadMaxGnarlyBranchesGeometry() {
         tree.GetGeometryProperties().SetNthRoot(2.2f);
-        tree.GetGeometryProperties().SetDisplayedLeavesPerNode(Leaf.LeafType.ParticleCrossFoil, 0f);
+        LoadNoLeavesGeometry();
     }
+
+
+
+
+    void LoadExactLimitedGrowth() {
+        GrowthProperties growthProperties = grower.GetGrowthProperties();
+
+        growthProperties.SetAttractionPoints(new PseudoEllipsoid(new Vector3(0, 0f, 0), 6, 6, 6, 30, 0.15f, 0.05f));
+        growthProperties.GnarlyBranchesRatio = 0.625f;
+
+        growthProperties.StemLength = 0;
+        growthProperties.SetIterations(45);
+    }
+
+    void LoadExactLimitedGeometry() {
+        GeometryProperties geometryProperties = tree.GetGeometryProperties();
+        geometryProperties.SetNthRoot(2f);
+        //geometryProperties.SetDisplayedLeavesPerNode(Leaf.LeafType.ParticleCrossFoil, 0.3f);
+    }
+
+
+
+    void LoadBitLimitedGrowth() {
+        GrowthProperties growthProperties = grower.GetGrowthProperties();
+
+        growthProperties.SetAttractionPoints(new PseudoEllipsoid(new Vector3(0, 0f, 0), 5, 5, 5, 30, 0.15f, 0.05f));
+        growthProperties.GnarlyBranchesRatio = 0.2f;
+
+        growthProperties.StemLength = 0.4f;
+        growthProperties.SetIterations(40);
+    }
+
+    void LoadBitLimitedGeometry() {
+        GeometryProperties geometryProperties = tree.GetGeometryProperties();
+        LoadNoLeavesGeometry();
+    }
+
+
+    void LoadExtremeLimitedGrowth() {
+        LoadBitLimitedGrowth();
+        GrowthProperties growthProperties = grower.GetGrowthProperties();
+        growthProperties.SetIterations(80);
+    }
+
+    void LoadExtremeLimitedGeometry() {
+        GeometryProperties geometryProperties = tree.GetGeometryProperties();
+        LoadNoLeavesGeometry();
+    }
+
+
+
+    //void LoadEarlyBorderGrowth() {
+    //    GrowthProperties growthProperties = grower.GetGrowthProperties();
+
+    //    growthProperties.SetAttractionPoints(new PseudoEllipsoid(new Vector3(0, 0f, 0), 3, 5, 5, 30, 0.15f, 0.05f));
+    //    growthProperties.GnarlyBranchesRatio = 0.2f;
+    //    growthProperties.StemLength = 0;
+    //}
+
+
 
 
     void LoadMediumBigGrowth() {
@@ -348,50 +420,8 @@ public class Core : MonoBehaviour, GrowerListener {
         tree.GetGeometryProperties().SetDisplayedLeavesPerNode(Leaf.LeafType.ParticleCrossFoil, 0);
     }
 
-    void LoadExactLimitedGrowth() {
-        GrowthProperties growthProperties = grower.GetGrowthProperties();
-
-        growthProperties.SetAttractionPoints(new PseudoEllipsoid(new Vector3(0, 0f, 0), 6, 6, 6, 30, 0.15f, 0.05f));
-
-        growthProperties.StemLength = 0;
-        growthProperties.SetIterations(45);
 
 
-    }
-
-    void LoadExactLimitedGeometry() {
-        GeometryProperties geometryProperties = tree.GetGeometryProperties();
-        geometryProperties.SetNthRoot(2f);
-        geometryProperties.SetDisplayedLeavesPerNode(Leaf.LeafType.ParticleCrossFoil, 0.3f);
-    }
-
-    void LoadBitLimitedGrowth() {
-        GrowthProperties growthProperties = grower.GetGrowthProperties();
-
-        growthProperties.SetAttractionPoints(new PseudoEllipsoid(new Vector3(0, 0f, 0), 5, 4, 4, 30, 0.15f, 0.05f));
-
-        growthProperties.StemLength = 0;
-        growthProperties.SetIterations(33);
-    }
-
-    void LoadBitLimitedGeometry() {
-        GeometryProperties geometryProperties = tree.GetGeometryProperties();
-        geometryProperties.SetDisplayedLeavesPerNode(Leaf.LeafType.ParticleCrossFoil, 0f);
-    }
-
-    void LoadExtremeLimitedGrowth() {
-        GrowthProperties growthProperties = grower.GetGrowthProperties();
-
-        growthProperties.SetAttractionPoints(new PseudoEllipsoid(new Vector3(0, 0f, 0), 3, 4, 3f, 30, 0.15f, 0.05f));
-
-        growthProperties.StemLength = 0;
-        growthProperties.SetIterations(50);
-    }
-
-    void LoadExtremeLimitedGeometry() {
-        GeometryProperties geometryProperties = tree.GetGeometryProperties();
-        geometryProperties.SetDisplayedLeavesPerNode(Leaf.LeafType.ParticleCrossFoil, 0f);
-    }
 
     void LoadPendulousGeometry() {
         tree.GetGeometryProperties().PendulousBranchesIntensity = 0.5f;
