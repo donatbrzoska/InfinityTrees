@@ -192,6 +192,8 @@ public class SpaceColonization {
         float smallest_z = crownRoot.GetPosition().z;
         float biggest_z = crownRoot.GetPosition().z;
 
+        int n_nodes = 0;
+
         treeHeight = 0;
 
         Stopwatch findClosePointStopwatch = new Stopwatch();
@@ -212,6 +214,10 @@ public class SpaceColonization {
             //iterate through all attractionPoints
             //foreach (Vector3 attractionPoint in growthProperties.GetAttractionPoints()) { //there is some threading problem with the enumeration foreach loop, usual for should fix it
             for (int j = 0; j < growthProperties.GetAttractionPoints().Points.Length; j++) {
+
+                if (!running) {
+                    return;
+                }
 
                 Vector3 attractionPoint = growthProperties.GetAttractionPoints().Points[j];
                 if (growthProperties.GetAttractionPoints().ActivePoints[j]) {
@@ -253,10 +259,6 @@ public class SpaceColonization {
                             nodes_to_attractionPoints[closest] = new List<Vector3> { attractionPoint };
                         }
                     }
-                }
-
-                if (!running) {
-                    return;
                 }
             }
 
@@ -325,6 +327,7 @@ public class SpaceColonization {
                     //add new node to currentNode
                     Node newNode = currentNode.Add(happyNodePosition);
                     n_newNodes++;
+                    n_nodes++;
 
                     //add to the nodeList
                     nearestNodeAlgorithm.Add(newNode);
@@ -366,6 +369,8 @@ public class SpaceColonization {
                 break;
             }
         }
+
+        debug(n_nodes + " nodes");
 
         debug(new FormatString("finding close points took {0}", findClosePointStopwatch.Elapsed));
         debug(new FormatString("removing close points took {0}", removeClosePointsStopwatch.Elapsed));

@@ -60,7 +60,7 @@ public class VoxelGridAlgorithm : NearestNodeAlgorithm {
             }
         }
     }
-        
+    
 
     public void Add(Node node) {
         Vector3Int gridPos = PositionToGridPosition(node.GetPosition());
