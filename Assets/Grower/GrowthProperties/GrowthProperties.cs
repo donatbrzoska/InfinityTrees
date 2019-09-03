@@ -154,6 +154,8 @@ public class GrowthProperties {
     }
 
     public void UpdateTropismsWeights() {
+        //this.TropismsWeights = new Vector3(1, 0.1f, 1);
+
         float w = attractionPoints.GetWidth();
         float h = attractionPoints.GetHeight();
         float d = attractionPoints.GetDepth();
@@ -161,7 +163,7 @@ public class GrowthProperties {
         float verticallyRevelant = Math.Max(w, d);
 
         if (verticallyRevelant > h) {
-            // up tropisms should be smaller, when h is smaller than Max(w, d)
+            //up tropisms should be smaller, when h is smaller than Max(w, d)
             float upTropismsWeights = h / verticallyRevelant;
 
             this.TropismsWeights = new Vector3(1, upTropismsWeights * upTropismsWeights, 1);

@@ -151,6 +151,7 @@ public class Core : MonoBehaviour, GrowerListener {
         growthProperties.SetIterations(30);
 
 
+        //all images where created with this, two values for the point cloud density are not reasoned yet though
         growthProperties.GnarlyBranches_min_dc_min = 0.05f;
         growthProperties.GnarlyBranches_min_dc_max = 0.4125f;
         growthProperties.GnarlyBranches_max_dc_min = 0.1f;
@@ -160,6 +161,30 @@ public class Core : MonoBehaviour, GrowerListener {
         growthProperties.GnarlyBranches_min_pointCloudDensity = 12;
         growthProperties.GnarlyBranches_max_pointCloudDensity = 30;
         growthProperties.GnarlyBranchesRatio = 0.8f;
+
+
+        //working parameters
+        //growthProperties.GnarlyBranches_min_dc_min = 0.05f;
+        //growthProperties.GnarlyBranches_min_dc_max = 0.42f;
+        //growthProperties.GnarlyBranches_max_dc_min = 0.1f;
+        //growthProperties.GnarlyBranches_max_dc_max = 1.285f;
+        //growthProperties.GnarlyBranches_min_di = 0.5f;
+        //growthProperties.GnarlyBranches_max_di = 1.3f;
+        //growthProperties.GnarlyBranches_min_pointCloudDensity = 30;
+        //growthProperties.GnarlyBranches_max_pointCloudDensity = 30;
+        //growthProperties.GnarlyBranchesRatio = 0.8f;
+
+
+        //growthProperties.GnarlyBranches_min_dc_min = 0.01f;
+        //growthProperties.GnarlyBranches_min_dc_max = 0.2f;
+        //growthProperties.GnarlyBranches_max_dc_min = 0.1f;
+        //growthProperties.GnarlyBranches_max_dc_max = 1.285f;
+        //growthProperties.GnarlyBranches_min_di = 0.4f;
+        //growthProperties.GnarlyBranches_max_di = 1.3f;
+        //growthProperties.GnarlyBranches_min_pointCloudDensity = 50;
+        //growthProperties.GnarlyBranches_max_pointCloudDensity = 50;
+        //growthProperties.GnarlyBranchesRatio = 0.8f;
+
         //growthProperties.GnarlyBranchesRatio = 0.1666f;
 
         grower = new SpaceColonization(growthProperties, this);
@@ -240,6 +265,9 @@ public class Core : MonoBehaviour, GrowerListener {
         grower.GetGrowthProperties().StemLength = 1f;
         grower.GetGrowthProperties().CrownStemLengthRatio = 1f;
         grower.GetGrowthProperties().SetIterations(14);
+
+        // for limit demo
+        tree.GetGeometryProperties().PendulousBranchesBeginDepthMax = CalculateBranchOrientationBeginDepthMax(grower.GetGrowthProperties().GetIterations());
     }
 
     void LoadExcurrentGeometry() {
@@ -259,6 +287,7 @@ public class Core : MonoBehaviour, GrowerListener {
         LoadNoLeavesGeometry();
         tree.GetGeometryProperties().PendulousBranchesIntensity = 0.4f;
         tree.GetGeometryProperties().PendulousBranchesBeginDepthRatio = 0.7f;
+        debug("depth: " + tree.GetGeometryProperties().PendulousBranchesBeginDepth);
     }
 
 
