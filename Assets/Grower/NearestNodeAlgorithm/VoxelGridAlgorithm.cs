@@ -19,7 +19,7 @@ public class VoxelGridAlgorithm : NearestNodeAlgorithm {
         }
     }
 
-    float squaredInfluenceDistance;
+    float squaredMaxDistance;
     float perceptionAngle;
 
     List<Node>[,,] voxelGrid;
@@ -30,12 +30,12 @@ public class VoxelGridAlgorithm : NearestNodeAlgorithm {
     PseudoEllipsoid attractionPoints;
     float voxelSize;
 
-    public VoxelGridAlgorithm(PseudoEllipsoid attractionPoints, float squaredInfluenceDistance, float perceptionAngle) {
+    public VoxelGridAlgorithm(PseudoEllipsoid attractionPoints, float squaredMaxDistance, float perceptionAngle) {
         this.attractionPoints = attractionPoints;
 
-        this.squaredInfluenceDistance = squaredInfluenceDistance;
+        this.squaredMaxDistance = squaredMaxDistance;
         this.perceptionAngle = perceptionAngle;
-        this.voxelSize = (float)Math.Sqrt(squaredInfluenceDistance);
+        this.voxelSize = (float)Math.Sqrt(squaredMaxDistance);
         //this.voxelSize = squaredInfluenceDistance;
 
         //x direction
@@ -85,7 +85,7 @@ public class VoxelGridAlgorithm : NearestNodeAlgorithm {
 
         foreach (Node n in candidates) {
             float squaredDistance = Util.SquaredDistance(position, n.Position);
-            if (squaredDistance < closestDistance && squaredDistance <= squaredInfluenceDistance) {
+            if (squaredDistance < closestDistance && squaredDistance <= squaredMaxDistance) {
                 if (AttractionPointInPerceptionAngle(n, position)) {
                     closest = n;
                     closestDistance = squaredDistance;
@@ -115,6 +115,7 @@ public class VoxelGridAlgorithm : NearestNodeAlgorithm {
     }
 
     private Vector3Int PositionToGridPosition(Vector3 pos) {
+        //crops are done, so positions outside the grid dont cause out of bounds exceptions
         int i = Crop((int)((attractionPoints.GetWidth() / 2 + pos.x) / voxelSize), 0, n_is-1);
         int j = Crop((int)(pos.y / voxelSize), 0, n_js-1);
         int k = Crop((int)((attractionPoints.GetDepth() / 2 + pos.z) / voxelSize), 0, n_ks-1);

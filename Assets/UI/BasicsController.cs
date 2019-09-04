@@ -72,12 +72,12 @@ public class BasicsController : MonoBehaviour {
 
     public void OnValueChanged_Thickness() {
         float value = GetComponent<Slider>().value;
-        GameObject.Find("Core").GetComponent<Core>().OnThickness(value);
+        GameObject.Find("Core").GetComponent<Core>().OnStemThickness(value);
     }
 
     public void OnValueChanged_Length() {
         float value = GetComponent<Slider>().value;
-        GameObject.Find("Core").GetComponent<Core>().OnLength(value);
+        GameObject.Find("Core").GetComponent<Core>().OnStemLength(value);
     }
 
     public void OnValueChanged_CrownStemLength() {
@@ -110,7 +110,7 @@ public class BasicsController : MonoBehaviour {
     }
 
     public void OnValueChanged_CircleResolution() {
-        int value = (int) GetComponent<Slider>().value;
+        int value = (int)GetComponent<Slider>().value;
         GameObject.Find("Core").GetComponent<Core>().OnCircleResolution(value);
     }
 
@@ -254,9 +254,9 @@ public class BasicsController : MonoBehaviour {
 
         if (Input.GetMouseButtonUp(0)) {
             //if (modifyingPointCloudParameter) {
-                modifyingPointCloudParameter = false;
-                GameObject.Find("Core").GetComponent<Core>().OnCrownShapeDone();
-                GameObject.Find("Core").GetComponent<Core>().DisablePointCloudRenderer();
+            modifyingPointCloudParameter = false;
+            GameObject.Find("Core").GetComponent<Core>().OnCrownShapeDone();
+            GameObject.Find("Core").GetComponent<Core>().DisablePointCloudRenderer();
             //}
 
             GameObject.Find("Core").GetComponent<Core>().EnableCameraMovement();

@@ -72,7 +72,7 @@ public class Leaf {
 
 
 
-    public void CalculateAndStoreGeometry(List<Vector3> verticesResult, List<Vector2> uvsResult, List<int> trianglesResult) {
+    public void GetMesh(List<Vector3> verticesResult, List<Vector2> uvsResult, List<int> trianglesResult) {
 
         //Vector3 swooshVector = new Vector3(0, 0.0000f, 0);
 

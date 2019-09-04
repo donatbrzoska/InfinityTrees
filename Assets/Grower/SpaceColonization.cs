@@ -21,6 +21,9 @@ public class SpaceColonization {
         }
     }
 
+    bool optimizedDeletion = true;
+    bool attractionPointNarrowing = true;
+
     NearestNodeAlgorithm nearestNodeAlgorithm;
     //VoxelGridAlgorithm nearestNodeAlgorithm;
 
@@ -117,14 +120,9 @@ public class SpaceColonization {
 
             growingStopwatch.Stop();
             debug(new FormatString("grew {0} times in {1}", GrowthProperties.Iterations, growingStopwatch.Elapsed));
-            //debug(new FormatString("finding voxels around took {0}", nearestNodeAlgorithm.voxelsAround.Elapsed));
-            //debug(new FormatString("finding nodes in voxels took {0}", nearestNodeAlgorithm.nodesAround.Elapsed));
         });
         growerThread.IsBackground = true;
         growerThread.Start();
-        //} else {
-        //throw new Exception("attempted to loose reference to runnning thread");
-        //}
     }
 
     private AdvancedRandom stemRandom;
@@ -177,7 +175,9 @@ public class SpaceColonization {
 
             if (addToNearestNodeAlgorithmAndBounds) {
                 nearestNodeAlgorithm.Add(node);
-                UpdateBoundStorage(node.Position);
+                if (attractionPointNarrowing) {
+                    UpdateBoundStorage(node.Position);
+                }
             }
         }
 
@@ -221,7 +221,7 @@ public class SpaceColonization {
             Dictionary<Node, List<Vector3>> nodes_to_attractionPoints = new Dictionary<Node, List<Vector3>>();
 
             //iterate through all attractionPoints
-            //foreach (Vector3 attractionPoint in growthProperties.AttractionPoints) { //there is some threading problem with the enumeration foreach loop, usual for should fix it
+            //foreach (Vector3 attractionPoint in growthProperties.AttractionPoints) { //there is some threading problem with the enumeration foreach loop, usual fixes it
             for (int j = 0; j < GrowthProperties.AttractionPoints.Points.Length; j++) {
 
                 if (!running) {
@@ -229,10 +229,12 @@ public class SpaceColonization {
                 }
 
                 Vector3 attractionPoint = GrowthProperties.AttractionPoints.Points[j];
-                if (GrowthProperties.AttractionPoints.ActivePoints[j]) {
+                if (GrowthProperties.AttractionPoints.IsActive(j)) {
 
-                    if (OutOfBounds(attractionPoint, influenceDistance)) {
-                        continue;
+                    if (attractionPointNarrowing){
+                        if (OutOfBounds(attractionPoint, influenceDistance)) {
+                            continue;
+                        }
                     }
 
                     //and find the closest Node respectively
@@ -242,16 +244,17 @@ public class SpaceColonization {
 
                     //if there is a close Node
                     if (closest != null) {
-                        // Rudis ultimate plan to make the removal in the next iteration
-                        removeClosePointsStopwatch.Start();
-                        if (i > 0) { //in the first iteration, the attraction points shall not get deleted
-                            if (Util.SquaredDistance(attractionPoint, closest.Position) <= squaredClearDistance) {
-                                GrowthProperties.AttractionPoints.ActivePoints[j] = false;
-                                GrowthProperties.AttractionPoints.ActiveCount--;
-                                removeClosePointsStopwatch.Stop();
-                                continue;
-                            } else {
-                                removeClosePointsStopwatch.Stop();
+                        if (optimizedDeletion) {
+                            // Rudis ultimate plan to make the removal in the next iteration
+                            removeClosePointsStopwatch.Start();
+                            if (i > 0) { //in the first iteration, the attraction points shall not get deleted
+                                if (Util.SquaredDistance(attractionPoint, closest.Position) <= squaredClearDistance) {
+                                    GrowthProperties.AttractionPoints.Deactivate(i);
+                                    removeClosePointsStopwatch.Stop();
+                                    continue;
+                                } else {
+                                    removeClosePointsStopwatch.Stop();
+                                }
                             }
                         }
 
@@ -270,6 +273,13 @@ public class SpaceColonization {
             }
 
             int n_newNodes = 0;
+
+            //only used for demonstration purposes of the optimization
+            NearestNodeAlgorithm nodeDeletionAlgorithm = new VoxelGridAlgorithm(GrowthProperties.AttractionPoints, squaredClearDistance, 720);
+            //NearestNodeAlgorithm nodeDeletionAlgorithm = new BinarySearchAlgorithm(squaredClearDistance, 360);
+            if (i == 0) {
+                nodeDeletionAlgorithm.Add(crownRoot);
+            }
 
             //iterate through all Nodes with attractionPoints associated
             foreach (Node currentNode in nodes_to_attractionPoints.Keys) {
@@ -304,13 +314,21 @@ public class SpaceColonization {
                     //add to the nodeList
                     nearestNodeAlgorithm.Add(newNode);
 
-                    UpdateBoundStorage(happyNodePosition);
+                    if (!optimizedDeletion) {
+                        nodeDeletionAlgorithm.Add(newNode);
+                    }
+
+                    if (attractionPointNarrowing) {
+                        UpdateBoundStorage(happyNodePosition);
+                    }
                 }
             }
 
-            //removeClosePointsStopwatch.Start();
-            //RemoveClosePoints(newPositions, i);
-            //removeClosePointsStopwatch.Stop();
+            if (!optimizedDeletion) {
+                removeClosePointsStopwatch.Start();
+                RemoveClosePoints(nodeDeletionAlgorithm, squaredClearDistance);
+                removeClosePointsStopwatch.Stop();
+            }
 
             growerListener.OnIterationFinished();
             //debug("finished iteration " + i);
@@ -327,6 +345,25 @@ public class SpaceColonization {
         debug(new FormatString("removing close points took {0}", removeClosePointsStopwatch.Elapsed));
 
         running = false;
+    }
+
+    private void RemoveClosePoints(NearestNodeAlgorithm nodeDeletionAlgorithm, float squaredClearDistance) {
+        for (int i=0; i<GrowthProperties.AttractionPoints.Points.Length; i++) { //look at all attraction points
+            if (GrowthProperties.AttractionPoints.IsActive(i)) { // that are active
+                Vector3 attractionPoint = GrowthProperties.AttractionPoints.Points[i];
+                Node nearest = nodeDeletionAlgorithm.GetNearest(attractionPoint);
+
+                if (nearest != null && Util.SquaredDistance(nearest.Position, attractionPoint) <= squaredClearDistance) { // and have a nearest node
+                    GrowthProperties.AttractionPoints.Deactivate(i);
+                }
+                //if (nodeDeletionAlgorithm.GetNearest(GrowthProperties.AttractionPoints.Points[i]) != null) { // and have a nearest node
+                //    if (nearestNodeAlgorithm.GetNearest(GrowthProperties.AttractionPoints.Points[i]) != null) { // and have a nearest node
+                //        GrowthProperties.AttractionPoints.ActivePoints[i] = false;
+                //        GrowthProperties.AttractionPoints.ActiveCount--;
+                //    }
+                //}
+            }
+        }
     }
 
     private bool IsDuplicateNode(Vector3 potentialPosition, Node node) {

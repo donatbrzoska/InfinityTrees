@@ -288,7 +288,7 @@ public class Node : IEquatable<Node> {
                     break;
                 }
 
-                Leaves[i].CalculateAndStoreGeometry(verticesResult, uvsResult, trianglesResult);
+                Leaves[i].GetMesh(verticesResult, uvsResult, trianglesResult);
             }
             //}
         }

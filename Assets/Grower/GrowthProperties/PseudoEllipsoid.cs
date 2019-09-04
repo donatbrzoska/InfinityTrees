@@ -1,8 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 
 public sealed class PseudoEllipsoid {
+
+    private static bool debugEnabled = true;
+    private static void debug(string message, [CallerMemberName]string callerName = "") {
+        if (debugEnabled) {
+            UnityEngine.Debug.Log("DEBUG: PseudoEllipsoid: " + callerName + "(): " + message);
+        }
+    }
+
+    private static void debug(FormatString formatString, [CallerMemberName]string callerName = "") {
+        if (debugEnabled) {
+            UnityEngine.Debug.Log("DEBUG: PseudoEllipsoid: " + callerName + "(): " + formatString);
+        }
+    }
 
     private Vector3 center;
     public Vector3 Center {
@@ -35,13 +49,23 @@ public sealed class PseudoEllipsoid {
         return biggest_z - smallest_z;
     }
 
-    public bool[] ActivePoints { get; private set; }
-    public int ActiveCount { get; set; }
+
+
     public Vector3[] Points { get; set; }
+
+    private bool[] activePoints;
+    public int ActiveCount { get;  private set; }
+    public bool IsActive(int pointIndex) {
+        return activePoints[pointIndex];
+    }
+    public void Deactivate(int pointIndex) {
+        activePoints[pointIndex] = false;
+        ActiveCount--;
+    }
     //"copies" all points in backup to the base
     public void Reset() {
-        for (int i = 0; i < ActivePoints.Length; i++) {
-            ActivePoints[i] = true;
+        for (int i = 0; i < activePoints.Length; i++) {
+            activePoints[i] = true;
         }
     }
 
@@ -191,8 +215,9 @@ public sealed class PseudoEllipsoid {
 
         //3. Calculate the amount of points for the given density
         int n_points = (int)Math.Ceiling(volume * Density);
+        debug(n_points + " attraction points");
         Points = new Vector3[n_points];
-        ActivePoints = new bool[n_points];
+        activePoints = new bool[n_points];
 
         //4. Generate n_points attraction points
         while (ActiveCount < n_points) {
@@ -226,7 +251,7 @@ public sealed class PseudoEllipsoid {
                 Vector3 calculatedPoint = point + targetCenter;
                 
                 Points[ActiveCount] = calculatedPoint; //ActiveCount is used as an indexer here
-                ActivePoints[ActiveCount] = true;
+                activePoints[ActiveCount] = true;
                 ActiveCount++;
 
                 // for Core -> CameraMovement and UpTropismDamping
