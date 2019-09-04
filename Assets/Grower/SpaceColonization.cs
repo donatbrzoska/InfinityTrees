@@ -231,7 +231,7 @@ public class SpaceColonization {
                 Vector3 attractionPoint = GrowthProperties.AttractionPoints.Points[j];
                 if (GrowthProperties.AttractionPoints.IsActive(j)) {
 
-                    if (attractionPointNarrowing){
+                    if (attractionPointNarrowing) {
                         if (OutOfBounds(attractionPoint, influenceDistance)) {
                             continue;
                         }
@@ -249,7 +249,7 @@ public class SpaceColonization {
                             removeClosePointsStopwatch.Start();
                             if (i > 0) { //in the first iteration, the attraction points shall not get deleted
                                 if (Util.SquaredDistance(attractionPoint, closest.Position) <= squaredClearDistance) {
-                                    GrowthProperties.AttractionPoints.Deactivate(i);
+                                    GrowthProperties.AttractionPoints.Deactivate(j);
                                     removeClosePointsStopwatch.Stop();
                                     continue;
                                 } else {
@@ -348,7 +348,7 @@ public class SpaceColonization {
     }
 
     private void RemoveClosePoints(NearestNodeAlgorithm nodeDeletionAlgorithm, float squaredClearDistance) {
-        for (int i=0; i<GrowthProperties.AttractionPoints.Points.Length; i++) { //look at all attraction points
+        for (int i = 0; i < GrowthProperties.AttractionPoints.Points.Length; i++) { //look at all attraction points
             if (GrowthProperties.AttractionPoints.IsActive(i)) { // that are active
                 Vector3 attractionPoint = GrowthProperties.AttractionPoints.Points[i];
                 Node nearest = nodeDeletionAlgorithm.GetNearest(attractionPoint);
