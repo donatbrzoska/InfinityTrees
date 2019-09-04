@@ -11,6 +11,9 @@ public class GrowthProperties {
     public int Iterations { get; set; }
     public float GrowthDistance { get; set; }
 
+    public float SigmoidMin { private get; set; }
+    public float SigmoidMax { private get; set; }
+
     public float BranchDensityBegin { get; set; }
     public float BranchDensityEnd { get; set; }
 
@@ -117,7 +120,7 @@ public class GrowthProperties {
     private float SigmoidInterpolation(float from, float to, int iteration) {
         float d = from - to;
 
-        return from - Sigmoid(MapIteration(iteration, -12, 6)) * d;
+        return from - Sigmoid(MapIteration(iteration, SigmoidMin, SigmoidMax)) * d;
     }
 
     //private float LinearInterpolation(int iteration) {

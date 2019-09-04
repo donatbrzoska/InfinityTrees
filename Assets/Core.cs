@@ -36,8 +36,8 @@ public class Core : MonoBehaviour, GrowerListener {
         //LoadPseudoPoplarGeometry();
 
         //9152, 8334 || 4352, 5934
-        LoadExcurrentGrowth();
-        LoadExcurrentGeometry();
+        //LoadExcurrentGrowth();
+        //LoadExcurrentGeometry();
 
         //LoadPendulousBranchesGrowth_();
         //LoadPendulousBranchesGeometry_();
@@ -131,12 +131,11 @@ public class Core : MonoBehaviour, GrowerListener {
     }
 
     void LoadDefaultGrowth() {
-        PseudoEllipsoid attractionPoints = new PseudoEllipsoid(5, 7, 4.5f, 30, 0.15f, 0.05f);
-
-
         GrowthProperties growthProperties = new GrowthProperties();
-        growthProperties.PerceptionAngle=160;
-        
+        growthProperties.PerceptionAngle = 160;
+
+        growthProperties.SigmoidMin = -12;
+        growthProperties.SigmoidMax = 6;
         growthProperties.BranchDensityBegin = 0f;
         growthProperties.BranchDensityEnd = 0.8f;
 
@@ -147,7 +146,7 @@ public class Core : MonoBehaviour, GrowerListener {
         growthProperties.CrownStemLengthRatio = 0f;
 
         growthProperties.GrowthDistance = 0.25f;
-        growthProperties.AttractionPoints = attractionPoints;
+        growthProperties.AttractionPoints = new PseudoEllipsoid(5, 7, 4.5f, 30, 0.15f, 0.05f);
         growthProperties.Iterations = 30;
 
 
@@ -163,7 +162,8 @@ public class Core : MonoBehaviour, GrowerListener {
         growthProperties.GnarlyBranchesRatio = 0.8f;
 
 
-        //working parameters
+        ////working parameters, min and max values are fine but in between the branch density in the beginning gets pretty big
+        ////.. also doesn't solve the "problem", that the density doesnt stay the same when changin the GnarlyBranchesRatio
         //growthProperties.GnarlyBranches_min_dc_min = 0.05f;
         //growthProperties.GnarlyBranches_min_dc_max = 0.42f;
         //growthProperties.GnarlyBranches_max_dc_min = 0.1f;
@@ -174,16 +174,6 @@ public class Core : MonoBehaviour, GrowerListener {
         //growthProperties.GnarlyBranches_max_pointCloudDensity = 30;
         //growthProperties.GnarlyBranchesRatio = 0.8f;
 
-
-        //growthProperties.GnarlyBranches_min_dc_min = 0.01f;
-        //growthProperties.GnarlyBranches_min_dc_max = 0.2f;
-        //growthProperties.GnarlyBranches_max_dc_min = 0.1f;
-        //growthProperties.GnarlyBranches_max_dc_max = 1.285f;
-        //growthProperties.GnarlyBranches_min_di = 0.4f;
-        //growthProperties.GnarlyBranches_max_di = 1.3f;
-        //growthProperties.GnarlyBranches_min_pointCloudDensity = 50;
-        //growthProperties.GnarlyBranches_max_pointCloudDensity = 50;
-        //growthProperties.GnarlyBranchesRatio = 0.8f;
 
         //growthProperties.GnarlyBranchesRatio = 0.1666f;
 
