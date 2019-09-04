@@ -70,12 +70,12 @@ public class BasicsController : MonoBehaviour {
         GameObject.Find("Core").GetComponent<Core>().OnIterations(value);
     }
 
-    public void OnValueChanged_Thickness() {
+    public void OnValueChanged_StemThickness() {
         float value = GetComponent<Slider>().value;
         GameObject.Find("Core").GetComponent<Core>().OnStemThickness(value);
     }
 
-    public void OnValueChanged_Length() {
+    public void OnValueChanged_StemLength() {
         float value = GetComponent<Slider>().value;
         GameObject.Find("Core").GetComponent<Core>().OnStemLength(value);
     }

@@ -746,7 +746,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 52865204}
-        m_MethodName: OnValueChanged_Length
+        m_MethodName: OnValueChanged_StemLength
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -8544,7 +8544,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 1057611503}
-        m_MethodName: OnValueChanged_Thickness
+        m_MethodName: OnValueChanged_StemThickness
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
