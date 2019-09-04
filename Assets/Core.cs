@@ -1049,11 +1049,10 @@ public class Core : MonoBehaviour, GrowerListener {
     //    grower.Grow(tree);
     //}
     string message = "";
-    int displayTime = 6000;
     int displayingThreads; //this is needed, otherwise newly arrived messaged would be deleted too early
 
     //should always get set to "" when changing a parameter that caused the message before
-    private void SetMessage(string msg) {
+    private void SetMessage(string msg, int displayTime = 6000) {
         message = msg;
         //messageLeft = false;
         Thread resetThread = new Thread(() => {
@@ -1151,6 +1150,7 @@ public class Core : MonoBehaviour, GrowerListener {
 
         UnityEngine.Debug.Log("Saved mesh to " + meshFilename);
         UnityEngine.Debug.Log("Saved texture to " + textureFilename);
+        SetMessage("Done :)", 2000);
     }
 
     public void OnApplicationQuit() {

@@ -14741,7 +14741,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 1670856964}
-        m_MethodName: OnClick
+        m_MethodName: OnClick_Save
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -14799,7 +14799,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1670856959}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4a4c96902371d4518a6cc0146387e115, type: 3}
+  m_Script: {fileID: 11500000, guid: e10c51f50a31d401bb6d6180155d1734, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &1672441764

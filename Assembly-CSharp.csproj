@@ -86,7 +86,6 @@
     <Compile Include="Assets\UI\CameraMovementController.cs" />
     <Compile Include="Assets\UI\NotificationReceiver.cs" />
     <Compile Include="Assets\UI\PointCloudRenderer.cs" />
-    <Compile Include="Assets\UI\SaveController.cs" />
     <Compile Include="Assets\UI\TreeRenderer.cs" />
     <Compile Include="Assets\Util.cs" />
     <Reference Include="Unity.Timeline.Editor">

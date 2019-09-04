@@ -221,7 +221,9 @@ public class BasicsController : MonoBehaviour {
     //}
 
     // BUTTONS
-
+    public void OnClick_Save() {
+        GameObject.Find("Core").GetComponent<Core>().OnSave();
+    }
 
     public void OnClick_NewSeed() {
         GameObject.Find("Core").GetComponent<Core>().OnNewSeed();
