@@ -19,10 +19,6 @@ public class Tree {
 
     private GeometryProperties geometryProperties;
 
-    public GeometryProperties GetGeometryProperties() {
-        return geometryProperties;
-    }
-
     public Node StemRoot { get; set; }
 
     public Tree(GeometryProperties geometryProperties) {
