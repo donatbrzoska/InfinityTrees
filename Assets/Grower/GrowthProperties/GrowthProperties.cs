@@ -7,28 +7,69 @@ public class GrowthProperties {
     public float CrownStemLengthRatio { get; set; } //how much of the crown is filled with an initial stem?
     public float StemAngleRange { get; set; }
 
-    private float influenceDistance;
-    private float perceptionAngle;
+    public float PerceptionAngle { get; set; }
+    public int Iterations { get; set; }
+    public float GrowthDistance { get; set; }
 
+    public float BranchDensityBegin { get; set; }
+    public float BranchDensityEnd { get; set; }
 
-    private Vector3 tropisms;
-    public Vector3 TropismsWeights { get; private set; }
-
-    private float growthDistance;
-
-    private PseudoEllipsoid attractionPoints;
-
-    private int iterations;
 
     public float GetInfluenceDistance() {
         // more gnarlyness means less influence distance
-        return GnarlyBranches_min_di + (1-GnarlyBranchesRatio) * (GnarlyBranches_max_di - GnarlyBranches_min_di);
+        return GnarlyBranches_min_di + (1 - GnarlyBranchesRatio) * (GnarlyBranches_max_di - GnarlyBranches_min_di);
     }
 
     public float GetSquaredInfluenceDistance() {
         return GetInfluenceDistance() * GetInfluenceDistance();
     }
 
+
+
+    private Vector3 tropisms;
+    public Vector3 Tropisms {
+        get {
+            return tropisms;
+        }
+        set {
+            tropisms = value.normalized;
+        }
+    }
+
+
+    public Vector3 TropismsWeights { get; private set; }
+
+    public void UpdateTropismsWeights() {
+        //this.TropismsWeights = new Vector3(1, 0.1f, 1);
+
+        float w = attractionPoints.GetWidth();
+        float h = attractionPoints.GetHeight();
+        float d = attractionPoints.GetDepth();
+
+        float verticallyRevelant = Math.Max(w, d);
+
+        if (verticallyRevelant > h) {
+            //up tropisms should be smaller, when h is smaller than Max(w, d)
+            float upTropismsWeights = h / verticallyRevelant;
+
+            this.TropismsWeights = new Vector3(1, upTropismsWeights * upTropismsWeights, 1);
+        } else {
+            this.TropismsWeights = new Vector3(1, 1, 1);
+        }
+    }
+
+
+    private PseudoEllipsoid attractionPoints;
+
+    public PseudoEllipsoid AttractionPoints {
+        get {
+            return attractionPoints;
+        }
+        set {
+            attractionPoints = value;
+            UpdateTropismsWeights();
+        }
+    }
 
 
     public float GnarlyBranches_min_di { private get; set; } //what is the smallest value for the influence distance
@@ -55,39 +96,9 @@ public class GrowthProperties {
 
 
 
-
-    public void SetPerceptionAngle(float perceptionAngle) {
-        this.perceptionAngle = perceptionAngle;
-    }
-
-    public float GetPerceptionAngle() {
-        return perceptionAngle;
-    }
-
-
-
-    private float branchDensityBegin;
-    public void SetBranchDensityBegin(float value) {
-        this.branchDensityBegin = value;
-    }
-
-    public float GetBranchDensityBegin() {
-        return branchDensityBegin;
-    }
-
-    private float branchDensityEnd;
-    public void SetBranchDensityEnd(float value) {
-        this.branchDensityEnd = value;
-    }
-
-    public float GetBranchDensityEnd() {
-        return branchDensityEnd;
-    }
-
-
     private float MapIteration(int iteration, float begin, float end) {
         float d = end - begin;
-        float step = d / (iterations - 1);
+        float step = d / (Iterations - 1);
 
         return begin + step * iteration;
     }
@@ -131,79 +142,16 @@ public class GrowthProperties {
         //-> typically the density is low in the beginning
         //-> this should result in a high squaredClearDistance_begin
         //-> therefore density * squaredClearDistanceRange has to be subtracted from the squaredClearDistance_max
-        float squaredClearDistance_begin = squaredClearDistance_max - branchDensityBegin * squaredClearDistance_range;
+        float squaredClearDistance_begin = squaredClearDistance_max - BranchDensityBegin * squaredClearDistance_range;
 
         //the density says how much of the squaredClearDistanceRange should be subtracted from the squaredClearDistance_max
         //-> typically the density is high in the end
         //-> this should result in a low squaredClearDistance_end
         //-> therefore density * squaredClearDistanceRange has to be subtracted from the squaredClearDistance_max
-        float squaredClearDistance_end = squaredClearDistance_max - branchDensityEnd * squaredClearDistance_range;
+        float squaredClearDistance_end = squaredClearDistance_max - BranchDensityEnd * squaredClearDistance_range;
 
         float result = SigmoidInterpolation(squaredClearDistance_begin, squaredClearDistance_end, iteration);
         return result;
     }
 
-
-
-    public void SetTropisms(Vector3 tropisms) {
-        this.tropisms = tropisms.normalized;
-    }
-
-    public Vector3 GetTropisms() {
-        return tropisms;
-    }
-
-    public void UpdateTropismsWeights() {
-        //this.TropismsWeights = new Vector3(1, 0.1f, 1);
-
-        float w = attractionPoints.GetWidth();
-        float h = attractionPoints.GetHeight();
-        float d = attractionPoints.GetDepth();
-
-        float verticallyRevelant = Math.Max(w, d);
-
-        if (verticallyRevelant > h) {
-            //up tropisms should be smaller, when h is smaller than Max(w, d)
-            float upTropismsWeights = h / verticallyRevelant;
-
-            this.TropismsWeights = new Vector3(1, upTropismsWeights * upTropismsWeights, 1);
-        } else {
-            this.TropismsWeights = new Vector3(1, 1, 1);
-        }
-    }
-
-
-
-
-
-    //FIXED?
-    public void SetGrowthDistance(float growthDistance) {
-        this.growthDistance = growthDistance;
-    }
-
-    public float GetGrowthDistance() {
-        return growthDistance;
-    }
-
-
-
-
-    public void SetAttractionPoints(PseudoEllipsoid attractionPoints) {
-        this.attractionPoints = attractionPoints;
-        UpdateTropismsWeights();
-    }
-
-    public PseudoEllipsoid GetAttractionPoints() {
-        return attractionPoints;
-    }
-
-
-
-    public void SetIterations(int iterations) {
-        this.iterations = iterations;
-    }
-
-    public int GetIterations() {
-        return iterations;
-    }
 }

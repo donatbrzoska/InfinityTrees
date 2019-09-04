@@ -46,7 +46,7 @@ public class BinarySearchAlgorithm : NearestNodeAlgorithm{
         //CheckOrder();
     }
 
-    public Node GetNearestWithinSquaredDistance(Vector3 position) {
+    public Node GetNearest(Vector3 position) {
         SortedCandidateNodeList candidates = new SortedCandidateNodeList();
 
         //find index of nearest Node concerning the x coordinate
@@ -56,7 +56,7 @@ public class BinarySearchAlgorithm : NearestNodeAlgorithm{
         }
         //look at left neighbours
         for (int i = nearest_x; i >= 0; i--) {
-            Vector3 currentPosition = x[i].GetPosition();
+            Vector3 currentPosition = x[i].Position;
             Vector3 d = currentPosition - position;
 
             //find out whether we are still in the x range
@@ -72,7 +72,7 @@ public class BinarySearchAlgorithm : NearestNodeAlgorithm{
         }
         //look at right neighbours
         for (int i = nearest_x + 1; i < x.Count; i++) {
-            Vector3 currentPosition = x[i].GetPosition();
+            Vector3 currentPosition = x[i].Position;
             Vector3 d = currentPosition - position;
 
             //find out whether we are still in the x range
@@ -90,7 +90,7 @@ public class BinarySearchAlgorithm : NearestNodeAlgorithm{
 
         int nearest_y = y.GetNearestIndex(new Node(position));
         for (int i = nearest_y; i >= 0; i--) {
-            Vector3 currentPosition = y[i].GetPosition();
+            Vector3 currentPosition = y[i].Position;
             Vector3 d = currentPosition - position;
 
             float dy = d.y * d.y;
@@ -104,7 +104,7 @@ public class BinarySearchAlgorithm : NearestNodeAlgorithm{
             }
         }
         for (int i = nearest_y + 1; i < y.Count; i++) {
-            Vector3 currentPosition = y[i].GetPosition();
+            Vector3 currentPosition = y[i].Position;
             Vector3 d = currentPosition - position;
 
             float dy = d.y * d.y;
@@ -121,7 +121,7 @@ public class BinarySearchAlgorithm : NearestNodeAlgorithm{
 
         int nearest_z = z.GetNearestIndex(new Node(position));
         for (int i = nearest_z; i >= 0; i--) {
-            Vector3 currentPosition = z[i].GetPosition();
+            Vector3 currentPosition = z[i].Position;
             Vector3 d = currentPosition - position;
 
             float dz = d.z * d.z;
@@ -135,7 +135,7 @@ public class BinarySearchAlgorithm : NearestNodeAlgorithm{
             }
         }
         for (int i = nearest_z + 1; i < z.Count; i++) {
-            Vector3 currentPosition = z[i].GetPosition();
+            Vector3 currentPosition = z[i].Position;
             Vector3 d = currentPosition - position;
 
             float dz = d.z * d.z;
@@ -164,7 +164,7 @@ public class BinarySearchAlgorithm : NearestNodeAlgorithm{
     }
 
     private bool AttractionPointInPerceptionAngle(Node node, Vector3 attractionPoint) {
-        float angle = Vector3.Angle(node.GetDirection(), attractionPoint - node.GetPosition());
+        float angle = Vector3.Angle(node.GetDirection(), attractionPoint - node.Position);
         bool isInPerceptionAngle = angle <= perceptionAngle / 2f;
         return isInPerceptionAngle;
     }

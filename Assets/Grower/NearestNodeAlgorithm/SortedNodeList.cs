@@ -136,11 +136,11 @@ public class SortedNodeList : List<Node> {
     private bool Equal(Node a, Node b) {
         switch (coordinateType) {
             case CoordinateType.x:
-                return Util.AlmostEqual(a.GetPosition().x, b.GetPosition().x, 0.00000001f);
+                return Util.AlmostEqual(a.Position.x, b.Position.x, 0.00000001f);
             case CoordinateType.y:
-                return Util.AlmostEqual(a.GetPosition().y, b.GetPosition().y, 0.00000001f);
+                return Util.AlmostEqual(a.Position.y, b.Position.y, 0.00000001f);
             case CoordinateType.z:
-                return Util.AlmostEqual(a.GetPosition().z, b.GetPosition().z, 0.00000001f);
+                return Util.AlmostEqual(a.Position.z, b.Position.z, 0.00000001f);
             default:
                 return false;
         }
@@ -149,11 +149,11 @@ public class SortedNodeList : List<Node> {
     private bool LessThan(Node a, Node b) {
         switch (coordinateType) {
             case CoordinateType.x:
-                return a.GetPosition().x < b.GetPosition().x;
+                return a.Position.x < b.Position.x;
             case CoordinateType.y:
-                return a.GetPosition().y < b.GetPosition().y;
+                return a.Position.y < b.Position.y;
             case CoordinateType.z:
-                return a.GetPosition().z < b.GetPosition().z;
+                return a.Position.z < b.Position.z;
             default: //impossible but neccessary
                 return false;
         }
@@ -162,11 +162,11 @@ public class SortedNodeList : List<Node> {
     private float Minus(Node a, Node b) {
         switch (coordinateType) {
             case CoordinateType.x:
-                return a.GetPosition().x - b.GetPosition().x;
+                return a.Position.x - b.Position.x;
             case CoordinateType.y:
-                return a.GetPosition().y - b.GetPosition().y;
+                return a.Position.y - b.Position.y;
             case CoordinateType.z:
-                return a.GetPosition().z - b.GetPosition().z;
+                return a.Position.z - b.Position.z;
             default: //impossible but neccessary
                 return 0;
         }

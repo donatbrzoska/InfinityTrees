@@ -21,53 +21,146 @@ public class Node : IEquatable<Node> {
 
     private GeometryProperties geometryProperties;
 
-    private Vector3 position;
-    //public int Order { get; private set; } // this is actually the order of the branch between this and supernode
-    private Vector3 normal;
-    private float radius;
-    public bool Active { get; set; }
-    
+    public Vector3 Position { get; private set; }
+
+    public void UpdatePosition(Vector3 diff) {
+        Position = Position + diff;
+        foreach (Node n in Subnodes) {
+            n.UpdatePosition(diff);
+        }
+
+        foreach (Leaf l in Leaves) {
+            l.UpdatePosition(diff);
+        }
+    }
+
+    public Vector3 GetDirection(bool normalized = false) {
+        if (this.IsRoot()) {
+            return Vector3.up;
+        } else {
+            if (normalized) {
+                return (Position - supernode.Position).normalized;
+            }
+            return Position - supernode.Position;
+        }
+    }
+
+
+    private Vector3 Normal { get; set; }
+
+    private void CalculateNormal() {
+        if (supernode == null) { //if this is the root node
+            if (!this.HasSubnodes()) { //no subnodes
+                //point upwards
+                Normal = Vector3.up;
+            } else if (Subnodes.Count == 1) { //one subnode
+                //point to subnode
+                Normal = Subnodes[0].Position - Position; //vector from this to subnode
+
+                //normal = Vector3.up;
+            } else { //many subnodes
+                Normal = Vector3.zero;
+                foreach (Node subnode in Subnodes) {
+                    Normal = Normal + (subnode.Position - Position) * subnode.Radius;
+                }
+            }
+        } else {
+            if (!this.HasSubnodes()) { //no subnodes
+                //point in own direction
+                Normal = Position - supernode.Position; //vector from supernode to this
+            } else if (Subnodes.Count == 1) { //one subnode
+                //find tangent between(vector pointing from super to this, vector pointing from this to sub)
+                //Vector3 superToThis = position - supernode.GetPosition();
+                //Vector3 thisToSub = subnodes[0].GetPosition() - position;
+                //normal = thisToSub + superToThis;
+                Normal = GetDirection() + Subnodes[0].GetDirection();
+            } else { //many subnodes
+                Normal = Vector3.zero;
+                foreach (Node subnode in Subnodes) {
+                    if (geometryProperties.UsualConnection(this.Radius, subnode.Radius)) {
+                        Normal = Normal + (subnode.Position - Position) * subnode.Radius;// * subnode.GetRadius();
+                    }
+                }
+            }
+        }
+    }
+
+    public float Radius { get; private set; }
+
+    public void RecalculateRadii() {
+        if (this.HasSubnodes()) { // signal upwards
+            foreach (Node sn in Subnodes) {
+                sn.RecalculateRadii();
+            }
+        } else { //signal downwards begin
+            Radius = geometryProperties.TipRadius;
+
+            supernode.RecalculateRadius();
+        }
+    }
+
+    private void RecalculateRadius() {
+        float summedPottedSubnodeRadii = 0;
+        foreach (Node subnode in Subnodes) {
+            summedPottedSubnodeRadii += (float)Math.Pow(subnode.Radius, geometryProperties.NthRoot);
+        }
+
+        Radius = (float)Math.Pow(summedPottedSubnodeRadii, 1f / geometryProperties.NthRoot);
+
+        if (!this.IsRoot()) {
+            supernode.RecalculateRadius();
+        }
+    }
+
 
     private Node supernode;
-    private List<Node> subnodes = new List<Node>();
-    private List<Leaf> leaves = new List<Leaf>();
+    public bool IsRoot() {
+        return supernode == null;
+    }
+
+
+    public List<Node> Subnodes { get; private set; } = new List<Node>();
+
+    public bool HasSubnodes() {
+        return Subnodes.Count != 0;
+    }
+
+
+    public List<Leaf> Leaves { get; private set; } = new List<Leaf>();
 
 
 
     public Node(Vector3 position, GeometryProperties geometryProperties) : this(position, null, geometryProperties) { }
 
     private Node(Vector3 position, Node supernode, GeometryProperties geometryProperties) {
-        this.position = position;
+        this.Position = position;
         this.supernode = supernode;
-        this.radius = geometryProperties.GetTipRadius();
+        this.Radius = geometryProperties.TipRadius;
         this.geometryProperties = geometryProperties;
 
-        Active = true;
-
-        //CalculateOrder();
         CalculateNormal();
         AddLeaves();
     }
 
 
 
-    //only used be nearest node algorithm
+    //only used by nearest node algorithm
     public Node(Vector3 position) {
-        this.position = position;
+        this.Position = position;
     }
 
 
 
     //only gets used by the method below
     private Node(Vector3 position, Vector3 normal, float radius, GeometryProperties geometryProperties) {
-        this.position = position;
-        this.normal = normal;
-        this.radius = radius;
+        this.Position = position;
+        this.Normal = normal;
+        this.Radius = radius;
         this.geometryProperties = geometryProperties;
     }
     //used for geometry data generation
     public Node GetGeometryCopyWithNormalAndRadius(Vector3 normal, float radius) {
-        return new Node(this.position, normal, radius, geometryProperties);
+        return new Node(this.Position, normal, radius, geometryProperties);
     }
 
 
@@ -76,44 +169,25 @@ public class Node : IEquatable<Node> {
     private Node(Node supernode) {
         this.supernode = supernode;
     }
-    private void SetPosition(Vector3 position) {
-        this.position = position;
-    }
-    private void SetNormal(Vector3 normal) {
-        this.normal = normal;
-    }
-    private void SetRadius(float radius) {
-        this.radius = radius;
-    }
-    private void SetGeometryProperties(GeometryProperties geometryProperties) {
-        this.geometryProperties = geometryProperties;
-    }
-    private void SetSubnodes(List<Node> subnodes) {
-        this.subnodes = subnodes;
-    }
-    private void SetLeaves(List<Leaf> leaves) {
-        this.leaves = leaves;
-    }
     //used for deep copy
     public Node GetDeepCopyWithSupernode(Node supernode) {
         Node copy = new Node(supernode);
-        copy.SetPosition(position);
-        //copy.Order = Order;
-        copy.SetNormal(normal);
-        copy.SetRadius(radius);
-        copy.SetGeometryProperties(geometryProperties);
+        copy.Position = Position;
+        copy.Normal = Normal;
+        copy.Radius = Radius;
+        copy.geometryProperties = geometryProperties;
 
         List<Node> subnodes_ = new List<Node>();
-        for (int i=0; i<subnodes.Count; i++) {
-            subnodes_.Add(subnodes[i].GetDeepCopyWithSupernode(copy));
+        for (int i=0; i< Subnodes.Count; i++) {
+            subnodes_.Add(Subnodes[i].GetDeepCopyWithSupernode(copy));
         }
-        copy.SetSubnodes(subnodes_);
+        copy.Subnodes = subnodes_;
         
         List<Leaf> leaves_ = new List<Leaf>();
-        foreach (Leaf leaf in leaves) {
+        foreach (Leaf leaf in Leaves) {
             leaves_.Add(leaf.GetCopy());
         }
-        copy.SetLeaves(leaves_);
+        copy.Leaves = leaves_;
 
         return copy;
     }
@@ -125,12 +199,12 @@ public class Node : IEquatable<Node> {
         for (int i = 0; i < geometryProperties.DisplayedLeafesPerNodeMaximum; i++) {
             Vector3 leafPosition;
             if (supernode == null) {
-                leafPosition = position;
+                leafPosition = Position;
             } else {
-                Vector3 d = this.position - supernode.GetPosition();
-                leafPosition = supernode.GetPosition() + Util.RandomInRange(0, 1) * d;
+                Vector3 d = Position - supernode.Position;
+                leafPosition = supernode.Position + Util.RandomInRange(0, 1) * d;
             }
-            leaves.Add(new Leaf(leafPosition, geometryProperties));
+            Leaves.Add(new Leaf(leafPosition, geometryProperties));
         }
     }
 
@@ -142,7 +216,7 @@ public class Node : IEquatable<Node> {
         // and when GetVertices() would get called in between, there would be an invalid result
         lock (this) { //the corresponding lock is located at GetVertices()
             //add the node
-            subnodes.Add(completeNode);
+            Subnodes.Add(completeNode);
 
             //recalculate the normal
             CalculateNormal();
@@ -160,7 +234,7 @@ public class Node : IEquatable<Node> {
         // and when GetVertices() would get called in between, there would be an invalid result
         lock (this) { //the corresponding lock is located at GetVertices()
             //add the node
-            subnodes.Add(node);
+            Subnodes.Add(node);
 
             //recalculate the normal
             CalculateNormal();
@@ -168,178 +242,59 @@ public class Node : IEquatable<Node> {
         RecalculateRadius();
     }
 
-    public bool IsRoot() {
-        return supernode == null;
-    }
 
-    public bool HasSubnodes() {
-        return subnodes.Count != 0;
-    }
-
-    public List<Node> GetSubnodes() {
-        return subnodes;
-    }
-
-    public Vector3 GetPosition() {
-        return position;
-    }
-
-    public void UpdatePosition(Vector3 diff) {
-        position = position + diff;
-        foreach (Node n in subnodes) {
-            n.UpdatePosition(diff);
-        }
-
-        foreach (Leaf l in leaves) {
-            l.UpdatePosition(diff);
-        }
-    }
 
     public void Rotate(Vector3 byPoint, Quaternion quaternion) {
-        Vector3 d = this.position - byPoint;
+        Vector3 d = Position - byPoint;
         Vector3 direction = quaternion * d;
-        this.position = byPoint + direction;
+        Position = byPoint + direction;
 
-        foreach (Node subnode in subnodes) {
+        foreach (Node subnode in Subnodes) {
             subnode.Rotate(byPoint, quaternion);
             this.CalculateNormal();
         }
 
-        foreach (Leaf l in leaves) {
+        foreach (Leaf l in Leaves) {
             l.Rotate(byPoint, quaternion);
         }
     }
 
-    public Vector3 GetNormal() {
-        return normal;
-    }
 
-    public Vector3 GetDirection(bool normalized=false) {
-        if (this.IsRoot()) {
-            return Vector3.up;
-        } else {
-            if (normalized) {
-                return (position - supernode.position).normalized;
-            }
-            return position - supernode.position;
-            //return supernode.position - position;
-        }
-    }
 
-    //private void CalculateOrder() {
-    //    if (this.supernode != null && this.supernode.supernode != null) {
-    //        float d_angle = Vector3.Angle(supernode.GetDirection(), GetDirection());
-    //        if (d_angle > 10) {
-    //            Order = supernode.Order+1;
-    //        } else {
-    //            Order = supernode.Order;
-    //        }
-    //    }
-    //    debug("order is " + Order);
-    //}
-
-    private void CalculateNormal() {
-        if (supernode == null) { //if this is the root node
-            if (!this.HasSubnodes()) { //no subnodes
-                //point upwards
-                normal = Vector3.up;
-            } else if (subnodes.Count == 1) { //one subnode
-                //point to subnode
-                normal = subnodes[0].position - position; //vector from this to subnode
-
-                //normal = Vector3.up;
-            } else { //many subnodes
-                normal = Vector3.zero;
-                foreach (Node subnode in subnodes) {
-                    normal = normal + (subnode.GetPosition() - position) * subnode.GetRadius();
-                }
-            }
-        } else {
-            if (!this.HasSubnodes()) { //no subnodes
-                //point in own direction
-                normal = position - supernode.GetPosition(); //vector from supernode to this
-            } else if (subnodes.Count == 1) { //one subnode
-                //find tangent between(vector pointing from super to this, vector pointing from this to sub)
-                //Vector3 superToThis = position - supernode.GetPosition();
-                //Vector3 thisToSub = subnodes[0].GetPosition() - position;
-                //normal = thisToSub + superToThis;
-                normal = GetDirection() + subnodes[0].GetDirection();
-            } else { //many subnodes
-                normal = Vector3.zero;
-                foreach (Node subnode in subnodes) {
-                    if (geometryProperties.UsualConnection(this.GetRadius(), subnode.GetRadius())) {
-                        normal = normal + (subnode.GetPosition() - position) * subnode.GetRadius();// * subnode.GetRadius();
-                    }
-                }
-            }
-        }
-    }
-
-    public void RecalculateRadii() {
-        if (this.HasSubnodes()) { // signal upwards
-            foreach (Node sn in subnodes) {
-				sn.RecalculateRadii();
-			}
-		} else { //signal downwards begin
-            radius = geometryProperties.GetTipRadius();
-
-            supernode.RecalculateRadius();
-		}
-	}
-
-	private void RecalculateRadius() {
-        float summedPottedSubnodeRadii = 0;
-        foreach (Node subnode in subnodes) {
-            summedPottedSubnodeRadii += (float) Math.Pow(subnode.GetRadius(), geometryProperties.GetNthRoot());
-        }
-
-        radius = (float) Math.Pow(summedPottedSubnodeRadii, 1f/geometryProperties.GetNthRoot());
-
-        if (!this.IsRoot()) {
-            supernode.RecalculateRadius();
-        }
-    }
-
-    public float GetRadius() {
-        return radius;
-    }
 
     public void GetCircleVertices(List<Vector3> verticesResult) {
         lock (this) {
-            TreeUtil.CalculateAndStoreCircleVertices(verticesResult, position, normal, radius, geometryProperties.GetCircleResolution());
+            TreeUtil.GetCircleVertices(verticesResult, Position, Normal, Radius, geometryProperties.CircleResolution);
         }
     }
 
     private static System.Random random = new System.Random();
 
-    public void CalculateAndStoreLeafData(List<Vector3> verticesResult, List<Vector2> uvsResult, List<int> trianglesResult) {
-        //if (geometryProperties.GetLeavesEnabled()
-        if (radius < geometryProperties.GetMaxTwigRadiusForLeaves()) {
+    public void GetLeafMesh(List<Vector3> verticesResult, List<Vector2> uvsResult, List<int> trianglesResult) {
+        if (Radius < geometryProperties.MaxTwigRadiusForLeaves) {
             //if (!HasSubnodes()) {
             int n_leaves = (int)geometryProperties.GetDisplayedLeavesPerNode();
             float floatingRest = geometryProperties.GetDisplayedLeavesPerNode() - n_leaves;
 
-            float r = (float)random.NextDouble();//Util.RandomInRange(0, 1);
+            float r = (float)random.NextDouble();
             if (r <= floatingRest) {
                 n_leaves++;
             }
 
-            //debug("displayed leaves per node: " + n_leaves);
-
             for (int i = 0; i < n_leaves; i++) {
 
                 //TODO: this is a hotfix, 2 leaves should have been calculated, 2 leaves should be displayed at max - at the time
-                if (i > leaves.Count - 1) {
+                if (i > Leaves.Count - 1) {
                     break;
                 }
 
-                leaves[i].CalculateAndStoreGeometry(verticesResult, uvsResult, trianglesResult);
+                Leaves[i].CalculateAndStoreGeometry(verticesResult, uvsResult, trianglesResult);
             }
+            //}
         }
-        //}
     }
 
     public bool Equals(Node other) {
-        return (other!=null) && this.position.Equals(other.position);
+        return (other!=null) && this.Position.Equals(other.Position);
     }
 }

@@ -64,11 +64,6 @@ public class SpaceColonization {
         if (happyNodePosition.z > biggest_z) {
             biggest_z = happyNodePosition.z;
         }
-
-        //debug("bounds are now\n"
-        //    + smallest_x + " " + biggest_x + "\n"
-        //    + smallest_y + " " + biggest_y + "\n"
-        //    + smallest_z + " " + biggest_z + "\n");
     }
 
     private bool OutOfBounds(Vector3 position, float influenceDistance) {
@@ -78,23 +73,14 @@ public class SpaceColonization {
                     || position.y > biggest_y + influenceDistance
                     || position.z < smallest_z - influenceDistance
                     || position.z > biggest_z + influenceDistance;
-        //debug("out of bounds: " + result);
         return result;
-
-        //IsInBounds()
-        //return position.x >= smallest_x - influenceDistance
-        //        && position.x <= biggest_x + influenceDistance
-        //        && position.y >= smallest_y - influenceDistance
-        //        && position.y <= biggest_y + influenceDistance
-        //        && position.z >= smallest_z - influenceDistance
-        //        && position.z <= biggest_z + influenceDistance;
     }
 
-    GrowthProperties growthProperties;
+    public GrowthProperties GrowthProperties { get; private set; }
     GrowerListener growerListener;
 
     public SpaceColonization(GrowthProperties growthProperties, GrowerListener growerListener) {
-        this.growthProperties = growthProperties;
+        this.GrowthProperties = growthProperties;
         this.growerListener = growerListener;
     }
 
@@ -116,7 +102,7 @@ public class SpaceColonization {
         //nearestNodeAlgorithm = new StandardAlgorithm(growthProperties.GetInfluenceDistance(), growthProperties.GetPerceptionAngle());
         //nearestNodeAlgorithm = new SquaredDistanceAlgorithm(growthProperties.GetSquaredInfluenceDistance(), growthProperties.GetPerceptionAngle());
         //nearestNodeAlgorithm = new BinarySearchAlgorithm(growthProperties.GetSquaredInfluenceDistance(), growthProperties.GetPerceptionAngle()); //little bug somewhere
-        nearestNodeAlgorithm = new VoxelGridAlgorithm(growthProperties.GetAttractionPoints(), growthProperties.GetSquaredInfluenceDistance(), growthProperties.GetPerceptionAngle());
+        nearestNodeAlgorithm = new VoxelGridAlgorithm(GrowthProperties.AttractionPoints, GrowthProperties.GetSquaredInfluenceDistance(), GrowthProperties.PerceptionAngle);
 
         //if (growerThread == null) {
         growerThread = new Thread(() => {
@@ -130,7 +116,7 @@ public class SpaceColonization {
             GrowCrown(tree);
 
             growingStopwatch.Stop();
-            debug(new FormatString("grew {0} times in {1}", growthProperties.GetIterations(), growingStopwatch.Elapsed));
+            debug(new FormatString("grew {0} times in {1}", GrowthProperties.Iterations, growingStopwatch.Elapsed));
             //debug(new FormatString("finding voxels around took {0}", nearestNodeAlgorithm.voxelsAround.Elapsed));
             //debug(new FormatString("finding nodes in voxels took {0}", nearestNodeAlgorithm.nodesAround.Elapsed));
         });
@@ -154,9 +140,9 @@ public class SpaceColonization {
         GrowStem(tree);
 
         //put the current crown structure to the new stem
-        Vector3 pos_diff = crownRoot.GetPosition() - CurrentCrownRoot.GetPosition();
+        Vector3 pos_diff = crownRoot.Position - CurrentCrownRoot.Position;
         CurrentCrownRoot.UpdatePosition(pos_diff);
-        foreach (Node n in CurrentCrownRoot.GetSubnodes()) {
+        foreach (Node n in CurrentCrownRoot.Subnodes) {
             crownRoot.Add(n);
             //have a look at the Add method again, if you want the move the attraction points towards the stem too
         }
@@ -164,120 +150,86 @@ public class SpaceColonization {
         growerListener.OnIterationFinished();
     }
 
-    private void GrowStem(Tree tree) {
-        if (Util.AlmostEqual(growthProperties.StemLength, 0)) {
-            crownRoot = tree.StemRoot;
-        } else {
-            stemRandom = new AdvancedRandom(growthProperties.GetAttractionPoints().Seed);
+    // grows a stem on the given node
+    // uses the tree.StemRoot for max angle difference
+    // adds the nodes to the nearest node optimization stuff if specified
+    // returns the tip (last node created)
+    private Node ProceduralStem(Tree tree, Node node, float length, bool addToNearestNodeAlgorithmAndBounds) {
+        float left = length;
 
-            int iterations = (int)(growthProperties.StemLength / growthProperties.GetGrowthDistance());
-            for (int i = 0; i < iterations; i++) {
-                float angle = stemRandom.RandomInRange(-growthProperties.StemAngleRange, growthProperties.StemAngleRange);
-                Vector3 axis = stemRandom.RandomVector3();
-                axis.y = 0;
+        stemRandom = new AdvancedRandom(GrowthProperties.AttractionPoints.Seed);
 
-                if (tree.StemRoot.HasSubnodes()) {
-                    Vector3 direction = Quaternion.AngleAxis(angle, axis) * crownRoot.GetDirection(true);
-                    Node newNode = crownRoot.Add(crownRoot.GetPosition() + direction * growthProperties.GetGrowthDistance());
-                    crownRoot = newNode;
-                } else {
-                    Vector3 direction = Quaternion.AngleAxis(angle, axis) * tree.StemRoot.GetDirection(true);
-                    Node newNode = tree.StemRoot.Add(tree.StemRoot.GetPosition() + direction * growthProperties.GetGrowthDistance());
-                    crownRoot = newNode;
-                }
+        while (left > 0) {
+            float growthDistance;
+            if (left > GrowthProperties.GrowthDistance) {
+                growthDistance = GrowthProperties.GrowthDistance;
+            } else { //this automatically hits in the last iteration
+                growthDistance = left;
             }
+            left = left - growthDistance;
 
-            float rest = growthProperties.StemLength % growthProperties.GetGrowthDistance();
-            if (!Util.AlmostEqual(rest, 0)) {
-                float angle = stemRandom.RandomInRange(-growthProperties.StemAngleRange, growthProperties.StemAngleRange);
-                Vector3 axis = stemRandom.RandomVector3();
-                axis.y = 0;
+            float angle = stemRandom.RandomInRange(-GrowthProperties.StemAngleRange, GrowthProperties.StemAngleRange);
+            Vector3 axis = stemRandom.RandomVector3();
+            axis.y = 0;
 
-                if (tree.StemRoot.HasSubnodes()) {
-                    Vector3 direction = Quaternion.AngleAxis(angle, axis) * crownRoot.GetDirection(true);
-                    Node newNode = crownRoot.Add(crownRoot.GetPosition() + direction * rest);
-                    crownRoot = newNode;
-                } else {
-                    Vector3 direction = Quaternion.AngleAxis(angle, axis) * tree.StemRoot.GetDirection(true);
-                    Node newNode = tree.StemRoot.Add(tree.StemRoot.GetPosition() + direction * rest);
-                    crownRoot = newNode;
-                }
+            Vector3 direction = Quaternion.AngleAxis(angle, axis) * tree.StemRoot.GetDirection(true);
+            node = node.Add(node.Position + direction * growthDistance);
+
+            if (addToNearestNodeAlgorithmAndBounds) {
+                nearestNodeAlgorithm.Add(node);
+                UpdateBoundStorage(node.Position);
             }
         }
 
+        return node;
+    }
+
+    private void GrowStem(Tree tree) {
+        crownRoot = tree.StemRoot;
+        crownRoot = ProceduralStem(tree, crownRoot, GrowthProperties.StemLength, false);
+
         nearestNodeAlgorithm.Add(crownRoot);
-        growthProperties.GetAttractionPoints().UpdatePosition(crownRoot.GetPosition());
+        GrowthProperties.AttractionPoints.UpdatePosition(crownRoot.Position);
         growerListener.OnIterationFinished();
     }
 
 
 
     private void GrowCrownStem(Tree tree) {
-        if (!Util.AlmostEqual(growthProperties.CrownStemLengthRatio, 0)) {
-            debug("growing crown stem");
-            Node crownStemTip = crownRoot;
-
-            stemRandom = new AdvancedRandom(growthProperties.GetAttractionPoints().Seed);
-
-            int iterations = (int)(growthProperties.CrownStemLengthRatio * growthProperties.GetAttractionPoints().GetHeight() / growthProperties.GetGrowthDistance());
-            for (int i = 0; i < iterations; i++) {
-                float angle = stemRandom.RandomInRange(-growthProperties.StemAngleRange, growthProperties.StemAngleRange);
-                Vector3 axis = stemRandom.RandomVector3();
-                axis.y = 0;
-
-                Vector3 direction = Quaternion.AngleAxis(angle, axis) * crownRoot.GetDirection(true);
-                crownStemTip = crownStemTip.Add(crownStemTip.GetPosition() + direction * growthProperties.GetGrowthDistance());
-
-                nearestNodeAlgorithm.Add(crownStemTip);
-                UpdateBoundStorage(crownStemTip.GetPosition());
-            }
-
-            float rest = growthProperties.StemLength % growthProperties.GetGrowthDistance();
-            if (!Util.AlmostEqual(rest, 0)) {
-                float angle = stemRandom.RandomInRange(-growthProperties.StemAngleRange, growthProperties.StemAngleRange);
-                Vector3 axis = stemRandom.RandomVector3();
-                axis.y = 0;
-
-                Vector3 direction = Quaternion.AngleAxis(angle, axis) * crownRoot.GetDirection(true);
-                crownStemTip = crownStemTip.Add(crownStemTip.GetPosition() + direction * growthProperties.GetGrowthDistance());
-
-                nearestNodeAlgorithm.Add(crownStemTip);
-                UpdateBoundStorage(crownStemTip.GetPosition());
-            }
-        }
+        ProceduralStem(tree, crownRoot, GrowthProperties.CrownStemLengthRatio * GrowthProperties.AttractionPoints.GetHeight(), true);
         growerListener.OnIterationFinished();
     }
 
 
     private void GrowCrown(Tree tree) {
-        UpdateBoundStorage(crownRoot.GetPosition());
+        UpdateBoundStorage(crownRoot.Position);
         int n_nodes = 0;
 
         Stopwatch findClosePointStopwatch = new Stopwatch();
         Stopwatch removeClosePointsStopwatch = new Stopwatch();
 
 
-        for (int i = 0; i < growthProperties.GetIterations(); i++) {
+        for (int i = 0; i < GrowthProperties.Iterations; i++) {
 
             if (!running) {
                 return;
             }
 
-            float influenceDistance = growthProperties.GetInfluenceDistance();
-            float squaredClearDistance = growthProperties.GetSquaredClearDistance(i);
+            float influenceDistance = GrowthProperties.GetInfluenceDistance();
+            float squaredClearDistance = GrowthProperties.GetSquaredClearDistance(i);
 
             Dictionary<Node, List<Vector3>> nodes_to_attractionPoints = new Dictionary<Node, List<Vector3>>();
 
             //iterate through all attractionPoints
-            //foreach (Vector3 attractionPoint in growthProperties.GetAttractionPoints()) { //there is some threading problem with the enumeration foreach loop, usual for should fix it
-            for (int j = 0; j < growthProperties.GetAttractionPoints().Points.Length; j++) {
+            //foreach (Vector3 attractionPoint in growthProperties.AttractionPoints) { //there is some threading problem with the enumeration foreach loop, usual for should fix it
+            for (int j = 0; j < GrowthProperties.AttractionPoints.Points.Length; j++) {
 
                 if (!running) {
                     return;
                 }
 
-                Vector3 attractionPoint = growthProperties.GetAttractionPoints().Points[j];
-                if (growthProperties.GetAttractionPoints().ActivePoints[j]) {
+                Vector3 attractionPoint = GrowthProperties.AttractionPoints.Points[j];
+                if (GrowthProperties.AttractionPoints.ActivePoints[j]) {
 
                     if (OutOfBounds(attractionPoint, influenceDistance)) {
                         continue;
@@ -285,7 +237,7 @@ public class SpaceColonization {
 
                     //and find the closest Node respectively
                     findClosePointStopwatch.Start();
-                    Node closest = nearestNodeAlgorithm.GetNearestWithinSquaredDistance(attractionPoint);
+                    Node closest = nearestNodeAlgorithm.GetNearest(attractionPoint);
                     findClosePointStopwatch.Stop();
 
                     //if there is a close Node
@@ -293,9 +245,9 @@ public class SpaceColonization {
                         // Rudis ultimate plan to make the removal in the next iteration
                         removeClosePointsStopwatch.Start();
                         if (i > 0) { //in the first iteration, the attraction points shall not get deleted
-                            if (Util.SquaredDistance(attractionPoint, closest.GetPosition()) <= squaredClearDistance) {
-                                growthProperties.GetAttractionPoints().ActivePoints[j] = false;
-                                growthProperties.GetAttractionPoints().ActiveCount--;
+                            if (Util.SquaredDistance(attractionPoint, closest.Position) <= squaredClearDistance) {
+                                GrowthProperties.AttractionPoints.ActivePoints[j] = false;
+                                GrowthProperties.AttractionPoints.ActiveCount--;
                                 removeClosePointsStopwatch.Stop();
                                 continue;
                             } else {
@@ -326,52 +278,21 @@ public class SpaceColonization {
                 //calculate direction
                 Vector3 sum = new Vector3(0, 0, 0);
                 foreach (Vector3 associatedAttractionPoint in associatedAttractionPoints) {
-                    sum += (associatedAttractionPoint - currentNode.GetPosition()).normalized;
-                    //sum += (associatedAttractionPoint - currentNode.GetPosition()) * (associatedAttractionPoint - currentNode.GetPosition()).magnitude;
-                    //sum += (associatedAttractionPoint - currentNode.GetPosition()) * (1/((associatedAttractionPoint - currentNode.GetPosition()).magnitude* (associatedAttractionPoint - currentNode.GetPosition()).magnitude));
+                    sum += (associatedAttractionPoint - currentNode.Position).normalized;
                 }
 
-                Vector3 direction = (sum + Util.Hadamard(growthProperties.GetTropisms(), growthProperties.TropismsWeights)).normalized * growthProperties.GetGrowthDistance();
+                Vector3 direction = (sum + Util.Hadamard(GrowthProperties.Tropisms, GrowthProperties.TropismsWeights)).normalized * GrowthProperties.GrowthDistance;
 
                 //sometimes tropisms make the nodes grow "backwards" again, this fixes that:
                 float d_angle = Vector3.Angle(currentNode.GetDirection(), direction);
-                if (d_angle > growthProperties.GetPerceptionAngle() / 2) {
-                    float unallowedDiff = d_angle - growthProperties.GetPerceptionAngle() / 2;
+                if (d_angle > GrowthProperties.PerceptionAngle / 2) {
+                    float unallowedDiff = d_angle - GrowthProperties.PerceptionAngle / 2;
                     Vector3 axis = Vector3.Cross(direction, currentNode.GetDirection());
                     direction = Quaternion.AngleAxis(unallowedDiff, axis) * direction;
                 }
 
-                //Vector3 direction;
-                //if (i < 0.3 * growthProperties.GetIterations()) {
-                //    direction = (sum + Util.Hadamard(growthProperties.GetTropisms(i), new Vector3(0, 10, 0))).normalized * growthProperties.GetGrowthDistance();
-                //} else if (i < 0.5 * growthProperties.GetIterations()) {
-                //    direction = (sum + Util.Hadamard(growthProperties.GetTropisms(i), new Vector3(0, 0, 0))).normalized * growthProperties.GetGrowthDistance();
-                //} else if (i < 0.8 * growthProperties.GetIterations()) {
-                //    direction = (sum + Util.Hadamard(growthProperties.GetTropisms(i), new Vector3(0, -5, 0))).normalized * growthProperties.GetGrowthDistance();
-                //} else {
-                //    direction = (sum + Util.Hadamard(growthProperties.GetTropisms(i), new Vector3(0, -5, 0))).normalized * growthProperties.GetGrowthDistance();
-                //}
-
-                //Vector3 direction;
-                //if (i < 0.5 * growthProperties.GetIterations()) {
-                //    direction = (sum + Util.Hadamard(growthProperties.GetTropisms(i), new Vector3(0, 10, 0))).normalized * growthProperties.GetGrowthDistance();
-                //} else {
-                //    direction = (sum + Util.Hadamard(growthProperties.GetTropisms(i), new Vector3(0, -1, 0))).normalized * growthProperties.GetGrowthDistance();
-                //}
-
-                //Vector3 direction = (sum + growthProperties.GetTropisms()).normalized * growthProperties.GetGrowthDistance();
-                //debug("direction is " + direction);
-                ////hanging branches:
-                //// the smaller the angle(newNode_direction, Vec3.down)
-                //// the more the gravitation gets applied (with lower bound of the branch pointing downwards!)
-                //// .. rotation by axis Cross(Vec3.down, newNode_direction)
-                //// ..        and f(angle) = k*(180-angle)
-                //float angleToDown = Vector3.Angle(direction, Vector3.down);
-                //Vector3 rotationAxis = Vector3.Cross(direction, Vector3.down);
-                //direction = Quaternion.AngleAxis(1f * (180 - angleToDown), rotationAxis) * direction;
-
                 //and new nodes position
-                Vector3 happyNodePosition = currentNode.GetPosition() + direction;
+                Vector3 happyNodePosition = currentNode.Position + direction;
 
 
                 if (!IsDuplicateNode(happyNodePosition, currentNode)) {
@@ -392,7 +313,7 @@ public class SpaceColonization {
             //removeClosePointsStopwatch.Stop();
 
             growerListener.OnIterationFinished();
-            debug("finished iteration " + i);
+            //debug("finished iteration " + i);
 
             if (n_newNodes == 0) {
                 growerListener.OnGrowthStopped();
@@ -405,88 +326,15 @@ public class SpaceColonization {
         debug(new FormatString("finding close points took {0}", findClosePointStopwatch.Elapsed));
         debug(new FormatString("removing close points took {0}", removeClosePointsStopwatch.Elapsed));
 
-        //Prune(tree);
-        //tree.StemRoot.RecalculateRadii();
-
         running = false;
     }
 
     private bool IsDuplicateNode(Vector3 potentialPosition, Node node) {
-        foreach (Node subnode in node.GetSubnodes()) {
-            if (subnode.GetPosition().Equals(potentialPosition)) {
+        foreach (Node subnode in node.Subnodes) {
+            if (subnode.Position.Equals(potentialPosition)) {
                 return true;
             }
         }
         return false;
-    }
-
-
-
-    //PRUNING FOR ONCE IN THE END
-    //private int maxConsecutiveNonBranchingNodes = 7;
-
-    //private void Prune(Tree tree) {
-    //    PruneHelper(tree.CrownRoot, 0);
-    //}
-
-    //private void PruneHelper(Node currentNode, int consecutiveNonBranchingNodes) {
-    //    if (consecutiveNonBranchingNodes == maxConsecutiveNonBranchingNodes) {
-    //        currentNode.GetSubnodes().Clear();
-    //    } else {
-
-    //        if (currentNode.HasSubnodes()) {
-    //            if (currentNode.GetSubnodes().Count == 1) {
-    //                PruneHelper(currentNode.GetSubnodes()[0], consecutiveNonBranchingNodes + 1);
-    //            } else { //(currentNode.GetSubnodes().Count > 1)
-    //                foreach (Node sn in currentNode.GetSubnodes()) {
-    //                    PruneHelper(sn, 0);
-    //                }
-    //            }
-    //        }
-    //    }
-    //}
-
-
-
-    //private int maxConsecutiveNonBranchingNodes = 8;
-
-    //private void Prune(Tree tree)
-    //{
-    //	PruneHelper(tree.CrownRoot, 0);
-    //}
-
-    //private void PruneHelper(Node currentNode, int consecutiveNonBranchingNodes)
-    //{
-    //	if (consecutiveNonBranchingNodes == maxConsecutiveNonBranchingNodes)
-    //	{
-    //		currentNode.Active = false;
-    //	}
-    //	else
-    //	{
-
-    //		if (currentNode.HasSubnodes())
-    //		{
-    //			if (currentNode.GetSubnodes().Count == 1)
-    //			{
-    //				PruneHelper(currentNode.GetSubnodes()[0], consecutiveNonBranchingNodes + 1);
-    //			}
-    //			else
-    //			{ //(currentNode.GetSubnodes().Count > 1)
-    //				foreach (Node sn in currentNode.GetSubnodes())
-    //				{
-    //					PruneHelper(sn, 0);
-    //				}
-    //			}
-    //		}
-    //	}
-    //}
-
-
-    //#######################################################################################
-    //##########                 INTERFACE IMPLEMENTIATION : Grower                ##########
-    //#######################################################################################
-
-    public GrowthProperties GetGrowthProperties() {
-        return growthProperties;
     }
 }

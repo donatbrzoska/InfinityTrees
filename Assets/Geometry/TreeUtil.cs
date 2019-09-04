@@ -67,7 +67,7 @@ public static class TreeUtil
 		}
 	}
 
-	public static void CalculateAndStoreCircleVertices(List<Vector3> verticesResult, Vector3 position, Vector3 targetNormal, float radius, int resolution)
+	public static void GetCircleVertices(List<Vector3> verticesResult, Vector3 position, Vector3 targetNormal, float radius, int resolution)
 	{
 		float angle = 360f / resolution;
 		float currentAngle = 0;

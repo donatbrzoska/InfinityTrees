@@ -2,9 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-//Entwurfsentscheidungen:
-// wichtig ist vor allem, dass geometryProperties geändert werden können
-// >> ohne, dass der ganze Baum neu berechnet werden muss
 public class Leaf {
 
     public enum LeafType {
@@ -45,11 +42,6 @@ public class Leaf {
         this.position = byPoint + direction;
     }
 
-        //float size;
-        //public void UpdateSize() {
-        //    size = geometryProperties.GetLeafSize();
-        //}
-
     GeometryProperties geometryProperties;
 
     Quaternion rotation;
@@ -64,8 +56,6 @@ public class Leaf {
         float rotationAngle = Util.RandomInRange(0, 360, random);
         Vector3 rotationAxis = Util.RandomVector3(random);
         rotation = Quaternion.AngleAxis(rotationAngle, rotationAxis);
-
-        //size = geometryProperties.GetLeafSize();
     }
 
 

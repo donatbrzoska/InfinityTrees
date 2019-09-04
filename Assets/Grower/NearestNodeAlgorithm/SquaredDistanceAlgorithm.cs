@@ -20,14 +20,14 @@ public class SquaredDistanceAlgorithm : NearestNodeAlgorithm{
 
 
     //returns null if there is no closest node
-    public Node GetNearestWithinSquaredDistance(Vector3 attractionPoint) {
+    public Node GetNearest(Vector3 attractionPoint) {
 
         float currentSmallestDistance = squaredInfluenceDistance;
         Node closest = null;
 
         foreach (Node current in nodeList) {
 
-            float quadraticDistanceToCurrent = GetQuadraticDistanceWithMaxValue(current.GetPosition(), attractionPoint, currentSmallestDistance);
+            float quadraticDistanceToCurrent = GetQuadraticDistanceWithMaxValue(current.Position, attractionPoint, currentSmallestDistance);
 
             if (quadraticDistanceToCurrent!=-1) { //check if the distance is smaller than required
                 if (AttractionPointInPerceptionAngle(current, attractionPoint, perceptionAngle)) { //angle calculation is a lot slower than one distance calculation
@@ -41,7 +41,7 @@ public class SquaredDistanceAlgorithm : NearestNodeAlgorithm{
     }
 
     private bool AttractionPointInPerceptionAngle(Node node, Vector3 attractionPoint, float nodePerceptionAngle) {
-        float angle = Vector3.Angle(node.GetDirection(), attractionPoint - node.GetPosition());
+        float angle = Vector3.Angle(node.GetDirection(), attractionPoint - node.Position);
         bool isInPerceptionAngle = angle <= nodePerceptionAngle / 2f;
         return isInPerceptionAngle;
     }
