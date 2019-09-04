@@ -8,6 +8,7 @@ public class SaveController : MonoBehaviour {
     Thread displayDoneThread;
     bool displayDoneThreadRunning;
     bool displayDone;
+    int displayDoneTime = 1500;
 
     public void OnClick() {
         GameObject.Find("Core").GetComponent<Core>().OnSave();
@@ -20,7 +21,7 @@ public class SaveController : MonoBehaviour {
         displayDone = true;
         displayDoneThread = new Thread(() => {
             int slept = 0;
-            while (slept < 700) {
+            while (slept < displayDoneTime) {
                 if (displayDoneThreadRunning) {
                     Thread.Sleep(50);
                     slept += 50;
@@ -43,12 +44,10 @@ public class SaveController : MonoBehaviour {
 
         if (Input.GetMouseButtonDown(0) && GameObject.Find("EventSystem").GetComponent<EventSystem>().currentSelectedGameObject == gameObject) {
             GameObject.Find("Core").GetComponent<Core>().DisableCameraMovement();
-            GameObject.Find("Core").GetComponent<Core>().EnablePointCloudRenderer();
         }
 
         if (Input.GetMouseButtonUp(0)) {
             GameObject.Find("Core").GetComponent<Core>().EnableCameraMovement();
-            GameObject.Find("Core").GetComponent<Core>().DisablePointCloudRenderer();
         }
     }
 
