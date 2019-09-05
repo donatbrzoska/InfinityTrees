@@ -55,19 +55,16 @@ public class GeometryProperties {
     public float MaxTwigRadiusForLeaves { get; set; } //make depend on tip radius?
 
 
-    private Dictionary<Leaf.LeafType, float> leafSizes = new Dictionary<Leaf.LeafType, float>();
+    public float DisplayedLeavesPerNode { get; set; }
 
-    public void SetLeafSize(Leaf.LeafType type, float leafSize) {
-        this.leafSizes[type] = leafSize;
-    }
+    public int DisplayedLeafesPerNodeMaximum { get; set; }
 
-    public float GetLeafSize() {
-        return leafSizes[leafType];
-    }
+
+    public float LeafSize { get;  set; }
 
     public float GetLeafSizeValue() {
-        float leafSizeStdDev = 0.2f * leafSizes[leafType];
-        return Util.RandomWithStdDev(leafSizes[leafType], leafSizeStdDev);
+        float leafSizeStdDev = 0.2f * LeafSize;
+        return Util.RandomWithStdDev(LeafSize, leafSizeStdDev);
     }
 
 
@@ -88,19 +85,6 @@ public class GeometryProperties {
         return leafType;
     }
 
-
-    private Dictionary<Leaf.LeafType, float> displayedLeavesPerNode = new Dictionary<Leaf.LeafType, float>();
-
-    public void SetDisplayedLeavesPerNode(Leaf.LeafType type, float displayedLeavesPerNode) {
-        this.displayedLeavesPerNode[type] = displayedLeavesPerNode;
-    }
-
-    public float GetDisplayedLeavesPerNode() {
-        return displayedLeavesPerNode[leafType];
-    }
-
-
-    public int DisplayedLeafesPerNodeMaximum;
 
 
     //##############################

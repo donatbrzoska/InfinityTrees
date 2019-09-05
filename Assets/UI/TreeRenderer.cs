@@ -56,13 +56,24 @@ public class TreeRenderer : MonoBehaviour {
         //also see https://answers.unity.com/questions/1016155/standard-material-shader-ignoring-setfloat-propert.html
     }
 
-    void SetTexture(string textureFilename) {
-        texture = Resources.Load(textureFilename) as Texture2D;
+    bool customLoaded = false;
 
-        ////https://forum.unity.com/threads/possible-to-import-custom-user-textures-from-file-system-at-runtime.265862/
-        //string texture_path = "/Users/donatdeva/Documents/Studium/6. Semester/Bachelorarbeit/Unity/AnimationTrees/Assets/Resources/" + textureFilename + ".png";
-        //byte[] byteFile = File.ReadAllBytes(texture_path);
-        //texture.LoadImage(byteFile);
+    void SetTexture(string textureFilename) {
+        if (textureFilename.Equals("custom_texture.png")) {
+            if (!customLoaded) {
+                //https://forum.unity.com/threads/possible-to-import-custom-user-textures-from-file-system-at-runtime.265862/
+                //string texture_path = textureFilename;
+                byte[] byteFile = File.ReadAllBytes(textureFilename);
+                //Debug.Log("byteFile size: " + ((byteFile==null) ? "null" : ""+byteFile.Length));
+                texture = new Texture2D(1024, 1024);
+                texture.LoadImage(byteFile);
+                customLoaded = true;
+            }
+        } else {
+            texture = Resources.Load(textureFilename) as Texture2D;
+            customLoaded = false;
+        }
+
 
         ////Tex = new Texture2D(256, 256);
         ////Tex.LoadImage(byteFile);

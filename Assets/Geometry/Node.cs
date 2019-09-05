@@ -273,8 +273,8 @@ public class Node : IEquatable<Node> {
     public void GetLeafMesh(List<Vector3> verticesResult, List<Vector2> uvsResult, List<int> trianglesResult) {
         if (Radius < geometryProperties.MaxTwigRadiusForLeaves) {
             //if (!HasSubnodes()) {
-            int n_leaves = (int)geometryProperties.GetDisplayedLeavesPerNode();
-            float floatingRest = geometryProperties.GetDisplayedLeavesPerNode() - n_leaves;
+            int n_leaves = (int)geometryProperties.DisplayedLeavesPerNode;
+            float floatingRest = geometryProperties.DisplayedLeavesPerNode - n_leaves;
 
             float r = (float)random.NextDouble();
             if (r <= floatingRest) {

@@ -202,25 +202,15 @@ public class Core : MonoBehaviour, GrowerListener {
         //geometryProperties.SetMinRadiusRatioForNormalConnection(0.1f);
 
         geometryProperties.PendulousBranchesIntensity = 0;
-        debug("pbi " + geometryProperties.PendulousBranchesIntensity);
 
         geometryProperties.PendulousBranchesBeginDepthMin = 0;
-        debug("stem length is " + growthProperties.StemLength);
-        debug("iterations are " + growthProperties.Iterations);
         geometryProperties.PendulousBranchesBeginDepthMax = CalculateBranchOrientationBeginDepthMax(growthProperties.Iterations);
-        debug("max depth is " + geometryProperties.PendulousBranchesBeginDepthMax);
-        debug("begin depth is " + geometryProperties.PendulousBranchesBeginDepth);
         geometryProperties.PendulousBranchesBeginDepthRatio = 0.75f;
-        debug("pbbdr " + geometryProperties.PendulousBranchesBeginDepthRatio);
 
         geometryProperties.MaxTwigRadiusForLeaves = 0.009f;
-        geometryProperties.SetLeafSize(Leaf.LeafType.Triangle, 0.4f);
-        geometryProperties.SetLeafSize(Leaf.LeafType.ParticleSquare, 1f);
-        geometryProperties.SetLeafSize(Leaf.LeafType.ParticleCrossFoil, 0.7f);
-        geometryProperties.SetDisplayedLeavesPerNode(Leaf.LeafType.Triangle, 2f);
-        geometryProperties.SetDisplayedLeavesPerNode(Leaf.LeafType.ParticleSquare, 0.5f);
-        geometryProperties.SetDisplayedLeavesPerNode(Leaf.LeafType.ParticleCrossFoil, 0.7f);
-        geometryProperties.DisplayedLeafesPerNodeMaximum = 3;
+        geometryProperties.LeafSize = 0.7f;
+        geometryProperties.DisplayedLeavesPerNode = 0.7f;
+        geometryProperties.DisplayedLeafesPerNodeMaximum = 4;
         //geometryProperties.SetLeafSize(0.5f);
         geometryProperties.SetLeafType(Leaf.LeafType.ParticleCrossFoil);
 
@@ -238,7 +228,7 @@ public class Core : MonoBehaviour, GrowerListener {
     }
 
     void LoadNoLeavesGeometry() {
-        geometryProperties.SetDisplayedLeavesPerNode(Leaf.LeafType.ParticleCrossFoil, 0);
+        geometryProperties.DisplayedLeavesPerNode = 0;
     }
 
 
@@ -254,8 +244,8 @@ public class Core : MonoBehaviour, GrowerListener {
     void LoadPseudoPoplarGeometry() {
         geometryProperties.StemThickness = 0.6f;
 
-        geometryProperties.SetLeafSize(Leaf.LeafType.ParticleCrossFoil, 0.7f);
-        geometryProperties.SetDisplayedLeavesPerNode(Leaf.LeafType.ParticleCrossFoil, 1.5f);
+        geometryProperties.LeafSize = 0.7f;
+        geometryProperties.DisplayedLeavesPerNode = 1.5f;
     }
 
 
@@ -275,8 +265,9 @@ public class Core : MonoBehaviour, GrowerListener {
     void LoadExcurrentGeometry() {
         geometryProperties.CurrentStemColorStringsIndex = 0;
         geometryProperties.CurrentLeafColorStringsIndex = 6;
-        geometryProperties.SetDisplayedLeavesPerNode(Leaf.LeafType.ParticleCrossFoil, 0.7f);
-        geometryProperties.SetLeafSize(Leaf.LeafType.ParticleCrossFoil, 0.85f);
+
+        geometryProperties.DisplayedLeavesPerNode = 0.7f;
+        geometryProperties.LeafSize = 0.85f;
     }
 
 
@@ -290,7 +281,6 @@ public class Core : MonoBehaviour, GrowerListener {
         LoadNoLeavesGeometry();
         geometryProperties.PendulousBranchesIntensity = 0.4f;
         geometryProperties.PendulousBranchesBeginDepthRatio = 0.7f;
-        debug("depth: " + geometryProperties.PendulousBranchesBeginDepth);
     }
 
 
@@ -301,8 +291,8 @@ public class Core : MonoBehaviour, GrowerListener {
 
     void LoadPendulousBranchesGeometry() {
         geometryProperties.StemThickness = 0.45f;
-        geometryProperties.SetLeafSize(Leaf.LeafType.ParticleCrossFoil, 0.3f);
-        geometryProperties.SetDisplayedLeavesPerNode(Leaf.LeafType.ParticleCrossFoil, 1.5f);
+        geometryProperties.LeafSize = 0.3f;
+        geometryProperties.DisplayedLeavesPerNode = 1.5f;
         geometryProperties.PendulousBranchesIntensity = 0.8f;
         geometryProperties.PendulousBranchesBeginDepthRatio = 0.7f;
     }
@@ -310,8 +300,8 @@ public class Core : MonoBehaviour, GrowerListener {
 
     void LoadBushGeometry() {
         //geometryProperties.SetDisplayedLeavesPerNode(Leaf.LeafType.ParticleCrossFoil, 0.1f);
-        geometryProperties.SetLeafSize(Leaf.LeafType.ParticleCrossFoil, 0.5f);
-        geometryProperties.SetDisplayedLeavesPerNode(Leaf.LeafType.ParticleCrossFoil, 1f);
+        geometryProperties.LeafSize = 0.5f;
+        geometryProperties.DisplayedLeavesPerNode = 1f;
         geometryProperties.CurrentStemColorStringsIndex = 4;
         geometryProperties.CurrentLeafColorStringsIndex = 8;
     }
@@ -424,7 +414,7 @@ public class Core : MonoBehaviour, GrowerListener {
     }
 
     void LoadTestGrowthGeometry() {
-        geometryProperties.SetDisplayedLeavesPerNode(Leaf.LeafType.ParticleCrossFoil, 0);
+        geometryProperties.DisplayedLeavesPerNode = 0;
     }
 
 
@@ -442,7 +432,7 @@ public class Core : MonoBehaviour, GrowerListener {
     void LoadBigGrowthGeometry() {
         geometryProperties.StemThickness = 0.45f;
         geometryProperties.CircleResolution = 7;
-        geometryProperties.SetDisplayedLeavesPerNode(Leaf.LeafType.ParticleCrossFoil, 0);
+        geometryProperties.DisplayedLeavesPerNode = 0;
     }
 
 
@@ -492,8 +482,8 @@ public class Core : MonoBehaviour, GrowerListener {
 
         GameObject.Find("Foliage Density Slider").GetComponent<Slider>().minValue = 0;
         GameObject.Find("Foliage Density Slider").GetComponent<Slider>().maxValue = geometryProperties.DisplayedLeafesPerNodeMaximum;
-        GameObject.Find("Foliage Density Slider").GetComponent<Slider>().SetValueWithoutNotify(geometryProperties.GetDisplayedLeavesPerNode());
-        GameObject.Find("Foliage Lobe Size Slider").GetComponent<Slider>().SetValueWithoutNotify(geometryProperties.GetLeafSize());
+        GameObject.Find("Foliage Density Slider").GetComponent<Slider>().SetValueWithoutNotify(geometryProperties.DisplayedLeavesPerNode);
+        GameObject.Find("Foliage Lobe Size Slider").GetComponent<Slider>().SetValueWithoutNotify(geometryProperties.LeafSize);
 
         GameObject.Find("Circle Resolution Slider").GetComponent<Slider>().SetValueWithoutNotify(geometryProperties.CircleResolution);
 
@@ -887,6 +877,9 @@ public class Core : MonoBehaviour, GrowerListener {
     //#######################################################################################
 
     public void OnLeafType(int value) {
+        if (value == 3) {
+            SetMessage("Put a texture with the filename \"custom_texture.png\" in the same folder as the application runs and you are good to go :)\n(stem texture on the left, leaf texture on the right)");
+        }
         geometryProperties.UpdateLeafType(value);
 
         recalculateMesh = true;
@@ -903,17 +896,21 @@ public class Core : MonoBehaviour, GrowerListener {
     }
 
     public string GetTexture() {
-        return Leaf.LeafTypeToFilename[geometryProperties.GetLeafType()] + "/" + geometryProperties.StemColorStrings[geometryProperties.CurrentStemColorStringsIndex] + "_" + geometryProperties.LeafColorStrings[geometryProperties.CurrentLeafColorStringsIndex];
+        if (geometryProperties.GetLeafType() == Leaf.LeafType.Square) {
+            return Leaf.LeafTypeToFilename[geometryProperties.GetLeafType()];
+        } else {
+            return Leaf.LeafTypeToFilename[geometryProperties.GetLeafType()] + "/" + geometryProperties.StemColorStrings[geometryProperties.CurrentStemColorStringsIndex] + "_" + geometryProperties.LeafColorStrings[geometryProperties.CurrentLeafColorStringsIndex];
+        }
     }
 
     public void OnFoliageDensity(float value) {
-        geometryProperties.SetDisplayedLeavesPerNode(geometryProperties.GetLeafType(), value);
+        geometryProperties.DisplayedLeavesPerNode = value;
 
         recalculateMesh = true;
     }
 
     public void OnFoliageLobeSize(float value) {
-        geometryProperties.SetLeafSize(geometryProperties.GetLeafType(), value);
+        geometryProperties.LeafSize = value;
 
         recalculateMesh = true;
     }
@@ -1089,15 +1086,17 @@ public class Core : MonoBehaviour, GrowerListener {
     public void OnSave() {
         string meshFilename = "tree_" + vertices.Count + "_" + triangles.Count + ".obj";
         ObjExporter.MeshToFile(vertices, normals, uvs, triangles, meshFilename);
+        UnityEngine.Debug.Log("Saved mesh to " + meshFilename);
 
         //Important: make sure that the textures have "Alpha is Transparency" checked, otherwise there are black borders
         //string textureFilename = geometryProperties.StemColorStrings[geometryProperties.CurrentStemColorStringsIndex] + "_" + geometryProperties.LeafColorStrings[geometryProperties.CurrentLeafColorStringsIndex] + "_" + Leaf.LeafTypeToFilename[geometryProperties.GetLeafType()] + ".png";
-        string textureFilename = GetTexture().Replace("/", "_") + ".png";
-        byte[] texture_bytes = DuplicateTexture(Resources.Load(GetTexture()) as Texture2D).EncodeToPNG();
-        File.WriteAllBytes(textureFilename, texture_bytes);
+        if (geometryProperties.GetLeafType() != Leaf.LeafType.Square) {
+            string textureFilename = GetTexture().Replace("/", "_") + ".png";
+            byte[] texture_bytes = DuplicateTexture(Resources.Load(GetTexture()) as Texture2D).EncodeToPNG();
+            File.WriteAllBytes(textureFilename, texture_bytes);
+            UnityEngine.Debug.Log("Saved texture to " + textureFilename);
+        }
 
-        UnityEngine.Debug.Log("Saved mesh to " + meshFilename);
-        UnityEngine.Debug.Log("Saved texture to " + textureFilename);
         SetMessage("Done :)", 2000);
     }
 

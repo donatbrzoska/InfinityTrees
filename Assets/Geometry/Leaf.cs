@@ -14,22 +14,25 @@ public class Leaf {
     public static Dictionary<Leaf.LeafType, string> LeafTypeToString = new Dictionary<Leaf.LeafType, string> {
         { Leaf.LeafType.ParticleSquare, "Particle"},
         { Leaf.LeafType.ParticleCrossFoil, "Particle Cross Foil"},
-        { Leaf.LeafType.Triangle, "Triangle" }
+        { Leaf.LeafType.Triangle, "Triangle" },
+        { Leaf.LeafType.Square, "Custom" }
     };
 
     public static Dictionary<Leaf.LeafType, string> LeafTypeToFilename = new Dictionary<Leaf.LeafType, string> {
         { Leaf.LeafType.ParticleSquare, "particle"},
         { Leaf.LeafType.ParticleCrossFoil, "particle"},
-        { Leaf.LeafType.Triangle, "triangle" }
+        { Leaf.LeafType.Triangle, "triangle" },
+        { Leaf.LeafType.Square, "custom_texture.png" }
     };
 
     public static Dictionary<string, Leaf.LeafType> LeafTypeStringToLeafType = new Dictionary<string, Leaf.LeafType> {
         { "Particle", Leaf.LeafType.ParticleSquare },
         { "Particle Cross Foil", Leaf.LeafType.ParticleCrossFoil },
-        { "Triangle", Leaf.LeafType.Triangle }
+        { "Triangle", Leaf.LeafType.Triangle },
+        {  "Custom", Leaf.LeafType.Square}
     };
 
-    public static List<string> LeafTypeStrings = new List<string> { "Particle", "Particle Cross Foil", "Triangle" };
+    public static List<string> LeafTypeStrings = new List<string> { "Particle", "Particle Cross Foil", "Triangle", "Custom"};
 
 	Vector3 position;
     public void UpdatePosition(Vector3 diff) {
