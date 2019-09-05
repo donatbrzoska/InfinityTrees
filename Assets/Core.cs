@@ -75,8 +75,8 @@ public class Core : MonoBehaviour, GrowerListener {
         //LoadBigGrowth();
         //LoadBigGrowthGeometry();
 
-        LoadBigGrowth2();
-        LoadBigGrowthGeometry();
+        //LoadBigGrowth2();
+        //LoadBigGrowthGeometry();
 
 
 
@@ -202,10 +202,16 @@ public class Core : MonoBehaviour, GrowerListener {
         //geometryProperties.SetMinRadiusRatioForNormalConnection(0.1f);
 
         geometryProperties.PendulousBranchesIntensity = 0;
+        debug("pbi " + geometryProperties.PendulousBranchesIntensity);
 
         geometryProperties.PendulousBranchesBeginDepthMin = 0;
+        debug("stem length is " + growthProperties.StemLength);
+        debug("iterations are " + growthProperties.Iterations);
         geometryProperties.PendulousBranchesBeginDepthMax = CalculateBranchOrientationBeginDepthMax(growthProperties.Iterations);
+        debug("max depth is " + geometryProperties.PendulousBranchesBeginDepthMax);
+        debug("begin depth is " + geometryProperties.PendulousBranchesBeginDepth);
         geometryProperties.PendulousBranchesBeginDepthRatio = 0.75f;
+        debug("pbbdr " + geometryProperties.PendulousBranchesBeginDepthRatio);
 
         geometryProperties.MaxTwigRadiusForLeaves = 0.009f;
         geometryProperties.SetLeafSize(Leaf.LeafType.Triangle, 0.4f);
@@ -424,6 +430,8 @@ public class Core : MonoBehaviour, GrowerListener {
 
     void LoadBigGrowth() {
         growthProperties.AttractionPoints = new PseudoEllipsoid(10, 10, 10, 15, 0.15f, 0.05f);
+        growthProperties.CrownStemLengthRatio = 0.07f;
+        growthProperties.BranchDensityBegin = 0.04f;
         growthProperties.GnarlyBranchesRatio = 1;
         debug(growthProperties.AttractionPoints.Points.Length + " attraction points");
         debug(growthProperties.AttractionPoints.Density + " density");
@@ -432,25 +440,11 @@ public class Core : MonoBehaviour, GrowerListener {
     }
 
     void LoadBigGrowthGeometry() {
-        geometryProperties.SetDisplayedLeavesPerNode(Leaf.LeafType.ParticleCrossFoil, 0);
-    }
-
-
-    void LoadBigGrowth2() {
-        growthProperties.AttractionPoints = new PseudoEllipsoid(10, 10, 10, 15, 0.15f, 0.05f);
-        growthProperties.CrownStemLengthRatio = 0.15f;
-        growthProperties.BranchDensityBegin = 0.1f;
-        growthProperties.GnarlyBranchesRatio = 1;
-        debug(growthProperties.AttractionPoints.Points.Length + " attraction points");
-        debug(growthProperties.AttractionPoints.Density + " density");
-
-        growthProperties.Iterations = 50;
-    }
-
-    void LoadBigGrowthGeometry2() {
+        geometryProperties.StemThickness = 0.45f;
         geometryProperties.CircleResolution = 7;
         geometryProperties.SetDisplayedLeavesPerNode(Leaf.LeafType.ParticleCrossFoil, 0);
     }
+
 
 
     private void InitializeUI() {
@@ -476,6 +470,10 @@ public class Core : MonoBehaviour, GrowerListener {
 
         //GameObject.Find("Grow Towards Light Slider").GetComponent<Slider>().SetValueWithoutNotify(growthProperties.UpTropismWeightRatio);
 
+
+        GameObject.Find("Examples Dropdown").GetComponent<BasicsController>().Initialize_Examples(exampleStrings);
+        GameObject.Find("Examples Dropdown").GetComponent<Dropdown>().SetValueWithoutNotify(currentExampleIndex);
+        GameObject.Find("Examples Dropdown").GetComponent<Dropdown>().RefreshShownValue();
 
         GameObject.Find("Stem Color Dropdown").GetComponent<BasicsController>().Initialize_StemColors(geometryProperties.StemColorStrings);
         GameObject.Find("Stem Color Dropdown").GetComponent<Dropdown>().SetValueWithoutNotify(geometryProperties.CurrentStemColorStringsIndex);
@@ -988,6 +986,7 @@ public class Core : MonoBehaviour, GrowerListener {
         SetMessage("");
         grower.Stop();
 
+        currentExampleIndex = 0;
         LoadDefaultGrowth();
         LoadDefaultGeometry();
         InitializeUI();
@@ -1004,6 +1003,63 @@ public class Core : MonoBehaviour, GrowerListener {
         growthProperties.AttractionPoints.NewSeed();
 
         tree.Reset();
+
+        grower.Grow(tree);
+    }
+
+    int currentExampleIndex = 0;
+
+    private List<string> exampleStrings = new List<string> {
+        "Normal Tree", //0
+        "Young Tree", //1
+        "Pseudo Poplar", //2
+        "Fir", //3
+        "Pendulous Branches", //4
+        "Bush", //5
+        "Big Gnarly Tree" //6
+
+    };
+
+    public void OnExample(int value) {
+        currentExampleIndex = value;
+
+        grower.Stop();
+
+        LoadDefaultGrowth();
+        LoadDefaultGeometry();
+        switch (value) {
+            case 1:
+                LoadYoungGrowth();
+                LoadYoungGeometry();
+                break;
+            case 2:
+                LoadPseudoPoplarGrowth();
+                LoadPseudoPoplarGeometry();
+                break;
+            case 3:
+                LoadExcurrentGrowth();
+                LoadExcurrentGeometry();
+                break;
+            case 4:
+                LoadPendulousBranchesGrowth();
+                LoadPendulousBranchesGeometry();
+                break;
+            case 5:
+                LoadBushGrowth();
+                LoadBushGeometry();
+                break;
+            case 6:
+                LoadBigGrowth();
+                LoadBigGrowthGeometry();
+                break;
+            default:
+                LoadDefaultGeometry();
+                LoadDefaultGrowth();
+                break;
+        }
+        InitializeUI();
+
+        pointCloudReady = true;
 
         grower.Grow(tree);
     }

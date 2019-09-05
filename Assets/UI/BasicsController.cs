@@ -14,6 +14,18 @@ public class BasicsController : MonoBehaviour {
 
     // DROPDOWNS
 
+    public void Initialize_Examples(List<string> examples) {
+        dropdown.options.Clear();
+        foreach (string c in examples) {
+            dropdown.options.Add(new Dropdown.OptionData(c));
+        }
+    }
+
+    public void OnValueChanged_Examples() {
+        GameObject.Find("Core").GetComponent<Core>().OnExample(dropdown.value);
+    }
+
+
     public void Initialize_StemColors(List<string> stemColors) {
         dropdown.options.Clear();
         foreach (string c in stemColors) {
@@ -24,6 +36,7 @@ public class BasicsController : MonoBehaviour {
     public void OnValueChanged_StemColor() {
         GameObject.Find("Core").GetComponent<Core>().OnStemColor(dropdown.value);
     }
+
 
 
     public void Initialize_LeafColors(List<string> leafColors) {
