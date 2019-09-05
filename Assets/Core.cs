@@ -221,7 +221,7 @@ public class Core : MonoBehaviour, GrowerListener {
         geometryProperties.CurrentLeafColorStringsIndex = 3;
 
         geometryProperties.LeafTypeStrings = Leaf.LeafTypeStrings;
-        geometryProperties.CurrentLeafTypeStringsIndex = 1;
+        geometryProperties.CurrentLeafTypeStringsIndex = 2;
 
 
         tree = new Tree(geometryProperties);
@@ -877,7 +877,7 @@ public class Core : MonoBehaviour, GrowerListener {
     //#######################################################################################
 
     public void OnLeafType(int value) {
-        if (value == 3) {
+        if (value == 3 || value == 4) {
             SetMessage("Put a texture with the filename \"custom_texture.png\" in the same folder as the application runs and you are good to go :)\n(stem texture on the left, leaf texture on the right)");
         }
         geometryProperties.UpdateLeafType(value);
@@ -896,7 +896,7 @@ public class Core : MonoBehaviour, GrowerListener {
     }
 
     public string GetTexture() {
-        if (geometryProperties.GetLeafType() == Leaf.LeafType.Square) {
+        if (geometryProperties.GetLeafType() == Leaf.LeafType.Square || geometryProperties.GetLeafType() == Leaf.LeafType.CustomCrossFoil) {
             return Leaf.LeafTypeToFilename[geometryProperties.GetLeafType()];
         } else {
             return Leaf.LeafTypeToFilename[geometryProperties.GetLeafType()] + "/" + geometryProperties.StemColorStrings[geometryProperties.CurrentStemColorStringsIndex] + "_" + geometryProperties.LeafColorStrings[geometryProperties.CurrentLeafColorStringsIndex];
@@ -1090,7 +1090,7 @@ public class Core : MonoBehaviour, GrowerListener {
 
         //Important: make sure that the textures have "Alpha is Transparency" checked, otherwise there are black borders
         //string textureFilename = geometryProperties.StemColorStrings[geometryProperties.CurrentStemColorStringsIndex] + "_" + geometryProperties.LeafColorStrings[geometryProperties.CurrentLeafColorStringsIndex] + "_" + Leaf.LeafTypeToFilename[geometryProperties.GetLeafType()] + ".png";
-        if (geometryProperties.GetLeafType() != Leaf.LeafType.Square) {
+        if (geometryProperties.GetLeafType() != Leaf.LeafType.Square && geometryProperties.GetLeafType() != Leaf.LeafType.CustomCrossFoil) {
             string textureFilename = GetTexture().Replace("/", "_") + ".png";
             byte[] texture_bytes = DuplicateTexture(Resources.Load(GetTexture()) as Texture2D).EncodeToPNG();
             File.WriteAllBytes(textureFilename, texture_bytes);
