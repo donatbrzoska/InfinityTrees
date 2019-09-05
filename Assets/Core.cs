@@ -878,7 +878,7 @@ public class Core : MonoBehaviour, GrowerListener {
 
     public void OnLeafType(int value) {
         if (value == 3 || value == 4) {
-            SetMessage("Put a texture with the filename \"custom_texture.png\" in the same folder as the application runs and you are good to go :)\n(stem texture on the left, leaf texture on the right)");
+            SetMessage("Put a texture with the filename \"custom_texture.png\" in the same folder as the application runs and you are good to go :)\n(stem texture on the left, leaf texture on the right)", 9000);
         }
         geometryProperties.UpdateLeafType(value);
 
