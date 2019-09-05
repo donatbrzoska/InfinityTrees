@@ -69,6 +69,16 @@ public class Core : MonoBehaviour, GrowerListener {
 
 
 
+        //LoadTestGrowth();
+        //LoadTestGrowthGeometry();
+
+        //LoadBigGrowth();
+        //LoadBigGrowthGeometry();
+
+        LoadBigGrowth2();
+        LoadBigGrowthGeometry();
+
+
 
 
 
@@ -113,9 +123,6 @@ public class Core : MonoBehaviour, GrowerListener {
 
         //LoadMediumBigGrowth();
         //LoadDefaultGeometry();
-
-        //LoadBigGrowth();
-        //LoadBigGrowthGeometry();
 
 
 
@@ -163,6 +170,7 @@ public class Core : MonoBehaviour, GrowerListener {
         growthProperties.GnarlyBranchesRatio = 0.8f;
 
 
+
         ////working parameters, min and max values are fine but in between the branch density in the beginning gets pretty big
         ////.. also doesn't solve the "problem", that the density doesnt stay the same when changin the GnarlyBranchesRatio
         //growthProperties.GnarlyBranches_min_dc_min = 0.05f;
@@ -202,10 +210,10 @@ public class Core : MonoBehaviour, GrowerListener {
         geometryProperties.MaxTwigRadiusForLeaves = 0.009f;
         geometryProperties.SetLeafSize(Leaf.LeafType.Triangle, 0.4f);
         geometryProperties.SetLeafSize(Leaf.LeafType.ParticleSquare, 1f);
-        geometryProperties.SetLeafSize(Leaf.LeafType.ParticleCrossFoil, 0.5f);
+        geometryProperties.SetLeafSize(Leaf.LeafType.ParticleCrossFoil, 0.7f);
         geometryProperties.SetDisplayedLeavesPerNode(Leaf.LeafType.Triangle, 2f);
         geometryProperties.SetDisplayedLeavesPerNode(Leaf.LeafType.ParticleSquare, 0.5f);
-        geometryProperties.SetDisplayedLeavesPerNode(Leaf.LeafType.ParticleCrossFoil, 1f);
+        geometryProperties.SetDisplayedLeavesPerNode(Leaf.LeafType.ParticleCrossFoil, 0.7f);
         geometryProperties.DisplayedLeafesPerNodeMaximum = 3;
         //geometryProperties.SetLeafSize(0.5f);
         geometryProperties.SetLeafType(Leaf.LeafType.ParticleCrossFoil);
@@ -246,7 +254,7 @@ public class Core : MonoBehaviour, GrowerListener {
 
 
     void LoadExcurrentGrowth() {
-        growthProperties.AttractionPoints = new PseudoEllipsoid(3, 10, 3.2f, 30, 0.5f, 0);
+        growthProperties.AttractionPoints = new PseudoEllipsoid(3, 15, 3.2f, 30, 0.6f, 0);
         growthProperties.GnarlyBranchesRatio = 0.5f;
 
         growthProperties.BranchDensityBegin = 0.4f;
@@ -261,7 +269,8 @@ public class Core : MonoBehaviour, GrowerListener {
     void LoadExcurrentGeometry() {
         geometryProperties.CurrentStemColorStringsIndex = 0;
         geometryProperties.CurrentLeafColorStringsIndex = 6;
-        geometryProperties.SetDisplayedLeavesPerNode(Leaf.LeafType.ParticleCrossFoil, 0.8f);
+        geometryProperties.SetDisplayedLeavesPerNode(Leaf.LeafType.ParticleCrossFoil, 0.7f);
+        geometryProperties.SetLeafSize(Leaf.LeafType.ParticleCrossFoil, 0.85f);
     }
 
 
@@ -318,11 +327,15 @@ public class Core : MonoBehaviour, GrowerListener {
     void LoadYoungGeometry() {
         geometryProperties.CurrentStemColorStringsIndex = 3;
         geometryProperties.CurrentLeafColorStringsIndex = 2;
+        geometryProperties.StemThickness = 0.65f;
+        //geometryProperties.SetLeafSize(Leaf.LeafType.ParticleCrossFoil, 0.5f);
+        //geometryProperties.SetDisplayedLeavesPerNode(Leaf.LeafType.ParticleCrossFoil, 1f);
     }
 
 
     void LoadDecurrentNewSeedGrowth() {
-        growthProperties.GnarlyBranchesRatio = 0.5f;
+        growthProperties.BranchDensityBegin = 0.1f;
+        growthProperties.GnarlyBranchesRatio = 0.8f;
     }
 
     void LoadDecurrentNewSeedGeometry() {
@@ -395,26 +408,23 @@ public class Core : MonoBehaviour, GrowerListener {
 
 
 
-    //void LoadEarlyBorderGrowth() {
-    //    GrowthProperties growthProperties = growthProperties;
+    void LoadTestGrowth() {
+        growthProperties.AttractionPoints = new PseudoEllipsoid(6, 6, 6, 15, 0.15f, 0.05f);
+        growthProperties.GnarlyBranchesRatio = 1;
+        debug(growthProperties.AttractionPoints.Points.Length + " attraction points");
+        debug(growthProperties.AttractionPoints.Density + " density");
 
-    //    growthProperties.AttractionPoints = new PseudoEllipsoid(new Vector3(0, 0f, 0), 3, 5, 5, 30, 0.15f, 0.05f));
-    //    growthProperties.GnarlyBranchesRatio = 0.2f;
-    //    growthProperties.StemLength = 0;
-    //}
-
-
-
-
-    void LoadMediumBigGrowth() {
-        growthProperties.AttractionPoints = new PseudoEllipsoid(10, 10, 10, 30, 0.15f, 0.05f);
-
-        growthProperties.Iterations = 35;
+        growthProperties.Iterations = 40;
     }
+
+    void LoadTestGrowthGeometry() {
+        geometryProperties.SetDisplayedLeavesPerNode(Leaf.LeafType.ParticleCrossFoil, 0);
+    }
+
 
     void LoadBigGrowth() {
         growthProperties.AttractionPoints = new PseudoEllipsoid(10, 10, 10, 15, 0.15f, 0.05f);
-        growthProperties.GnarlyBranchesRatio = 0.16666f;
+        growthProperties.GnarlyBranchesRatio = 1;
         debug(growthProperties.AttractionPoints.Points.Length + " attraction points");
         debug(growthProperties.AttractionPoints.Density + " density");
 
@@ -426,57 +436,22 @@ public class Core : MonoBehaviour, GrowerListener {
     }
 
 
+    void LoadBigGrowth2() {
+        growthProperties.AttractionPoints = new PseudoEllipsoid(10, 10, 10, 15, 0.15f, 0.05f);
+        growthProperties.CrownStemLengthRatio = 0.15f;
+        growthProperties.BranchDensityBegin = 0.1f;
+        growthProperties.GnarlyBranchesRatio = 1;
+        debug(growthProperties.AttractionPoints.Points.Length + " attraction points");
+        debug(growthProperties.AttractionPoints.Density + " density");
 
-
-    void LoadPendulousGeometry() {
-        geometryProperties.PendulousBranchesIntensity = 0.5f;
+        growthProperties.Iterations = 50;
     }
 
-    void LoadBaobabGrowth() {
-        growthProperties.AttractionPoints = new PseudoEllipsoid(5, 3, 5, 30, 0.5f, 0.0f);
-
-        growthProperties.StemLength = 6;
+    void LoadBigGrowthGeometry2() {
+        geometryProperties.CircleResolution = 7;
+        geometryProperties.SetDisplayedLeavesPerNode(Leaf.LeafType.ParticleCrossFoil, 0);
     }
 
-    void LoadExtremelyDetailedGeometry() {
-        geometryProperties.CircleResolution = 50;
-        geometryProperties.SetDisplayedLeavesPerNode(Leaf.LeafType.ParticleCrossFoil, 3);
-    }
-
-    //void LoadBush2Growth() {
-    //    PseudoEllipsoid attractionPoints = new PseudoEllipsoid(new Vector3(0, 0f, 0), 7, 4, 7f, 15, 0.15f, 0.05f);
-
-
-    //    GrowthProperties growthProperties = new GrowthProperties();
-    //    growthProperties.SetInfluenceDistance(1f);
-    //    growthProperties.SetPerceptionAngle(160);
-    //    growthProperties.SetMinClearDistanceRatio(0.1f);
-    //    growthProperties.SetMaxClearDistanceRatio(0.95f);
-    //    growthProperties.SetBranchDensityBegin(0f);
-    //    growthProperties.SetBranchDensityEnd(0.8f);
-    //    growthProperties.SetClearDistanceBegin_clearDistanceEnd_Ratio(0.5f);
-    //    growthProperties.SetTropisms(new Vector3(0f, 1f, 0));
-    //    growthProperties.SetTropismsWeights(new Vector3(1, 0.3f, 1)); //adjusted by hand
-    //    growthProperties.UpTropismsDampRatio = 0.36f;
-    //    growthProperties.UpTropismsWhenDamped = 0.3f;
-    //    growthProperties.SetPendulousBranchesIntensity(0);
-
-    //    growthProperties.UpTropismWeight_min = 0;
-    //    growthProperties.UpTropismWeight_max = 5;
-    //    growthProperties.UpTropismWeightRatio = 0.2f;
-
-    //    growthProperties.StemLength = 0f;
-    //    growthProperties.StemAngleRange = 2;
-    //    growthProperties.CrownStemLengthRatio = 0f;
-
-    //    growthProperties.SetGrowthDistance(0.25f);
-    //    growthProperties.SetLeavesPerNode(10);
-    //    growthProperties.AttractionPoints = attractionPoints);
-    //    growthProperties.Iterations = 30);
-
-
-    //    grower = new SpaceColonization(growthProperties, this);
-    //}
 
     private void InitializeUI() {
         GameObject.Find("Initial Stem Length Slider").GetComponent<Slider>().SetValueWithoutNotify(growthProperties.StemLength);
@@ -908,89 +883,6 @@ public class Core : MonoBehaviour, GrowerListener {
         grower.Grow(tree);
     }
 
-
-    //public void OnGnarlyness(float value) {
-    //    grower.Stop();
-
-    //    //growthProperties.Gnarlyness = value;
-
-    //    growthProperties.AttractionPoints.Reset();
-
-    //    tree.Reset();
-
-    //    grower.Grow(tree);
-    //}
-
-
-    // SPACE COLONIZATION
-
-    //public void OnDensity(float value) {
-    //    cameraMode = CameraMode.AttractionPoints;
-
-    //    grower.Stop();
-
-    //    growthProperties.AttractionPoints.UpdateDensity(value);
-    //    pointCloudReady = true;
-
-    //    tree.Reset();
-
-    //    grower.Grow(tree);
-    //}
-
-    //public void OnClearDistanceBegin(float value) {
-    //    grower.Stop();
-
-    //    growthProperties.SetClearDistanceBegin(value);
-    //    growthProperties.AttractionPoints.Reset();
-
-    //    tree.Reset();
-
-    //    grower.Grow(tree);
-    //}
-
-    //public void OnClearDistanceEnd(float value) {
-    //    grower.Stop();
-
-    //    growthProperties.SetClearDistanceEnd(value);
-    //    growthProperties.AttractionPoints.Reset();
-
-    //    tree.Reset();
-
-    //    grower.Grow(tree);
-    //}
-
-    //public void OnInfluenceDistance(float value) {
-    //    grower.Stop();
-
-    //    growthProperties.SetInfluenceDistance(value);
-    //    growthProperties.AttractionPoints.Reset();
-
-    //    tree.Reset();
-
-    //    grower.Grow(tree);
-    //}
-
-    //public void OnGrowthDistance(float value) {
-    //    grower.Stop();
-
-    //    growthProperties.SetGrowthDistance(value);
-    //    growthProperties.AttractionPoints.Reset();
-
-    //    tree.Reset();
-
-    //    grower.Grow(tree);
-    //}
-
-    //public void OnPerceptionAngle(float value) {
-    //    grower.Stop();
-
-    //    growthProperties.SetPerceptionAngle(value);
-    //    growthProperties.AttractionPoints.Reset();
-
-    //    tree.Reset();
-
-    //    grower.Grow(tree);
-    //}
 
     //#######################################################################################
     //##########                           STEM AND LEAVES                         ##########

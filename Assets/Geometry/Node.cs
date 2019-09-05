@@ -55,9 +55,9 @@ public class Node : IEquatable<Node> {
                 Normal = Vector3.up;
             } else if (Subnodes.Count == 1) { //one subnode
                 //point to subnode
-                Normal = Subnodes[0].Position - Position; //vector from this to subnode
+                //Normal = Subnodes[0].Position - Position; //vector from this to subnode
 
-                //normal = Vector3.up;
+                Normal = Vector3.up;
             } else { //many subnodes
                 Normal = Vector3.zero;
                 foreach (Node subnode in Subnodes) {

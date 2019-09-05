@@ -21,10 +21,11 @@ public class SpaceColonization {
         }
     }
 
-    bool optimizedDeletion = true;
-    bool attractionPointNarrowing = true;
+    bool optimizedDeletion = true; //shortcut: d
+    bool attractionPointNarrowing = true; //shortcut: n
 
-    NearestNodeAlgorithm nearestNodeAlgorithm;
+    NearestNodeAlgorithm growthNNA;
+    NearestNodeAlgorithm deletionNNA;
     //VoxelGridAlgorithm nearestNodeAlgorithm;
 
     // used by Core -> CameraMovement
@@ -102,10 +103,10 @@ public class SpaceColonization {
     public void Grow(Tree tree) {
         ResetBounds();
 
-        //nearestNodeAlgorithm = new StandardAlgorithm(growthProperties.GetInfluenceDistance(), growthProperties.GetPerceptionAngle());
-        //nearestNodeAlgorithm = new SquaredDistanceAlgorithm(growthProperties.GetSquaredInfluenceDistance(), growthProperties.GetPerceptionAngle());
-        //nearestNodeAlgorithm = new BinarySearchAlgorithm(growthProperties.GetSquaredInfluenceDistance(), growthProperties.GetPerceptionAngle()); //little bug somewhere
-        nearestNodeAlgorithm = new VoxelGridAlgorithm(GrowthProperties.AttractionPoints, GrowthProperties.GetSquaredInfluenceDistance(), GrowthProperties.PerceptionAngle);
+        //growthNNA = new StandardAlgorithm(GrowthProperties.GetInfluenceDistance(), GrowthProperties.PerceptionAngle); //shortcut: 0
+        //growthNNA = new SquaredDistanceAlgorithm(GrowthProperties.GetSquaredInfluenceDistance(), GrowthProperties.PerceptionAngle); //shortcut: 1
+        //growthNNA = new BinarySearchAlgorithm(GrowthProperties.GetSquaredInfluenceDistance(), GrowthProperties.PerceptionAngle); //shortcut: 2
+        growthNNA = new VoxelGridAlgorithm(GrowthProperties.AttractionPoints, GrowthProperties.GetSquaredInfluenceDistance(), GrowthProperties.PerceptionAngle); //shortcut: 3
 
         //if (growerThread == null) {
         growerThread = new Thread(() => {
@@ -174,7 +175,7 @@ public class SpaceColonization {
             node = node.Add(node.Position + direction * growthDistance);
 
             if (addToNearestNodeAlgorithmAndBounds) {
-                nearestNodeAlgorithm.Add(node);
+                growthNNA.Add(node);
                 if (attractionPointNarrowing) {
                     UpdateBoundStorage(node.Position);
                 }
@@ -188,7 +189,7 @@ public class SpaceColonization {
         crownRoot = tree.StemRoot;
         crownRoot = ProceduralStem(tree, crownRoot, GrowthProperties.StemLength, false);
 
-        nearestNodeAlgorithm.Add(crownRoot);
+        growthNNA.Add(crownRoot);
         GrowthProperties.AttractionPoints.UpdatePosition(crownRoot.Position);
         growerListener.OnIterationFinished();
     }
@@ -209,15 +210,16 @@ public class SpaceColonization {
         Stopwatch removeClosePointsStopwatch = new Stopwatch();
 
 
+
         for (int i = 0; i < GrowthProperties.Iterations; i++) {
 
             if (!running) {
                 return;
             }
 
-            float influenceDistance = GrowthProperties.GetInfluenceDistance();
-            float squaredClearDistance = GrowthProperties.GetSquaredClearDistance(i);
 
+
+            float influenceDistance = GrowthProperties.GetInfluenceDistance();
             Dictionary<Node, List<Vector3>> nodes_to_attractionPoints = new Dictionary<Node, List<Vector3>>();
 
             //iterate through all attractionPoints
@@ -237,27 +239,31 @@ public class SpaceColonization {
                         }
                     }
 
+
+
+
+                    if (optimizedDeletion && i>0) {
+                        removeClosePointsStopwatch.Start();
+                        Node deletionClosest = deletionNNA.GetNearest(attractionPoint);
+                        if (deletionClosest != null) {
+                            GrowthProperties.AttractionPoints.Deactivate(j);
+                            removeClosePointsStopwatch.Stop();
+                            continue;
+                        } else {
+                            removeClosePointsStopwatch.Stop();
+                        }
+                    }
+
+
+
+
                     //and find the closest Node respectively
                     findClosePointStopwatch.Start();
-                    Node closest = nearestNodeAlgorithm.GetNearest(attractionPoint);
+                    Node closest = growthNNA.GetNearest(attractionPoint);
                     findClosePointStopwatch.Stop();
 
                     //if there is a close Node
                     if (closest != null) {
-                        if (optimizedDeletion) {
-                            // Rudis ultimate plan to make the removal in the next iteration
-                            removeClosePointsStopwatch.Start();
-                            if (i > 0) { //in the first iteration, the attraction points shall not get deleted
-                                if (Util.SquaredDistance(attractionPoint, closest.Position) <= squaredClearDistance) {
-                                    GrowthProperties.AttractionPoints.Deactivate(j);
-                                    removeClosePointsStopwatch.Stop();
-                                    continue;
-                                } else {
-                                    removeClosePointsStopwatch.Stop();
-                                }
-                            }
-                        }
-
                         //add it to the nodesAttractionPoints
                         if (nodes_to_attractionPoints.ContainsKey(closest)) {
                             nodes_to_attractionPoints[closest].Add(attractionPoint);
@@ -268,18 +274,26 @@ public class SpaceColonization {
                 }
             }
 
+
+
+            // the node deletion algorithm has to be created here, because in the optimized case, it is needed at the beginning of the next iteration
+            float squaredClearDistance = GrowthProperties.GetSquaredClearDistance(i);
+            //deletionNNA = new StandardAlgorithm((float)Math.Sqrt(squaredClearDistance), 360);
+            //deletionNNA = new SquaredDistanceAlgorithm(squaredClearDistance, 360);
+            //deletionNNA = new BinarySearchAlgorithm(squaredClearDistance, 360);
+            deletionNNA = new VoxelGridAlgorithm(GrowthProperties.AttractionPoints, squaredClearDistance, 360);
+            if (i == 0) { // crownRoot is no new node in the context of node creation, therefore needs to be added here
+                deletionNNA.Add(crownRoot);
+            }
+
+
+
             if (!running) {
                 return;
             }
 
             int n_newNodes = 0;
 
-            //only used for demonstration purposes of the optimization
-            NearestNodeAlgorithm nodeDeletionAlgorithm = new VoxelGridAlgorithm(GrowthProperties.AttractionPoints, squaredClearDistance, 720);
-            //NearestNodeAlgorithm nodeDeletionAlgorithm = new BinarySearchAlgorithm(squaredClearDistance, 360);
-            if (i == 0) {
-                nodeDeletionAlgorithm.Add(crownRoot);
-            }
 
             //iterate through all Nodes with attractionPoints associated
             foreach (Node currentNode in nodes_to_attractionPoints.Keys) {
@@ -312,11 +326,8 @@ public class SpaceColonization {
                     n_nodes++;
 
                     //add to the nodeList
-                    nearestNodeAlgorithm.Add(newNode);
-
-                    if (!optimizedDeletion) {
-                        nodeDeletionAlgorithm.Add(newNode);
-                    }
+                    growthNNA.Add(newNode);
+                    deletionNNA.Add(newNode);
 
                     if (attractionPointNarrowing) {
                         UpdateBoundStorage(happyNodePosition);
@@ -326,7 +337,7 @@ public class SpaceColonization {
 
             if (!optimizedDeletion) {
                 removeClosePointsStopwatch.Start();
-                RemoveClosePoints(nodeDeletionAlgorithm, squaredClearDistance);
+                RemoveClosePoints(deletionNNA);
                 removeClosePointsStopwatch.Stop();
             }
 
@@ -347,21 +358,15 @@ public class SpaceColonization {
         running = false;
     }
 
-    private void RemoveClosePoints(NearestNodeAlgorithm nodeDeletionAlgorithm, float squaredClearDistance) {
+    private void RemoveClosePoints(NearestNodeAlgorithm nodeDeletionAlgorithm) {
         for (int i = 0; i < GrowthProperties.AttractionPoints.Points.Length; i++) { //look at all attraction points
             if (GrowthProperties.AttractionPoints.IsActive(i)) { // that are active
                 Vector3 attractionPoint = GrowthProperties.AttractionPoints.Points[i];
                 Node nearest = nodeDeletionAlgorithm.GetNearest(attractionPoint);
 
-                if (nearest != null && Util.SquaredDistance(nearest.Position, attractionPoint) <= squaredClearDistance) { // and have a nearest node
+                if (nearest != null) { // and have a nearest node
                     GrowthProperties.AttractionPoints.Deactivate(i);
                 }
-                //if (nodeDeletionAlgorithm.GetNearest(GrowthProperties.AttractionPoints.Points[i]) != null) { // and have a nearest node
-                //    if (nearestNodeAlgorithm.GetNearest(GrowthProperties.AttractionPoints.Points[i]) != null) { // and have a nearest node
-                //        GrowthProperties.AttractionPoints.ActivePoints[i] = false;
-                //        GrowthProperties.AttractionPoints.ActiveCount--;
-                //    }
-                //}
             }
         }
     }
