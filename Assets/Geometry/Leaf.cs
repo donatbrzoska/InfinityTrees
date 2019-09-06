@@ -89,6 +89,12 @@ public class Leaf {
 
         if (geometryProperties.GetLeafType() == LeafType.Square) {
 
+            //Quaternion y_rotation = Quaternion.AngleAxis(Util.RandomInRange(0, 360), Vector3.up);
+            //Quaternion x_z_rotation = Quaternion.AngleAxis(Util.RandomInRange(0, 90), Vector3.right * Util.RandomWithStdDev(0, 1) + Vector3.forward * Util.RandomWithStdDev(0, 1));
+            ////Quaternion x_z_rotation = Quaternion.AngleAxis(Util.RandomInRange(0, 90), Vector3.right * Util.RandomInRange(-1, 1) + Vector3.forward * Util.RandomInRange(-1, 1));
+            //Quaternion rotation = y_rotation * x_z_rotation;
+
+
 			//top side of leaf
 			verticesResult.Add(rotation * new Vector3(-0.5f, 0, 0) * size + position);
             verticesResult.Add(rotation * new Vector3(-0.5f, 0, 1) * size + position);

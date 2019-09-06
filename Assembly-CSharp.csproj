@@ -89,22 +89,22 @@
     <Compile Include="Assets\UI\TreeRenderer.cs" />
     <Compile Include="Assets\Util.cs" />
     <Reference Include="Unity.Timeline.Editor">
-      <HintPath>/Users/donatdeva/Documents/Studium/6. Semester/Bachelorarbeit/Unity/InfinityTrees/Library/ScriptAssemblies/Unity.Timeline.Editor.dll</HintPath>
+      <HintPath>/Users/donatdeva/Appspace/workspace/Unity/InfinityTrees/Library/ScriptAssemblies/Unity.Timeline.Editor.dll</HintPath>
     </Reference>
     <Reference Include="Unity.TextMeshPro.Editor">
-      <HintPath>/Users/donatdeva/Documents/Studium/6. Semester/Bachelorarbeit/Unity/InfinityTrees/Library/ScriptAssemblies/Unity.TextMeshPro.Editor.dll</HintPath>
+      <HintPath>/Users/donatdeva/Appspace/workspace/Unity/InfinityTrees/Library/ScriptAssemblies/Unity.TextMeshPro.Editor.dll</HintPath>
     </Reference>
     <Reference Include="Unity.Timeline">
-      <HintPath>/Users/donatdeva/Documents/Studium/6. Semester/Bachelorarbeit/Unity/InfinityTrees/Library/ScriptAssemblies/Unity.Timeline.dll</HintPath>
+      <HintPath>/Users/donatdeva/Appspace/workspace/Unity/InfinityTrees/Library/ScriptAssemblies/Unity.Timeline.dll</HintPath>
     </Reference>
     <Reference Include="Unity.CollabProxy.Editor">
-      <HintPath>/Users/donatdeva/Documents/Studium/6. Semester/Bachelorarbeit/Unity/InfinityTrees/Library/ScriptAssemblies/Unity.CollabProxy.Editor.dll</HintPath>
+      <HintPath>/Users/donatdeva/Appspace/workspace/Unity/InfinityTrees/Library/ScriptAssemblies/Unity.CollabProxy.Editor.dll</HintPath>
     </Reference>
     <Reference Include="Unity.TextMeshPro">
-      <HintPath>/Users/donatdeva/Documents/Studium/6. Semester/Bachelorarbeit/Unity/InfinityTrees/Library/ScriptAssemblies/Unity.TextMeshPro.dll</HintPath>
+      <HintPath>/Users/donatdeva/Appspace/workspace/Unity/InfinityTrees/Library/ScriptAssemblies/Unity.TextMeshPro.dll</HintPath>
     </Reference>
     <Reference Include="Unity.Analytics.DataPrivacy">
-      <HintPath>/Users/donatdeva/Documents/Studium/6. Semester/Bachelorarbeit/Unity/InfinityTrees/Library/ScriptAssemblies/Unity.Analytics.DataPrivacy.dll</HintPath>
+      <HintPath>/Users/donatdeva/Appspace/workspace/Unity/InfinityTrees/Library/ScriptAssemblies/Unity.Analytics.DataPrivacy.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.AIModule">
       <HintPath>/Applications/Unity/Hub/Editor/2019.1.10f1/Unity.app/Contents/Managed/UnityEngine/UnityEngine.AIModule.dll</HintPath>
@@ -290,13 +290,13 @@
       <HintPath>/Applications/Unity/Hub/Editor/2019.1.10f1/Unity.app/Contents/UnityExtensions/Unity/TestRunner/net35/unity-custom/nunit.framework.dll</HintPath>
     </Reference>
     <Reference Include="Unity.Analytics.Tracker">
-      <HintPath>/Users/donatdeva/Documents/Studium/6. Semester/Bachelorarbeit/Unity/InfinityTrees/Library/PackageCache/com.unity.analytics@3.3.2/Unity.Analytics.Tracker.dll</HintPath>
+      <HintPath>/Users/donatdeva/Appspace/workspace/Unity/InfinityTrees/Library/PackageCache/com.unity.analytics@3.3.2/Unity.Analytics.Tracker.dll</HintPath>
     </Reference>
     <Reference Include="Unity.Analytics.Editor">
-      <HintPath>/Users/donatdeva/Documents/Studium/6. Semester/Bachelorarbeit/Unity/InfinityTrees/Library/PackageCache/com.unity.analytics@3.3.2/Unity.Analytics.Editor.dll</HintPath>
+      <HintPath>/Users/donatdeva/Appspace/workspace/Unity/InfinityTrees/Library/PackageCache/com.unity.analytics@3.3.2/Unity.Analytics.Editor.dll</HintPath>
     </Reference>
     <Reference Include="Unity.Analytics.StandardEvents">
-      <HintPath>/Users/donatdeva/Documents/Studium/6. Semester/Bachelorarbeit/Unity/InfinityTrees/Library/PackageCache/com.unity.analytics@3.3.2/Unity.Analytics.StandardEvents.dll</HintPath>
+      <HintPath>/Users/donatdeva/Appspace/workspace/Unity/InfinityTrees/Library/PackageCache/com.unity.analytics@3.3.2/Unity.Analytics.StandardEvents.dll</HintPath>
     </Reference>
     <Reference Include="netstandard">
       <HintPath>/Applications/Unity/Hub/Editor/2019.1.10f1/Unity.app/Contents/NetStandard/ref/2.0.0/netstandard.dll</HintPath>
