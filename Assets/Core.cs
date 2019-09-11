@@ -210,7 +210,8 @@ public class Core : MonoBehaviour, GrowerListener {
         geometryProperties.MaxTwigRadiusForLeaves = 0.009f;
         geometryProperties.LeafSize = 0.7f;
         geometryProperties.DisplayedLeavesPerNode = 0.7f;
-        geometryProperties.DisplayedLeafesPerNodeMaximum = 4;
+        //geometryProperties.DisplayedLeafesPerNodeMaximum = 4;
+        geometryProperties.DisplayedLeafesPerNodeMaximum = 10;
         //geometryProperties.SetLeafSize(0.5f);
         geometryProperties.SetLeafType(Leaf.LeafType.ParticleCrossFoil);
 
@@ -838,6 +839,7 @@ public class Core : MonoBehaviour, GrowerListener {
 
 
     public void OnBranchDensityBegin(float value) {
+        SetMessage("");
         grower.Stop();
 
         growthProperties.BranchDensityBegin = value;
@@ -849,6 +851,7 @@ public class Core : MonoBehaviour, GrowerListener {
     }
 
     public void OnBranchDensityEnd(float value) {
+        SetMessage("");
         grower.Stop();
 
         growthProperties.BranchDensityEnd = value;
@@ -862,6 +865,7 @@ public class Core : MonoBehaviour, GrowerListener {
 
 
     public void OnGnarlyBranches(float value) {
+        SetMessage("");
         grower.Stop();
 
         growthProperties.GnarlyBranchesRatio = value;

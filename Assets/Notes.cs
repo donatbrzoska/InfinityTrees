@@ -1,4 +1,12 @@
-﻿/* BUGS
+﻿/*
+* Astordnungen für herunterhängende Äste
+* Texturlappen richtig ausrichten
+* mehr Blätter je Node erlauben
+* Random vom Main Thread wird noch irgendwo anders verwendet
+*/
+
+
+/* BUGS
  *
  * 
  * Twisting-Bug -> Frenet Frame?

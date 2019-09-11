@@ -18,6 +18,7 @@ public class Node : IEquatable<Node> {
             UnityEngine.Debug.Log("DEBUG: Node: " + callerName + "(): " + formatString);
         }
     }
+    private static System.Random random = new System.Random();
 
     private GeometryProperties geometryProperties;
 
@@ -202,7 +203,7 @@ public class Node : IEquatable<Node> {
                 leafPosition = Position;
             } else {
                 Vector3 d = Position - supernode.Position;
-                leafPosition = supernode.Position + Util.RandomInRange(0, 1) * d;
+                leafPosition = supernode.Position + Util.RandomInRange(0, 1, random) * d;
             }
             Leaves.Add(new Leaf(leafPosition, geometryProperties));
         }
@@ -268,7 +269,6 @@ public class Node : IEquatable<Node> {
         }
     }
 
-    private static System.Random random = new System.Random();
 
     public void GetLeafMesh(List<Vector3> verticesResult, List<Vector2> uvsResult, List<int> trianglesResult) {
         if (Radius < geometryProperties.MaxTwigRadiusForLeaves) {
@@ -276,7 +276,7 @@ public class Node : IEquatable<Node> {
             int n_leaves = (int)geometryProperties.DisplayedLeavesPerNode;
             float floatingRest = geometryProperties.DisplayedLeavesPerNode - n_leaves;
 
-            float r = (float)random.NextDouble();
+            float r = Util.RandomInRange(0,1);
             if (r <= floatingRest) {
                 n_leaves++;
             }

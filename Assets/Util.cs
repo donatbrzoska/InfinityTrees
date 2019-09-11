@@ -144,7 +144,6 @@ public static class Util {
             }
             currentTriangles.Add(localTriangleIndizes.x);
 
-
             if (!globalVerticesIndizes_to_localVerticesIndizes.ContainsKey(globalTriangleIndizes.y)) {
                 currentVertices.Add(vertices[globalTriangleIndizes.y]);
                 currentNormals.Add(normals[globalTriangleIndizes.y]);
