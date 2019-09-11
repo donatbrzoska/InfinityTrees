@@ -596,7 +596,7 @@ public class Core : MonoBehaviour, GrowerListener {
         if (growthProperties.AttractionPoints.ActiveCount > 0.75*growthProperties.AttractionPoints.Points.Length) {
             SetMessage("You discovered some unfortunate randomness, try a different seed");
         } else {
-            SetMessage("Growth stopped unexpectedly, try defining wider crown shape bounds or use less iterations (Age Slider)");
+            SetMessage("Growth stopped unexpectedly, try defining wider crown shape bounds or use less iterations (Growth Iterations Slider)");
         }
     }
 
